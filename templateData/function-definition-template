@@ -1,0 +1,24 @@
+{
+  "name": "$$FUNCTION_NAME$$",
+  "description": "",
+  "version": "1.0.0",
+  "pathMap": "",
+  "allowedMethods": "GET",
+  "logLevel": "Debug",
+  "sessionRequired": false,
+  "userRequired": false,
+  "schemas": {
+  },
+  "parameters": [
+  ],
+  "returns": {
+    "200": {
+      "type": "empty",
+      "description": "successful response."
+    },
+    "500": {
+      "type": "string",
+      "description": "Error details"
+    }
+  }
+}

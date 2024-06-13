@@ -1,0 +1,11 @@
+
+import Tap from "tap"
+function test(t:any) {
+    t.ok(true, 'Sanity test passes')
+
+    t.end()
+
+}
+Tap.test('First function Test', t => {
+    test(t)
+})

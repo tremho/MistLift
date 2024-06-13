@@ -1,0 +1,14 @@
+
+import {start} from "./main"
+import fs from "fs";
+
+async function run() {
+    const name = process.argv[2] ?? "request.json"
+    const path = `lambda/$$FUNCTION_NAME$$/${name}`;
+
+    console.log("Local run with request "+path)
+    const requestContext = JSON.parse(fs.readFileSync(path).toString())
+    const event = { requestContext }
+    console.log(await start(event, null, (ret:any) => { return ret; }));
+}
+run();
