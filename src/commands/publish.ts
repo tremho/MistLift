@@ -17,6 +17,8 @@ import {
     CreateStageCommand, CreateDeploymentCommand, GetDeploymentsCommand, GetDeploymentCommand
 } from "@aws-sdk/client-api-gateway";
 
+import {getAWSCredentials} from "../lib/LiftConfig";
+
 import {doDeployAsync} from "./deploy";
 import * as ac from "ansi-colors"
 
@@ -30,6 +32,8 @@ import {gatherFunctionDefinitions} from "../lib/openAPI/ApiBuildCollector";
 import {delay} from "../lib/utils";
 import {addBuiltInDefinitions, MakeBuiltinApiDoc, MakePublicApiDoc} from "./builtin/ApiDocMaker";
 import {DeployApiBuiltin, DeployRootFileserves, DeployWebrootBuiltIn} from "./builtin/BuiltInHandler";
+import {getProjectName, getProjectVersion} from "../lib/LiftVersion";
+import md5 from 'md5';
 
 let projectPaths:any;
 
@@ -69,12 +73,12 @@ async function publishApi(stageName:string)
     const appPrefix = 'MistLift';
     try {
         tmpDir = path.join(os.tmpdir(), appPrefix);
-        console.log("making "+tmpDir)
+        // console.log("making "+tmpDir)
         mkdirSync(tmpDir, {recursive:true});
 
         const yamlFile = path.join(tmpDir, 'papi.yaml')
         await MakeBuiltinApiDoc(yamlFile);
-        console.log("reading "+yamlFile)
+        // console.log("reading "+yamlFile)
         apiBytes = fs.readFileSync(yamlFile)
     }
     catch (e:any) {
@@ -84,7 +88,7 @@ async function publishApi(stageName:string)
     finally {
         try {
             if (tmpDir) {
-                console.log("Removing "+tmpDir)
+                // console.log("Removing "+tmpDir)
                 fs.rmSync(tmpDir, { recursive: true });
             }
         }
@@ -93,7 +97,7 @@ async function publishApi(stageName:string)
         }
     }
 
-    const client = new APIGatewayClient({});
+    const client = new APIGatewayClient(getAWSCredentials());
 
     await RemoveExistingVersions(client)
 
@@ -118,7 +122,7 @@ async function publishApi(stageName:string)
         console.error(ac.bold.red(e.message));
     }
     var apidoc = new TextDecoder().decode(apiBytes);
-    console.log(apidoc)
+    // console.log(apidoc)
     if(!apiId) return;
 
     console.log(ac.grey("Continuing with binding..."))
@@ -126,6 +130,7 @@ async function publishApi(stageName:string)
     const intRequests = prereq.MakeRequests();
     await PutIntegrations(intRequests);
     await DeployApi(apiId, stageName);
+    // TODO: From a config source
     console.log(ac.green.bold(`\n Successfully deployed to https://${apiId}.execute-api.us-west-1.amazonaws.com/${stageName}`));
 }
 function findApiName()
@@ -197,17 +202,25 @@ class PrereqInfo {
     apis: any[] = [] // Resource + method
     defs: any[] = []
 
+    public constructor() {
+        this.functions = []
+        this.apis = []
+        this.defs = []
+    }
+
+
     public findApi(pathMap:string, allowedMethods:string):any
     {
         // find the pathmap in the apis list
+        // console.log("findApi "+pathMap, allowedMethods)
         // see that this method exists in method map
         for(let api of this.apis) {
             if (api?.path === pathMap) {
-                // ClogTrace("resourceMethods", api.resourceMethods)
+                // console.log("resourceMethods", api.resourceMethods)
                 const methodList = Object.getOwnPropertyNames(api.resourceMethods);
                 // ClogTrace("methodList", methodList)
                 for(let meth of allowedMethods.toUpperCase().split(',')) {
-                    // ClogTrace("meth", meth)
+                    // console.log("meth", meth)
                     if(methodList.indexOf(meth) !== -1) {
                         (api as any).method = meth
                         return api;
@@ -221,13 +234,17 @@ class PrereqInfo {
     public findARN(name:string):string
     {
         for(let f of this.functions ?? []) {
-            if(f.name.toLowerCase() === name.toLowerCase()) return f.arn;
+            let lastus = f.name.lastIndexOf('_');
+            const fname = f.name.substring(0, lastus);
+            if(fname.toLowerCase() === name.toLowerCase()) return f.arn;
         }
+        console.log("$$$ Couldn't find "+name+" in ", this.functions)
         return "";
     }
 
     public MakeRequests():PutIntegrationRequest[]
     {
+        // TODO: from a config source
         const region = "us-west-1"
         const out:PutIntegrationRequest[] = [];
         for(let d of this.defs) {
@@ -257,7 +274,8 @@ class PrereqInfo {
 
 async function PrequisiteValues(id:string):Promise<PrereqInfo>
 {
-    const out = await GetFunctionInfo(new PrereqInfo())
+    const pri = new PrereqInfo()
+    const out = await GetFunctionInfo(pri)
     out.defs = gatherFunctionDefinitions()
     addBuiltInDefinitions(out.defs)
     out.requestApiId = id;
@@ -268,15 +286,19 @@ async function PrequisiteValues(id:string):Promise<PrereqInfo>
 
 async function GetFunctionInfo(info:PrereqInfo):Promise<PrereqInfo>
 {
-    const client = new LambdaClient({});
+    const client = new LambdaClient(getAWSCredentials());
     const listCommand:any = new ListFunctionsCommand({})
     const response:any = await client.send(listCommand);
 
+    const sfx = "_"+md5((getProjectName()??"")+(getProjectVersion()??""))
+
     for(let func of response.Functions ?? []) {
-        info.functions.push({
-            name: func.FunctionName ?? "",
-            arn: func.FunctionArn ?? ""
-        })
+        if(func.FunctionName.endsWith(sfx)) {
+            info.functions.push({
+                name: func.FunctionName ?? "",
+                arn: func.FunctionArn ?? ""
+            })
+        }
     }
     return info;
 
@@ -284,11 +306,11 @@ async function GetFunctionInfo(info:PrereqInfo):Promise<PrereqInfo>
 
 async function GetMethodResources(id:string, info:PrereqInfo)
 {
-    const client = new APIGatewayClient({})
+    const client = new APIGatewayClient(getAWSCredentials())
     const listCommand = new GetResourcesCommand({
         restApiId: id
     });
-    const response = await client.send(listCommand);
+    const response:any|null = await client.send(listCommand);
     // ClogInfo("Resources response", response)
     if(response?.items) info.apis = response.items;
 
@@ -297,7 +319,7 @@ async function GetMethodResources(id:string, info:PrereqInfo)
 
 async function PutIntegrations(integrations:PutIntegrationRequest[])
 {
-    const client = new APIGatewayClient({})
+    const client = new APIGatewayClient(getAWSCredentials())
     for(let input of integrations) {
 
         try {
@@ -315,7 +337,7 @@ async function PutIntegrations(integrations:PutIntegrationRequest[])
 async function DeployApi(restApiId:string, stageName:string)
 {
     try {
-        const client = new APIGatewayClient({})
+        const client = new APIGatewayClient(getAWSCredentials())
         const command = new CreateDeploymentCommand({
             restApiId,
             stageName

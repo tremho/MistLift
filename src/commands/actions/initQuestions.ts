@@ -26,7 +26,7 @@ export async function interrogateUserForPackageJsonSettings(
     let description = pkgJson.description ?? ""
     let author = pkgJson.author ?? gitAuthor
     let copyright = pkgJson.copyright ?? defaultCopyright(author)
-    let spdx = pkgJson.license ?? "NO LICENSE"
+    let spdx = pkgJson.license ?? "MIT"
 
 
     let ok = false;

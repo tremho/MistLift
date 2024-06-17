@@ -53,10 +53,10 @@ export async function doInit(
         fs.copyFileSync(path.join(swaggerSrcDir, 'swagger-ui-standalone-preset.js'), path.join(webrootDocs, 'swagger-ui-standalone-preset.js'));
     }
 
-    interrogateUserForPackageJsonSettings(refPath)
-    addPackageScripts(refPath)
-    installDevPackage("@types/node")
-    installDevPackage("typescript")
-    installDevPackage("tap")
-    installPackage("@tremho/inverse-y")
+    await interrogateUserForPackageJsonSettings(refPath)
+    await addPackageScripts(refPath)
+    await installDevPackage(refPath,"@types/node")
+    await installDevPackage(refPath,"typescript")
+    await installDevPackage(refPath,"tap")
+    await installPackage(refPath,"@tremho/inverse-y")
 }

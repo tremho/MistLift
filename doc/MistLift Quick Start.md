@@ -90,14 +90,22 @@ type
 
 This actually creates a working Hello, World! example as a starting point.  We are almost done!  First, we need to attach this
 function to a route, and to do this, go to functions/HelloWorld/src
-and edit the file definitions.json
+and look at the file definitions.json
 
-Change the value of "pathMap" to "/helloworld" and save the file
+- this describes the function.
+- it will be accessed at the uri path /helloworld
+- it is a GET method function
+- it takes no parameters
+
+Look now a the file main.ts in this directory.
+
+- it logs a messsage
+- it returns a string "Hello, World"
 
 For a real function for your application,
 you would edit both the definition.json and main.ts source files in the functions/HelloWorld/src folder to match the needs of your new API function.
 
-but for now, we'll stick with Hello World.
+but for now, we'll stick with the "Hello World" default.
 
 ##### build the function
 
@@ -151,8 +159,14 @@ Basically, use these two commands:
 
     lift publish
 
-The publish command will report an endpoint from the cloud.  go here with a browser and you should see your front-end Hello World content.
-add the /helloworld endpoint and you should see the service content. These should be the same as what you saw locally, but now it is public on the internet!
+The publish command will report an endpoint from the cloud.  go here with a browser and you should see your front-end Hello World content if you access it as
+<publish_url>/index.html or as <publish_url>/+.  If you enter an unknown endpoint, you will receive a response similar to
+`{"message":"Missing Authentication Token"}`
+
+Note that index.html is not automatically invoked by simply appending a / to the end of the <publish_url> as one might expect.  This is because the path must
+contain a filepath before it is recognized. This is why /+ will work for this (+ can be substituted for / in any MistLift path).
+
+You can also access the <publish_url>/helloworld endpoint and you should see the service content. These should be the same as what you saw locally, but now it is public on the internet!
 
 If you make further revisions to your functions, but do not change the API signatures, simply use the `deploy` command again to update
 the changes to the cloud.

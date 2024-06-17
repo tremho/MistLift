@@ -16,8 +16,8 @@ export function doHelp(
             return helpTest()
         case 'start':
             return helpStart()
-        case 'stop':
-            return helpStop()
+        // case 'stop':
+        //     return helpStop()
         case 'package':
             return helpPackage()
         case 'deploy':
@@ -39,7 +39,7 @@ function helpDefault() {
     console.log("  " + ac.green("build") + "  -- build the project");
     console.log("  " + ac.green("test") + "  -- build, and run unit tests");
     console.log("  " + ac.cyan.bold("start") + "  -- start the local express server");
-    console.log("  " + ac.cyan.bold("stop") + "  -- stop the local express server");
+    // console.log("  " + ac.cyan.bold("stop") + "  -- stop the local express server");
     console.log("  " + ac.green("package "+ ac.grey.italic("[functionName]")) + "  -- builds and packages functions into lambda-ready zips");
     console.log("  " + ac.green("deploy " + ac.grey.italic("[functionName]")) + "  -- builds, packages, and deploys function packages to AWS lambda");
     console.log("  " + ac.blue.bold("publish") + "  -- publishes the API and binds to the deployed functions");

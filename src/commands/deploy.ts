@@ -6,6 +6,8 @@ import {
     AddPermissionCommand
 } from "@aws-sdk/client-lambda";
 
+import md5 from "md5";
+
 import path from "path"
 import fs, {Stats} from "fs"
 import {resolvePaths} from "../lib/pathResolve"
@@ -20,6 +22,7 @@ import {isNewerFile} from "../lib/fileCompare"
 import {delay} from "../lib/utils"
 import {doBuildAsync} from "./build";
 import {doPackageAsync} from "./package";
+import {Md5} from "@smithy/md5-js";
 
 let projectPaths:{basePath: string, buildPath: string, functionPath: string, packagePath: string, verified: boolean}
 
@@ -98,41 +101,33 @@ export async function deployPackage(funcName:string, zipFile?:string) {
     // first off, anchor a base directory
     zipFile ??= path.join(projectPaths.basePath, 'MistLift_Zips', funcName+".zip")
 
+    // funcname gets decorated with current instance identifier
+    var idsrc = md5((getProjectName()??"") + (getProjectVersion()??""))
+    var dFuncName = funcName + "_"+idsrc
+
     // See if function exists
     const emptyConfig:any = {}
     const client:any = new LambdaClient(emptyConfig);
     const command:any = new DeleteFunctionCommand({
-        FunctionName: funcName
+        FunctionName: dFuncName
     });
     client.send(command).then((response:any) => {
     }).catch((e:any) =>  {
     });
 
-    console.log(ac.green.italic("deploying ")+ac.green.bold(funcName)+"...")
+    // console.log(ac.green.italic("deploying ")+ac.green.bold(funcName)+"...")
 
     try {
-        const response:any = await CreateCloudFunction(funcName, zipFile);
+        const response:any = await CreateCloudFunction(dFuncName, zipFile);
         const parts = response.FunctionArn.split(":");
         const principal = parts[4]
-        await AddPermissions(client, funcName, principal);
+        await AddPermissions(client, dFuncName, principal);
         console.log(ac.green.bold(`Successfully deployed ${funcName}`));
     }
     catch(e:any) {
         console.error(ac.red.bold.italic("Error deploying "+funcName), e);
     }
 }
-// // TODO: Replace this with sdk op
-// async function createWithCli(funcName:string, zipFile:string) {
-//     return executeCommand('aws lambda create-function', [
-//         '--function-name', funcName,
-//         '--zip-file', 'fileb://'+zipFile,
-//         '--handler', 'runmain.handler',
-//         '--runtime', 'nodejs18.x', // todo: to come from config or derived from package.json / discovery
-//         '--role', 'arn:aws:iam::545650260286:role/tremho-services-role', // todo: to come from a config file
-//         '--timeout', '60' // todo: pass in / come from service description
-//     ])
-// }
-
 async function CreateCloudFunction(
     funcName:string,
     zipFile:string
@@ -157,6 +152,7 @@ async function CreateCloudFunction(
 
 function AddPermissions(client:LambdaClient, funcName:string, principal:string):Promise<any>
 {
+    // TODO: from a config source
     const region = "us-west-1";
     const WSApi = "/"+funcName.toLowerCase();
     const command:any = new AddPermissionCommand({

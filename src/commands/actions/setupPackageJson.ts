@@ -20,15 +20,17 @@ export function addPackageScripts(
 
 }
 export async function installPackage(
+    projectPath:string,
     packageName:string
 )
 {
-    return executeCommand("npm", ["i", packageName], '', true)
+    return executeCommand("npm", ["i", packageName], projectPath, true)
 }
 
 export async function installDevPackage(
+    projectPath:string,
     packageName:string
 )
 {
-    return executeCommand("npm", ["i", "--save-dev", packageName], '', true)
+    return executeCommand("npm", ["i", "--save-dev", packageName], projectPath, true)
 }

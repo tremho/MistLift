@@ -38,7 +38,13 @@ export function allBinder() {
             return res.send('')
         }
 
+
+
         let filepath = req.originalUrl || '/'
+        // match cloud behavior for docs because /api doesn't change cwd there
+        if(filepath.substring(0, 10) == '/api/docs/') {
+            filepath = filepath.replace('/api', '');
+        }
         let funcFound = filepath === '/api'; // reserved "function"
         if(!funcFound) {
             if (filepath.charAt(0) === '/') {
@@ -64,7 +70,7 @@ export function allBinder() {
             // check for '/' in path beyond the first one
             if(filepath.indexOf('/',1) !== -1)
             {
-                console.log(ac.magenta.italic("Warning: / path delimiters will not be honored in a cloud deployment, use + instead ")+filepath)
+                // console.log(ac.magenta.italic("Warning: / path delimiters will not be honored in a cloud deployment, use + instead ")+filepath)
             }
             // convert any incoming + to / to match cloud behavior
             while(filepath.indexOf("+")!== -1) filepath = filepath.replace("+", "/")

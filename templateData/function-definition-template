@@ -2,11 +2,9 @@
   "name": "$$FUNCTION_NAME$$",
   "description": "",
   "version": "1.0.0",
-  "pathMap": "",
+  "pathMap": "$$PATHMAP$$",
   "allowedMethods": "GET",
   "logLevel": "Debug",
-  "sessionRequired": false,
-  "userRequired": false,
   "schemas": {
   },
   "parameters": [

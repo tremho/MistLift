@@ -8,6 +8,7 @@ export async function DeployBuiltInZip
     zipPath:string
 )
 {
+    // console.log(">> Deploying "+name)
     await deployPackage(name, zipPath);
 }
 
@@ -17,8 +18,10 @@ export async function DeployFileserve
 )
 {
     // rootName is without slash
-    let rootName = root.replace("/", "")
-    let name = "fileserve_"+rootName
-    let zipPath = path.join(__dirname, 'prebuilt-zips', 'FileServe.zip')
-    await DeployBuiltInZip(name, zipPath)
+    if(root) {
+        let rootName = root.replace("/", "")
+        let name = "fileserve_" + rootName
+        let zipPath = path.join(__dirname, 'prebuilt-zips', 'FileServe.zip')
+        await DeployBuiltInZip(name, zipPath)
+    }
 }

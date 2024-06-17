@@ -12,6 +12,7 @@ export async function StageWebrootZip
 (
 ):Promise<string>
 {
+    // console.log(">> staging webroot to zip")
     const projectPaths = resolvePaths();
     // make a public yaml
     await MakePublicApiDoc(); // writes apidoc.yaml to docs
@@ -20,7 +21,7 @@ export async function StageWebrootZip
     await UnzipToFolder(builtinPath, exdir)
     const webroot = path.join(projectPaths.basePath, 'webroot');
     const packageTemp = path.join(projectPaths.basePath, '.package_temp')
-    const zipFilesPath = path.join(packageTemp, 'Webroot', '__files__')
+    const zipFilesPath = path.join(packageTemp, 'Webroot','__files__')
     await recurseDirectory(webroot, (filepath, stats) => {
         const relPath = filepath.substring(webroot.length)
         if(stats.isDirectory()) {
@@ -31,7 +32,7 @@ export async function StageWebrootZip
     })
     const webrootZip = path.join(projectPaths.basePath, 'a.zip')
     // TODO: this isn't working. Try a package
-    await FolderToZip(packageTemp, webrootZip)
+    await FolderToZip(path.join(packageTemp, 'Webroot'), webrootZip)
     // return path to this zip
     return webrootZip
 

@@ -38,6 +38,8 @@ export function doCreate(
         while(defsrc.indexOf("$$FUNCTION_NAME$$") !== -1) {
             defsrc = defsrc.replace("$$FUNCTION_NAME$$", funcName);
         }
+        let defpathMap = "/"+funcName.toLowerCase();
+        defsrc = defsrc.replace("$$PATHMAP$$", defpathMap)
         fs.writeFileSync(path.join(funcPath, 'src', 'definition.json'), defsrc);
         let mainsrc = fs.readFileSync(path.join(dataDir, 'function-main-ts')).toString();
         while(mainsrc.indexOf("$$TemplateName$$") !== -1) {
