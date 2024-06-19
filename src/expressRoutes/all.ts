@@ -80,6 +80,14 @@ export function allBinder() {
                 filepath = filepath.substring(0, filepath.indexOf('?'))
             }
             if (filepath.substring(filepath.length - 1) === '/') filepath += 'index.html'
+            if(filepath.substring(0, 10) == '/api/docs/') {
+                filepath = filepath.replace('/api', '');
+            }
+            if(filepath.indexOf("/docs") !== -1) {
+                if(filepath.indexOf('.map') !== -1) {
+                    return res.sendStatus(200)
+                }
+            }
             filepath = path.resolve(path.join(projectPaths.basePath, 'webroot', filepath)) // .. out of build
             if (fs.existsSync(filepath)) {
                 return res.sendFile(filepath)

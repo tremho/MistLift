@@ -159,7 +159,15 @@ Basically, use these two commands:
 
     lift publish
 
-The publish command will report an endpoint from the cloud.  go here with a browser and you should see your front-end Hello World content if you access it as
+The publish command will report an endpoint from the cloud.  It should look similar to this, but with different identifiers:
+
+`https://8204kxvzs9.execute-api.us-west-1.amazonaws.com/Dev`
+
+The content you created is accessed via uri paths off of this, so for example, 
+`https://8204kxvzs9.execute-api.us-west-1.amazonaws.com/Dev/helloworld` will execute your helloworld service,
+and `https://8204kxvzs9.execute-api.us-west-1.amazonaws.com/Dev/index.html` will show your front-end html content.
+
+Go here with a browser and you should see your front-end Hello World content if you access it as
 <publish_url>/index.html or as <publish_url>/+.  If you enter an unknown endpoint, you will receive a response similar to
 `{"message":"Missing Authentication Token"}`
 
@@ -171,9 +179,38 @@ You can also access the <publish_url>/helloworld endpoint and you should see the
 If you make further revisions to your functions, but do not change the API signatures, simply use the `deploy` command again to update
 the changes to the cloud.
 
-If you make a change to the api, you must use the `publish` command again. But note that this invalidates the previous url and produces a new one.
+If you make a change to the api definitions, or to any of the webroot content, you must use the `publish` command again. But note that this invalidates the previous url and produces a new one.
 
 ## Testing and Debugging
+It is a rare project that doesn't need to be tested and debugged in one way or another.
+One of the advantages to using `lift` is that you can do most of your testing and debugging locally
+where you have more tools at your disposal, rather than facing troubleshooting entirely
+once the code is deployed to the cloud.
+
+### Local run without browser
+
+You can run your function directly in Node without running the local server. The log output and the response object will be printed to the 
+console.  This is helpful for simple tests and debugging purposes.
+
+To do this, run this command from the project directory
+
+`node build/functions/<Function_Name>/src/local.js`
+
+Replacing "<Function_Name>" with the name of your function, for example:
+
+`node build/functions/HelloWorld/src/local.js`
+
+You will see the output of the request processsing logs and finally, after the Trace log "Calling Handler..." is seen,
+any log messages that originate from your function, a Debug log that shows the content-type chosen for your response (if your function
+didn't specify this itself), and then the object of the function response. 
+
+You can also specify custom requests be sent to this local run option by creating a json file within the function directory of 
+your function (e.g. "request.json").  See [Request and Response details](./Request%20and%20Response%20details.md) 
+for the properties you can include in a local request. 
+
+Then run the command with a parameter, such as
+
+`node build/functions/HelloWorld/src/local.js request.json`
 
 ### Testing
 
@@ -185,19 +222,37 @@ separated from the functional source files.
 The command `lift test` will initiate the tap testing.
 
 ### Debugging
-It is a rare project that doesn't need to be debugged in one way or another.
-One of the advantages to using `lift` is that you can do most of your debugging locally
-where you have more tools at your disposal, rather than facing troubleshooting entirely
-once the code is deployed to the cloud.
+
+The exact steps used for local debugging will depend upon your development set up and your choice for IDE or other debugger.
+Troubleshooting problems for apis deployed to the cloud will require you to access the logs in your AWS console.
 
 #### Local Debugging using your IDE debugger
+
+Your IDE likely has a mechanism for debugging NodeJS scripts.  Use this and the "local run" option described previously to
+execute your code via the debugger.
+For example, in the WebStorm IDE, create a new debug configuration for NodeJS, set the project root as the current directory, and point
+the target JS file to `build/functions/HelloWorld/src/local.js`.
+Set a breakpoint at the start of your function in "main.ts" (where the Log.Info statement is) and run in the debugger.  You should hit the
+breakpoint you set.  With this, you can step through and investigate your code execution.
+
 
 #### Debugging using logs
 Debugging using logs is available both locally and once deployed to cloud.
 
+- If you run locally, the logs are emitted directly to the console window.
+- If you run via `lift start`, logs appear in the console window where `lift start` was executed.
+- If you run via the AWS cloud, you can find your logs in the AWS console under CloudWatch.
 
-## Using your API 
+##### Reviewing Cloudwatch logs
 
+- login to your AWS Console (console.aws.amazon.com)
+- go to the Cloudwatch section
+- look in Log Groups and find the function to debug (e.g. /aws/lambda/HelloWorld_xxxxxx)
+- Find the latest log stream at the top of the list.  Refresh if this is not the most current.
+- Click into this to reveal the log messages.
+- You can reveal the log message by clicking the arrow to the left of each mesasge entry.
+- There will be several logs (8-15) issued by the request handling before reaching your code function
+- You should then see any logs your function has produced.
 
 
 

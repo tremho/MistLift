@@ -4,7 +4,6 @@
   "version": "1.0.0",
   "pathMap": "$$PATHMAP$$",
   "allowedMethods": "GET",
-  "logLevel": "Debug",
   "schemas": {
   },
   "parameters": [

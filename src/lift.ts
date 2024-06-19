@@ -69,7 +69,7 @@ async function processCommand() {
 function doUnknown(command:string) {
     console.log(ac.red.bold(`Unrecognized command ${command || ''}`))
     console.log(ac.grey.dim('try'))
-    console.log(ac.blue.dim('help, init, build, run, doc, validate, test, nativescript'))
+    console.log(ac.blue.dim('help, init, create, build, test, start, package, deploy, publish'))
     console.log('')
 }
 

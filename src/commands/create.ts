@@ -10,7 +10,7 @@ import {helpCreate} from "./help";
 
 /// Create command
 export function doCreate(
-    funcName:string // bane of function to create
+    funcName:string // name of function to create
 )
 {
         if(!funcName) {
@@ -29,11 +29,11 @@ export function doCreate(
         if(!fs.existsSync(path.join(funcPath, testdirname))) fs.mkdirSync(path.join(funcPath, testdirname))
         if(!fs.existsSync(path.join(funcPath, 'src'))) fs.mkdirSync(path.join(funcPath, 'src'))
 
-        let indexsrc = fs.readFileSync(path.join(dataDir, 'function-index-ts')).toString();
-        while (indexsrc.indexOf("$$FUNCTION_NAME$$") !== -1) {
-            indexsrc = indexsrc.replace("$$FUNCTION_NAME$$", funcName);
+        let localsrc = fs.readFileSync(path.join(dataDir, 'function-local-ts')).toString();
+        while (localsrc.indexOf("$$FUNCTION_NAME$$") !== -1) {
+            localsrc = localsrc.replace("$$FUNCTION_NAME$$", funcName);
         }
-        fs.writeFileSync(path.join(funcPath, 'src', 'index.ts'), indexsrc);
+        fs.writeFileSync(path.join(funcPath, 'src', 'local.ts'), localsrc);
         let defsrc = fs.readFileSync(path.join(dataDir, 'function-definition-template')).toString();
         while(defsrc.indexOf("$$FUNCTION_NAME$$") !== -1) {
             defsrc = defsrc.replace("$$FUNCTION_NAME$$", funcName);
