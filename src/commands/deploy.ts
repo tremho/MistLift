@@ -61,6 +61,10 @@ export async function doDeployAsync(
         else await delay(2500);
     }
 
+    if(options.indexOf("--clean") !== -1) {
+        deploymentRecord = {};
+    }
+
     if (!funcsToDeploy.length) {
         let firstDepth = 0
         recurseDirectory(projectPaths.functionPath, (filepath, stats) => {

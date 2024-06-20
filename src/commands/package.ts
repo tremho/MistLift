@@ -148,7 +148,11 @@ async function packageFunction(funcName:string)
         // console.log("now zip it")
     }))
 
-    return Promise.all(all).then(() => error)
+    return Promise.all(all).then(() => {
+        // remove temp folder when done
+        fs.rmSync(workPath, {recursive: true})
+        return error
+    })
 }
 
 function findAllImports(folder:string) {

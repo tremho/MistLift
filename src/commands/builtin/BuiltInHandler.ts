@@ -2,7 +2,8 @@ import {StageWebrootZip} from "./StageWebrootZip";
 import {DeployBuiltInZip} from "./DeployBuiltInZip";
 import {GetWebrootServePaths} from "../../lib/openAPI/WebrootFileSupport";
 
-import * as path from 'path'
+import fs from 'fs'
+import path from 'path'
 
 
 export async function DeployWebrootBuiltIn
@@ -12,6 +13,8 @@ export async function DeployWebrootBuiltIn
     const wrZip = await StageWebrootZip()
     // console.log("Deploy Webroot Builtin from "+wrZip)
     await DeployBuiltInZip("Webroot", wrZip)
+    // remove temp zip when done
+    fs.rmSync(wrZip, {recursive: true});
 }
 
 export async function DeployRootFileserves

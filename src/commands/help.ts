@@ -24,6 +24,8 @@ export function doHelp(
             return helpDeploy()
         case 'publish':
             return helpPublish()
+        case 'doctor':
+            return helpDoctor()
         default:
             return helpDefault()
     }
@@ -43,6 +45,7 @@ function helpDefault() {
     console.log("  " + ac.green("package "+ ac.grey.italic("[functionName]")) + "  -- builds and packages functions into lambda-ready zips");
     console.log("  " + ac.green("deploy " + ac.grey.italic("[functionName]")) + "  -- builds, packages, and deploys function packages to AWS lambda");
     console.log("  " + ac.blue.bold("publish") + "  -- publishes the API and binds to the deployed functions");
+    console.log("  " + ac.blue.bold("doctor") + "  -- checks MistLift installation and status");
     console.log('');
     console.log("use " + ac.bold("lift help " + ac.grey.dim('[command]')) + " for command arguments and detals.");
     console.log(ac.italic("use " + ac.bold("lift version " +ac.grey.dim("or lift -v or lift --version") + ac.grey(" to see current running version of MistLift"))))
@@ -88,7 +91,12 @@ export function helpCreate() {
 }
 export function helpBuild() {
     printBanner("build")
-    console.log("use "+ ac.bold('lift build') + " to build all your functions and api for your application")
+    console.log("use "+ ac.bold('lift build') + " to build all your functions of the project")
+    console.log("use "+ ac.bold('lift build') + " one or more function names to build these individually")
+    console.log("")
+    console.log("include "+ ac.bold('--clean') + " to force a rebuild, bypassing file date compare")
+    console.log("include "+ ac.bold('--failfast') + " to stop after encountering an error")
+    console.log("include "+ ac.bold('--deferfail') + " to build all, then report any errors (the default)")
     console.log("")
     console.log("The build step compiles your typescript (.ts) files into executable javascript (.js) files within a folder named 'build' in your project directory.")
     console.log("Files that are not updated are not rebuilt.")
@@ -99,8 +107,8 @@ export function helpTest() {
     printBanner("test")
     console.log("use "+ ac.bold( 'lift test') + " to invoke the testing framework and run unit tests for all functions")
     console.log("")
-    console.log("Tests should be written in files within the named test folder for each created function. test files are given the suffix .test.cs")
-    console.log("The test framework used by default is 'Tap'")
+    console.log("Tests should be written in files within the named test folder for each created function. test files are given the suffix .test.ts")
+    console.log("The test framework used is 'Tap' (https://node-tap.org)")
     console.log("");
 }
 export function helpStart() {
@@ -122,15 +130,20 @@ export function helpPackage() {
     printBanner("package")
     console.log("use "+ ac.bold('lift package') + " to build and package functions for cloud deployment")
     console.log("")
+    console.log("options such as "+ac.bold('--clean')+ " may be specified to force a build prior to packaging")
+    console.log("")
     console.log("Functions must be packaged into zip files before delivery to the cloud")
     console.log("The package command handles this by first insuring a fresh build and then packaging the function and its module dependencies")
-    console.log(ac.grey("This action is invoked as part of deployment, and need not be invoked separately with this command"));
+    console.log(ac.grey("This action is invoked as part of deployment, and need not be invoked separately with this command"))
     console.log("");
 }
 export function helpDeploy() {
     printBanner("deploy")
     console.log("use " + ac.bold('lift deploy') + ac.grey.dim(' functionName') + " to package and deploy a function to the cloud")
     console.log("use " + ac.bold('lift deploy') + " with no argument to deploy all functions to the cloud")
+    console.log("")
+    console.log("options such as "+ac.bold('--clean')+ " may be specified to force a build prior to packaging")
+    console.log("the option "+ac.bold('--no-package')+ " may be specified to deploy without repackaging")
     console.log("");
     console.log("functions will be built and packaged if necessary before deployment");
 
@@ -139,6 +152,13 @@ export function helpPublish() {
     printBanner("publish")
     console.log("use " + ac.bold('lift publish') + " to publish the API to an accessible cloud endpoint")
     console.log("");
-    console.log("The API must be published be used.");
     console.log("The base url for the cloud API will be returned by this operation.")
+    console.log("");
+    console.log("Once published, updates to functions may be made with "+ac.bold('deploy')+ " without needing to republish.")
+    console.log("Changes to webroot content or api definitions will require a new publish")
+    console.log("Each publish operation returns a new URL.  The previous URL is invalid.")
+}
+export function helpDoctor() {
+    printBanner("doctor")
+    console.log("use " + ac.bold('lift doctor') + " to report the status of your MistLift installation and dependencies")
 }
