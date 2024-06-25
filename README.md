@@ -3,7 +3,7 @@
 
 _CLI tools and structured project support for easy-access cloud development_
 
-MistLift is an OpenSource project aimed at providing an easy and seamless platform for developers
+MistLift [@tremho/mist-lift at npm](https://www.npmjs.com/package/@tremho/mist-lift) is an OpenSource project aimed at providing an easy and seamless platform for developers
 to quickly develop cloud services locally and then migrating to cloud with a simple and
 lightweight Command Line API that avoids some of the more intimidating aspects of 
 using larger frameworks for such purposes.
@@ -24,6 +24,9 @@ Other cloud hosts, such as Azure, are also planned to be supported in future ver
 
 MistLift is fully functional now, but there is much more planned in the
 vision roadmap, and your help is needed!
+
+[GitHub Repository](https://github.com/tremho/MistLift)
+
 Any level of involvement or contribution is appreciated.  Please see
 the [Contribution Guidelines](CONTRIBUTING.md).
 
@@ -32,6 +35,4 @@ and the [issues page](https://github.com/tremho/MistLift/issues) for future stat
 
 ## Getting Started
 
-To get started using Mist Lift, please see the [QuickStart Guide](./doc/MistLift Quick Start.md)
-
-
+To get started using MistLift, please see the [QuickStart Guide](./doc/MistLift%20Quick%20Start.md)

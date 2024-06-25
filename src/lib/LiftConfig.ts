@@ -4,7 +4,6 @@
 import path from "path";
 import fs from "fs";
 import AWS, {fromIni} from '@aws-sdk/credential-providers';
-import {NodeJsRuntimeStreamingBlobTypes} from "@smithy/types";
 
 let s_liftConfigLoaded:LiftConfig|null = null;
 
