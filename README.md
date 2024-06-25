@@ -35,4 +35,4 @@ and the [issues page](https://github.com/tremho/MistLift/issues) for future stat
 
 ## Getting Started
 
-To get started using MistLift, please see the [QuickStart Guide](./doc/MistLift%20Quick%20Start.md)
+To get started using MistLift, please see the [QuickStart Guide](https://github.com/tremho/MistLift/blob/main/doc/MistLift%20Quick%20Start.md)
