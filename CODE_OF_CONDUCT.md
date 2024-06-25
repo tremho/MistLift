@@ -1,5 +1,5 @@
 
-# Contributor Covenant Code of Conduct for TO BE NAMED
+# Contributor Covenant Code of Conduct for MistLift
 
 Content of this document derived from [contributor-covenant.org](https://www.contributor-covenant.org/version/2/1/code_of_conduct/code_of_conduct.md)
 
