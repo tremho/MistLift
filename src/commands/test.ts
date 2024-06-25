@@ -3,7 +3,6 @@ import {doBuildAsync} from "./build";
 
 export async function doTestAsync(args:string[] ): Promise<number>
 {
-    // todo: accept args above and do selective build and test accordingly
     if(await doBuildAsync(args)) return 1 // don't test if build fails
     if(args.length === 0) args = ['*']
     let ret = 0;

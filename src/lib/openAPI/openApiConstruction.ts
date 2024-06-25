@@ -6,6 +6,7 @@ import fs, {mkdirSync} from 'fs'
 import path from 'path'
 import {resolvePaths} from "../pathResolve";
 import {recurseDirectory} from "../DirectoryUtils";
+import {getSettings} from "../LiftConfig";
 
 export async function buildOpenApi(
     defs:any[],
@@ -113,8 +114,7 @@ function addFunctionMethod(pathDef:any, method:string, def:any) {
     const mime = retDef?.content ?? retDef?.mime ?? "text/plain"
     content[mime] = {}
 
-    // todo: from a config source
-    const region = "us-west-1"
+    const region = getSettings().awsPreferredRegion;
     const accountId = "545650260286";
     const methData = {
         summary: def.name,

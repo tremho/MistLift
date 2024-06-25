@@ -7,7 +7,7 @@
  * populate with directory structure
  * build
  * functions
- * tscconfig
+ * tsccoinfig
  * package.json
  *
  * npm i

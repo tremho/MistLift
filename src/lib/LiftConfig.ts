@@ -3,33 +3,21 @@
 
 import path from "path";
 import fs from "fs";
-import AWS, {fromIni, fromTemporaryCredentials} from '@aws-sdk/credential-providers';
+import AWS, {fromIni} from '@aws-sdk/credential-providers';
+import {NodeJsRuntimeStreamingBlobTypes} from "@smithy/types";
 
 let s_liftConfigLoaded:LiftConfig|null = null;
 
-// Defines the structure of the .mistlft.json file
-export class LiftConfig {
-    public CloudHost:CloudHost = new CloudHost()
-}
+// Defines the structure of the .mistlft json file
 // All relevant configuration for the cloud host goes here
-export class CloudHost {
-    public hostType: string = "AWS"; // all we support now
-    public AWS:AWSHostOptions = new AWSHostOptions()
+export class LiftConfig {
+    public cloudHost: string = "AWS" // all we support now
+    public awsIniProfile?: string
+    public awsPreferredRegion?:string
+    public awsNodeRuntime?: RuntimeType
+    public awsServiceRoleARN?:string
 }
-
-// HostOptions per host type (in this case, AWS)
-// if no profile and no config.json, will attempt to use profile "default"
-// if config.json is provided and exists, profile choice is ignored.
-export class AWSHostOptions {
-    public useAWSIniProfile:string = "default" // or name, or null/empty for none
-    // public useAWSConfigPath:string = "" // path to aws credentials config.json or null/empty for none
-}
-// format for the AWS credential config.json style file noted above.
-// export class AWSConfig {
-//     public accessKeyId:string = ""
-//     public secretAccessKey:string = ""
-//     public region:string = ""
-// }
+export type RuntimeType = "nodejs" | "nodejs4.3" | "nodejs6.10" | "nodejs8.10" | "nodejs10.x" | "nodejs12.x" | "nodejs14.x" | "nodejs16.x" | "java8" | "java8.al2" | "java11" | "python2.7" | "python3.6" | "python3.7" | "python3.8" | "python3.9" | "dotnetcore1.0" | "dotnetcore2.0" | "dotnetcore2.1" | "dotnetcore3.1" | "dotnet6" | "dotnet8" | "nodejs4.3-edge" | "go1.x" | "ruby2.5" | "ruby2.7" | "provided" | "provided.al2" | "nodejs18.x" | "python3.10" | "java17" | "ruby3.2" | "ruby3.3" | "python3.11" | "nodejs20.x" | "provided.al2023" | "python3.12" | "java21";
 
 // Available for general use because, why not?
 export function getUserHome() {
@@ -40,7 +28,7 @@ export function LoadLiftConfig() : LiftConfig|null
 {
     if(!s_liftConfigLoaded) {
 
-        const mistlift = path.join(getUserHome(), ", mistlift.json");
+        const mistlift = path.join(getUserHome(), ".mistlift");
         let configJson = "{}";
         if (fs.existsSync(mistlift)) {
             try {
@@ -58,24 +46,33 @@ export function resetLiftConfig()
     s_liftConfigLoaded = null;
 }
 
+export function getSettings() : LiftConfig {
+    if (s_liftConfigLoaded == null) LoadLiftConfig();
+    return s_liftConfigLoaded as LiftConfig
+}
+
 /**
  * Return the credentials required for AWS based upon our config options.
+ *
+ * We will use the standard .aws config ini file, looked up by profile or default
+ * Prior attempts to have it do more than this failed, and resulted in a default profile choice anyway.
  */
 export function getAWSCredentials() : any
 {
-    // TODO: replace use of Error with custom Exceptions
-
-    let config = LoadLiftConfig();
+    let config = LoadLiftConfig()
     if(!config) {
         // console.error("No .mistlift configuration found - using AWS default profile");
-        config = { CloudHost: {hostType: "AWS", AWS: { useAWSIniProfile: "default"}}}
+        config = { cloudHost: "AWS", awsIniProfile: "default" }
     }
-    if (config.CloudHost?.hostType?.toUpperCase() !== "AWS")
+    if (config.cloudHost?.toUpperCase() !== "AWS")
     {
         throw Error("HostType Not Supported");
     }
-    const awsOptions = config?.CloudHost?.AWS ?? {}
-    const profile = awsOptions.useAWSIniProfile ?? "default"
-    let credentials = fromIni({profile})
+    let credentials = {};
+    const profile = config.awsIniProfile ?? "default"
+    if(profile) {
+        credentials = fromIni({profile})
+    }
+
     return credentials;
 }

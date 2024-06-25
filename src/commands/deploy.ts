@@ -23,6 +23,7 @@ import {delay} from "../lib/utils"
 import {doBuildAsync} from "./build";
 import {doPackageAsync} from "./package";
 import {Md5} from "@smithy/md5-js";
+import {getAWSCredentials, getSettings, RuntimeType} from "../lib/LiftConfig";
 
 let projectPaths:{basePath: string, buildPath: string, functionPath: string, packagePath: string, verified: boolean}
 
@@ -110,8 +111,7 @@ export async function deployPackage(funcName:string, zipFile?:string) {
     var dFuncName = funcName + "_"+idsrc
 
     // See if function exists
-    const emptyConfig:any = {}
-    const client:any = new LambdaClient(emptyConfig);
+    const client:any = new LambdaClient(getAWSCredentials());
     const command:any = new DeleteFunctionCommand({
         FunctionName: dFuncName
     });
@@ -139,13 +139,15 @@ async function CreateCloudFunction(
 ) : Promise<any>
 {
 
+    const settings = getSettings();
+    const nodeRuntime:RuntimeType|undefined = settings.awsNodeRuntime
+    const serviceRole:string = settings.awsServiceRoleARN ?? ""
     const zipFileBase64:Uint8Array = fs.readFileSync(zipFile);
-    const emptyConfig:any = {}
-    const client:any = new LambdaClient(emptyConfig);
+    const client:any = new LambdaClient(getAWSCredentials());
     const command:any = new CreateFunctionCommand({
         FunctionName: funcName,
-        Runtime: 'nodejs18.x', // todo: to come from config or derived from package.json / discovery
-        Role: 'arn:aws:iam::545650260286:role/tremho-services-role', // todo: to come from a config file
+        Runtime: nodeRuntime,
+        Role: serviceRole,
         Handler: 'runmain.handler',
         Code: {
             ZipFile: zipFileBase64
@@ -156,8 +158,7 @@ async function CreateCloudFunction(
 
 function AddPermissions(client:LambdaClient, funcName:string, principal:string):Promise<any>
 {
-    // TODO: from a config source
-    const region = "us-west-1";
+    const region = getSettings().awsPreferredRegion
     const WSApi = "/"+funcName.toLowerCase();
     const command:any = new AddPermissionCommand({
         FunctionName: funcName,

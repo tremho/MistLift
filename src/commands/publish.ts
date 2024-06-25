@@ -17,7 +17,7 @@ import {
     CreateStageCommand, CreateDeploymentCommand, GetDeploymentsCommand, GetDeploymentCommand
 } from "@aws-sdk/client-api-gateway";
 
-import {getAWSCredentials} from "../lib/LiftConfig";
+import {getAWSCredentials, getSettings} from "../lib/LiftConfig";
 
 import {doDeployAsync} from "./deploy";
 import * as ac from "ansi-colors"
@@ -130,8 +130,8 @@ async function publishApi(stageName:string)
     const intRequests = prereq.MakeRequests();
     await PutIntegrations(intRequests);
     await DeployApi(apiId, stageName);
-    // TODO: From a config source
-    console.log(ac.green.bold(`\n Successfully deployed to https://${apiId}.execute-api.us-west-1.amazonaws.com/${stageName}`));
+    const region = getSettings().awsPreferredRegion;
+    console.log(ac.green.bold(`\n Successfully deployed to https://${apiId}.execute-api.${region}.amazonaws.com/${stageName}`));
 }
 function findApiName()
 {
@@ -244,8 +244,7 @@ class PrereqInfo {
 
     public MakeRequests():PutIntegrationRequest[]
     {
-        // TODO: from a config source
-        const region = "us-west-1"
+        const region = getSettings().awsPreferredRegion;
         const out:PutIntegrationRequest[] = [];
         for(let d of this.defs) {
             const def = (d as any);

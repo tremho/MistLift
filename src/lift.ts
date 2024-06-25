@@ -15,6 +15,7 @@ import {doDeployAsync} from "./commands/deploy";
 import {doPublishAsync} from "./commands/publish";
 import {doDoctor} from "./commands/doctor";
 import {startLocalServer} from "./commands/start";
+import {doSettings} from "./commands/settings";
 
 const command = process.argv[2] || 'help'
 const args = process.argv.slice(3)
@@ -59,6 +60,10 @@ async function processCommand() {
         return;
         case 'publish': {
             const ret = await doPublishAsync();
+            if (ret) process.exit(ret);
+        }
+        case 'settings': {
+            const ret = await doSettings();
             if (ret) process.exit(ret);
         }
         return;

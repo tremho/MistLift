@@ -150,7 +150,6 @@ async function packageFunction(funcName:string)
 
     return Promise.all(all).then(() => {
         // remove temp folder when done
-        fs.rmSync(workPath, {recursive: true})
         return error
     })
 }
@@ -162,7 +161,7 @@ function findAllImports(folder:string) {
         recurseDirectory(folder, (filepath, stats) => {
             // console.log(`filepath = ${filepath}`);
             if(filepath.indexOf("__files__") == -1) {
-                if (!stats.isDirectory()) { // TODO: maybe limit to .ts files?
+                if (!stats.isDirectory()) {
                     const content = fs.readFileSync(filepath).toString();
                     for (const m of findImports(content)) {
                         // console.log('  import', m)
@@ -207,7 +206,6 @@ function reconcileVersionImports(imports:string[], mainPkgJson:any) {
             r = devDependencies[m]
         }
         if(r) {
-            // TODO: check version map to insure we didn't shift versions
             if(depsOut[m] && depsOut[m] !== r) {
                 console.error(ac.red.bold(`  Version mismatch on ${m}: ${r} vs ${depsOut[m]}`))
             }

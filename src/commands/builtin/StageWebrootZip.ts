@@ -31,7 +31,7 @@ export async function StageWebrootZip
         }
     })
     const webrootZip = path.join(projectPaths.basePath, 'a.zip')
-    // TODO: this isn't working. Try a package
+
     await FolderToZip(path.join(packageTemp, 'Webroot'), webrootZip)
     // return path to this zip
     return webrootZip
