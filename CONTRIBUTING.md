@@ -1,4 +1,4 @@
-# Welcome to TO BE NAMED contributing guide <!-- omit in toc -->
+# Welcome to the MistLift contributing guide <!-- omit in toc -->
 
 Thank you for investing your time in contributing to our project!
 
