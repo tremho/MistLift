@@ -44,7 +44,7 @@ export async function doSettings()
                 )
                 ok = !!runtime
             }
-            settings.awsNodeRuntime = runtime as RuntimeType
+            settings.awsNodeRuntime = runtime.toLowerCase() as RuntimeType
 
             ok = false;
             while(!ok) {

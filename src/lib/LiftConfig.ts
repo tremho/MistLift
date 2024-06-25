@@ -46,6 +46,11 @@ export function resetLiftConfig()
     s_liftConfigLoaded = null;
 }
 
+export function areSettingsAvailable():boolean {
+    const mistlift = path.join(getUserHome(), ".mistlift");
+    return fs.existsSync(mistlift);
+}
+
 export function getSettings() : LiftConfig {
     if (s_liftConfigLoaded == null) LoadLiftConfig();
     return s_liftConfigLoaded as LiftConfig

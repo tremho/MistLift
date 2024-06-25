@@ -62,6 +62,7 @@ async function processCommand() {
             const ret = await doPublishAsync();
             if (ret) process.exit(ret);
         }
+        return;
         case 'settings': {
             const ret = await doSettings();
             if (ret) process.exit(ret);
@@ -74,7 +75,7 @@ async function processCommand() {
 function doUnknown(command:string) {
     console.log(ac.red.bold(`Unrecognized command ${command || ''}`))
     console.log(ac.grey.dim('try'))
-    console.log(ac.blue.dim('help, init, create, build, test, start, package, deploy, publish'))
+    console.log(ac.blue.dim('help, init, create, build, test, start, package, deploy, publish, settings'))
     console.log('')
 }
 

@@ -14,6 +14,10 @@ npm version should be 10.3.0 or greater
 Installing MistLift will also install Typescript if you don't already have it.
 You should be using Typescript 5.3.3 or higher.
 
+To use the cloud features, you will need to set up an AWS account.
+See [Getting set up with AWS](./Getting%20set%20up%20with%20AWS.md) for 
+instructions on this part.
+
 ### Installing MistLift
 
 Install MistLift with the command

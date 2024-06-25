@@ -3,6 +3,7 @@ import * as ac from "ansi-colors"
 import {VersionInfo, getLiftVersion, getProjectVersion, getProjectName} from "../lib/LiftVersion";
 import {executeCommand} from "../lib/executeCommand"
 import {resolvePaths} from "../lib/pathResolve";
+import {areSettingsAvailable} from "../lib/LiftConfig";
 
 export async function doDoctor():Promise<boolean>
 {
@@ -15,6 +16,7 @@ export async function doDoctor():Promise<boolean>
     const nodeVersion = await fetchNodeVersion()
     const npmVersion = await fetchNpmVersion()
     const gitVersion = await fetchGitVersion();
+    const settingsAvail = areSettingsAvailable();
 
     console.log("Checking installed dependencies:")
     let ok = report("MistLift", liftVersion, "0.1.0")
@@ -22,6 +24,10 @@ export async function doDoctor():Promise<boolean>
     ok = ok && report("Node", nodeVersion, "20.11.0")
     ok = ok && report("Npm", npmVersion, "10.3.0")
     report("Git", gitVersion, "2.0.0")
+    if(!settingsAvail) {
+        console.log("")
+        console.log(ac.yellow.dim.bold("Cloud Settings are not set. ")+ac.blue("run "+ac.bold("lift settings")))
+    }
     if(!ok) {
         console.log("")
         console.log(ac.red.bold("System needs updates before MistLift can be used."));

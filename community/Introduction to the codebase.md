@@ -1,16 +1,15 @@
-# TODO
+# Introduction to the MistLift codebase
 
-Describe the different parts of the code and how it fits together.
+Welcome to the MistLift OpenSource project. If you are interested in contributing
+to this project, you will want to become familiar with the code.
+Before you begin, be sure you are familiar with all of what MistLift does from
+a user standpoint. Make sure you have gone through the 
+[MistLift QuickStart](../doc/MistLift%20Quick%20Start.md),
+and are familiar with all the [Lift Command Actions](../doc/Lift%20Command%20Actions.md).
 
-Note how inverseY fits into this and how to jump to that project.
-
-- Express server
-- CLI and commands
-- User project structure
-- User AWS credentials and configurations
-- AWS Lambda functions (InverseY)
-
-Current and future state architecture
+If you are ready to write new code,
+Please start by reviewing the [Architectural Overview](../doc/Architectural%20Overview.md).
+Browse the other document files in this repository for more insights.
 
 --
 
@@ -32,8 +31,11 @@ user functions as a locally testable API.
 the `src/lib` folder holds miscellaneous support functions, including the OpenAPI
 _Swagger_ page generation code.
 
-Not a part of the main repository, another project named "InverseY" provides
-an NPM package with functions that support activity at AWS and their Lambda function 
+Not a part of the main repository, another project named `@tremho/inverse-y`provides
+an NPM package with functions that support activity at AWS and the Lambda function 
 support.
 
+To contribute to that project,
+please see the [inverse-y project](https://github.com/tremho/inverse-y). If you plan to make
+changes there, please give a heads up to [Steve Ohmert](email://steve@ohmert.com) of your intentions.
 

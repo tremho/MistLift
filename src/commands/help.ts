@@ -24,6 +24,8 @@ export function doHelp(
             return helpDeploy()
         case 'publish':
             return helpPublish()
+        case 'settings':
+            return helpSettings()
         case 'doctor':
             return helpDoctor()
         default:
@@ -45,6 +47,7 @@ function helpDefault() {
     console.log("  " + ac.green("package "+ ac.grey.italic("[functionName]")) + "  -- builds and packages functions into lambda-ready zips");
     console.log("  " + ac.green("deploy " + ac.grey.italic("[functionName]")) + "  -- builds, packages, and deploys function packages to AWS lambda");
     console.log("  " + ac.blue.bold("publish") + "  -- publishes the API and binds to the deployed functions");
+    console.log("  " + ac.blue.bold("settings") + "  -- sets up cloud settings");
     console.log("  " + ac.blue.bold("doctor") + "  -- checks MistLift installation and status");
     console.log('');
     console.log("use " + ac.bold("lift help " + ac.grey.dim('[command]')) + " for command arguments and detals.");
@@ -157,6 +160,10 @@ export function helpPublish() {
     console.log("Once published, updates to functions may be made with "+ac.bold('deploy')+ " without needing to republish.")
     console.log("Changes to webroot content or api definitions will require a new publish")
     console.log("Each publish operation returns a new URL.  The previous URL is invalid.")
+}
+export function helpSettings() {
+    printBanner("settings")
+    console.log("use " + ac.bold('lift settings') + " to set or review the Cloud settings and configured options")
 }
 export function helpDoctor() {
     printBanner("doctor")
