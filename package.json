@@ -1,5 +1,5 @@
 {
-  "name": "@tremho/MistLift",
+  "name": "@tremho/mist-lift",
   "version": "1.0.0",
   "description": "lift command line utility for MistLift development",
   "main": "build/index.js",
