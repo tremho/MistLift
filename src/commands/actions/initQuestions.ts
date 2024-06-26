@@ -21,7 +21,7 @@ export async function interrogateUserForPackageJsonSettings (
   const gitAuthor = await findGitAuthor()
   const pkgJson = existingPackageJson(projectPath)
   let name = pkgJson.name ?? nameFromProjectPath(projectPath)
-  let version = pkgJson.version ?? '0.1.0-prerelease.1'
+  let version = pkgJson.version ?? '1.0.0-prerelease.1'
   let description = pkgJson.description ?? ''
   let author = pkgJson.author ?? gitAuthor
   let copyright = pkgJson.copyright ?? defaultCopyright(author)
@@ -93,7 +93,7 @@ async function findGitAuthor (
   return await executeCommand('git', ['config', '--get', 'user.name']).then((rt: any) => {
     const rrt: { retcode: number | undefined, stdStr: string | undefined, errStr: string | undefined } = rt
     let name: string | undefined = ''
-    if (rrt?.retcode !== undefined) {
+    if (rrt?.retcode !== 0) {
       console.error(`Error ${rrt.retcode}`, rrt.errStr)
     } else {
       name = rrt?.stdStr?.trim().toLowerCase()

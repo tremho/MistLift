@@ -115,7 +115,7 @@ async function packageFunction (funcName: string): Promise<number> {
   // console.log("writing package.json", pkgjson)
   fs.writeFileSync(path.join(workPath, 'package.json'), JSON.stringify(pkgjson, null, 2))
   //  - execute npm i at workpath, create node_modules
-  all.push(executeCommand('npm i', [], workPath).then(() => {
+  await executeCommand('npm i', [], workPath).then(() => {
     // copy the lambda function
     recurseDirectory(funcPath, (filepath: string, stats: Stats) => {
       if (filepath.substring(0, funcPath.length) === funcPath) {
@@ -139,13 +139,11 @@ async function packageFunction (funcName: string): Promise<number> {
     const runmainPath = path.join(workPath, 'runmain.mjs')
     fs.writeFileSync(runmainPath, fs.readFileSync(templatePath))
 
-    // ClogInfo("Zipping...")
     all.push(FolderToZip(workPath, zipFile))
     // console.log("now zip it")
-  }))
+  })
 
   return await Promise.all(all).then(() => {
-    // remove temp folder when done
     return error
   })
 }
@@ -205,7 +203,7 @@ function reconcileVersionImports (
       r = devDependencies[m]
     }
     if (r !== undefined) {
-      if (depsOut[m] !== r) {
+      if (depsOut[m] !== undefined && depsOut[m] !== r) {
         console.error(ac.red.bold(`  Version mismatch on ${m}: ${r} vs ${depsOut[m] as string}`))
       }
       if (isDev) {

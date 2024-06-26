@@ -64,7 +64,6 @@ export async function doDeployAsync (
   }
 
   for (const funcName of funcsToDeploy) {
-    // console.log("Deploy "+funcName)
     const zipFile = path.join(projectPaths.basePath, 'MistLift_Zips', funcName + '.zip')
     if (fs.existsSync(zipFile)) {
       const zipTime = fs.statSync(zipFile).mtime

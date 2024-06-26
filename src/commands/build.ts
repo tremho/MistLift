@@ -106,8 +106,8 @@ async function buildFunctionModules (
             '--sourceMap', 'true',
             '--outdir', outDir,
             filepath
-          ], '', true).then((result: { retcode: number | undefined }) => {
-            if (result.retcode !== undefined) {
+          ], '', true).then((result: { retcode: number | undefined, stdOut:string, stdErr:string }) => {
+            if (result.retcode !== 0) {
               fails++
               // console.log("error detected", fails)
               const now = new Date()

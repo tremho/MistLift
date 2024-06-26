@@ -18,9 +18,9 @@ export async function FolderToZip (
   folderPath: string,
   zipPath: string
 ): Promise<Uint8Array> {
-  return await new Promise(resolve => {
+  return new Promise(resolve => {
     zipDir(folderPath, { saveTo: zipPath }, function (err: any, buffer: Uint8Array) {
-      if (err !== undefined) throw err
+      if (err !== '' && err !== undefined && err !== null) throw err
       // `buffer` is the buffer of the zipped file
       // And the buffer was saved to `~/myzip.zip`
       resolve(buffer)
