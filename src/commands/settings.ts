@@ -53,7 +53,7 @@ export async function doSettings (): Promise<number> {
         ok = (settings.awsPreferredRegion ?? '') !== ''
       }
       ok = false
-      console.log('Supply the ARN for the service role you have created in your AWS IAM account for Lambda, S3, and Cloudwatch access')
+      console.log('Supply the ARN for the service role you have created in your AWS IAM account for Lambda and Cloudwatch access')
       while (!ok) {
         settings.awsServiceRoleARN = ask('AWS service role ARN',
           'serviceRole ARN',
