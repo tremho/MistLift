@@ -1,13 +1,12 @@
-import {executeCommand} from "../lib/executeCommand";
-import {doBuildAsync} from "./build";
+import { executeCommand } from '../lib/executeCommand'
+import { doBuildAsync } from './build'
 
-export async function doTestAsync(args:string[] ): Promise<number>
-{
-    if(await doBuildAsync(args)) return 1 // don't test if build fails
-    if(args.length === 0) args = ['*']
-    let ret = 0;
-    for (let funcName of args) {
-        const result = await executeCommand('tap', [
+export async function doTestAsync (args: string[]): Promise<number> {
+  if (await doBuildAsync(args) !== 0) return 1 // don't test if build fails
+  if (args.length === 0) args = ['*']
+  let ret = 0
+  for (const funcName of args) {
+    const result = await executeCommand('tap', [
             `build/functions/${funcName}/*-tests/*.js`,
             /*
                              - base -- looks a lot like terse
@@ -27,12 +26,12 @@ export async function doTestAsync(args:string[] ): Promise<number>
             '--allow-empty-coverage',
             '--allow-incomplete-coverage'
 
-        ], '', true)
+    ], '', true)
 
-        if (result.retcode) {
-            ret = result.retcode
-            break;
-        }
+    if (result.retcode !== 0) {
+      ret = result.retcode
+      break
     }
-    return ret;
+  }
+  return ret
 }

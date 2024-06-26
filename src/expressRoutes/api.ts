@@ -1,24 +1,22 @@
+/* eslint @typescript-eslint/no-var-requires: "off" */
 import express from 'express'
-const router = express.Router();
 
-import {getProjectName, getProjectVersion} from "../lib/LiftVersion";
+import { getProjectName, getProjectVersion } from '../lib/LiftVersion'
 
-const openApiUI = require("openapi-ui");
+const openApiUi = require('openapi-ui')
+const router = express.Router()
 
-
-router.get('/', function(req, res, next) {
+router.get('/', function (req, res, next) {
   res.send(generateApiDoc())
-});
+})
 
 export default router
 
-function generateApiDoc()
-{
-  console.log("---- Serving up api")
-  return openApiUI.generateIndex({
-    baseUrl: "docs",
-    title: `${getProjectName()} ${getProjectVersion()}`,
-    url: "docs/apidoc.yaml"
-  });
-
+function generateApiDoc (): void {
+  console.log('---- Serving up api')
+  return openApiUi.generateIndex({
+    baseUrl: 'docs',
+    title: `${getProjectName() ?? ''} ${getProjectVersion()?.toString() ?? ''}`,
+    url: 'docs/apidoc.yaml'
+  })
 }
