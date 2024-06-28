@@ -1,6 +1,6 @@
 {
   "name": "@tremho/mist-lift",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "lift command line utility for MistLift development",
   "main": "build/index.js",
   "bin": {
@@ -22,8 +22,10 @@
   "files": [
     "build/**/*",
     "src/**/*",
+    "templateData/*",
     "index.d.ts",
     "README.md",
+    "LICENSE",
     "tsconfig.json"
   ],
   "keywords": [
