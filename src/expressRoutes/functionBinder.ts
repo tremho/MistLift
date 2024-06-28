@@ -47,7 +47,7 @@ export function functionBinder (): void {
         if (method === 'get') {
           router.get(entryRoot, (req, res) => callNoBody(pathMap, req, res))
         } else if (method === 'post') {
-          router.get(entryRoot, (req, res) => callWithBody(pathMap, req, res))
+          router.post(entryRoot, (req, res) => callWithBody(pathMap, req, res))
         } else if (method === 'put') {
           router.put(entryRoot, (req, res) => callWithBody(pathMap, req, res))
         } else if (method === 'patch') {
