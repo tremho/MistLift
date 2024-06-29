@@ -28,6 +28,8 @@ export function doHelp (
       return helpSettings()
     case 'doctor':
       return helpDoctor()
+    case 'info':
+      return helpInfo()
     default:
       return helpDefault()
   }
@@ -49,6 +51,7 @@ function helpDefault (): void {
   console.log('  ' + ac.blue.bold('publish') + '  -- publishes the API and binds to the deployed functions')
   console.log('  ' + ac.blue.bold('settings') + '  -- sets up cloud settings')
   console.log('  ' + ac.blue.bold('doctor') + '  -- checks MistLift installation and status')
+  console.log('  ' + ac.blue.bold('info') + '  -- reports latest published API Url info')
   console.log('')
   console.log('use ' + ac.bold('lift help ' + ac.grey.dim('[command]')) + ' for command arguments and detals.')
   console.log(ac.italic('use ' + ac.bold('lift version ' + ac.grey.dim('or lift -v or lift --version') + ac.grey(' to see current running version of MistLift'))))
@@ -167,4 +170,9 @@ export function helpSettings (): void {
 export function helpDoctor (): void {
   printBanner('doctor')
   console.log('use ' + ac.bold('lift doctor') + ' to report the status of your MistLift installation and dependencies')
+}
+
+export function helpInfo(): void {
+  printBanner('info')
+  console.log('use ' + ac.bold('lift info') + ' to report the last published url and the time of its publishing along with the associated deployed functions')
 }

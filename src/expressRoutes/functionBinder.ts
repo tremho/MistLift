@@ -7,8 +7,8 @@ import { resolvePaths } from '../lib/pathResolve'
 import express from 'express'
 import { gatherFunctionDefinitions } from '../lib/openAPI/ApiBuildCollector'
 import { buildOpenApi } from '../lib/openAPI/openApiConstruction'
+import {Log} from '@tremho/inverse-y'
 
-// import * as clearModule from 'clear-module'
 const clearModule = require('clear-module')
 const router = express.Router()
 
@@ -21,41 +21,39 @@ export function functionBinder (): void {
       const { name, pathMap, allowedMethods } = def
       const methods = allowedMethods.split(',')
       for (let method of methods) {
-        method = method.trim().toLowerCase()
-        const rpath = path.join(projectPaths.buildPath, 'functions', name, 'src', 'main.js')
-        clearModule(rpath)
-        const { start } = require(rpath)
+        try {
+          method = method.trim().toLowerCase()
+          const rpath = path.join(projectPaths.buildPath, 'functions', name, 'src', 'main.js')
+          clearModule(rpath)
+          const { start } = require(rpath)
 
-        let entryRoot: string = pathMap
-        const n = entryRoot.indexOf('/{')
-        if (n !== -1) entryRoot = entryRoot.substring(0, n) + '/*'
+          let entryRoot: string = pathMap
+          const n = entryRoot.indexOf('/{')
+          if (n !== -1) entryRoot = entryRoot.substring(0, n) + '/*'
 
-        const callNoBody = (pathMap: string, req: any, res: any): void => {
-          const event = requestToEvent(pathMap, req)
-          Promise.resolve(start(event, null, null)).then(respOut => {
-            handleResponse(res, respOut)
-          }).catch<any>((reason: any) => undefined)
+          const callHandler = (pathMap: string, req: any, res: any): void => {
+            const event = requestToEvent(pathMap, req)
+            Promise.resolve(start(event, null, null)).then(respOut => {
+              handleResponse(res, respOut)
+            }).catch<any>((reason: any) => undefined)
+          }
+
+          if (method === 'get') {
+            router.get(entryRoot, (req, res) => callHandler(pathMap, req, res))
+          } else if (method === 'post') {
+            router.post(entryRoot, (req, res) => callHandler(pathMap, req, res))
+          } else if (method === 'put') {
+            router.put(entryRoot, (req, res) => callHandler(pathMap, req, res))
+          } else if (method === 'patch') {
+            router.patch(entryRoot, (req, res) => callHandler(pathMap, req, res))
+          } else if (method === 'delete') {
+            router.delete(entryRoot, (req, res) => callHandler(pathMap, req, res))
+          } else {
+            console.log(ac.red.bold('Cannot map method ') + ac.blue.bold(method))
+          }
         }
-        const callWithBody = (pathMap: string, req: any, res: any): void => {
-          const event = requestToEvent(pathMap, req)
-          event.body = req.body
-          Promise.resolve(start(event, null, null)).then(respOut => {
-            handleResponse(res, respOut)
-          }).catch<any>((reason: any) => undefined)
-        }
-
-        if (method === 'get') {
-          router.get(entryRoot, (req, res) => callNoBody(pathMap, req, res))
-        } else if (method === 'post') {
-          router.post(entryRoot, (req, res) => callWithBody(pathMap, req, res))
-        } else if (method === 'put') {
-          router.put(entryRoot, (req, res) => callWithBody(pathMap, req, res))
-        } else if (method === 'patch') {
-          router.patch(entryRoot, (req, res) => callWithBody(pathMap, req, res))
-        } else if (method === 'delete') {
-          router.delete(entryRoot, (req, res) => callNoBody(pathMap, req, res))
-        } else {
-          console.log(ac.red.bold('Cannot map method ') + ac.blue.bold(method))
+        catch(e:any) {
+          Log.Error(ac.bold.red(e.message.split('\n')[0]));
         }
       }
     }
@@ -70,16 +68,11 @@ function requestToEvent (template: string, req: any): any {
   const ei: number = path.indexOf('/', ptci)
   let host: string = path.substring(0, ei)
   if (ptci < 3) {
-    host = req.headers?.origin ?? ''
-    if (host !== '') {
-      host = req.headers?.referer ?? ''
-      const ptci: number = path.indexOf('://') + 3
-      const ei: number = path.indexOf('/', ptci)
-      host = ptci > 3 ? path.substring(0, ei) : ''
-    }
-    if (host !== '') {
-      // todo: http or https?
-      host = `http://${(req.headers?.host as string | undefined) ?? ''}`
+    host = req.headers?.host ?? req.headers?.origin ?? req.headers?.referer ?? ''
+    if(!host.startsWith('http')) {
+      if(!host.startsWith('https')) {
+        host = 'http://'+host;
+      }
     }
   }
   const cookies: any = {}
@@ -108,6 +101,7 @@ function requestToEvent (template: string, req: any): any {
       originalUrl: host + (req.originalUrl as string),
       headers: req.headers
     },
+    body: req.body,
     cookies,
     parameters
   }

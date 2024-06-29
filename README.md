@@ -40,10 +40,21 @@ To get started using MistLift, please see the [QuickStart Guide](https://github.
 
 ## Changelog
 
-### 1.0.3 -- Initial Release 6/28/24
+### 1.1.1 -- 7/1/24
+
+- documentation updates
+- insure commands issued at project root
+- build if necessary before starting local server
+- fix local request handling treatment of body
+
+
+### 1.1.0 -- 6/28/24
+- add `info` command
+
+### 1.0.3 -- Initial Release 6/27/24
 - Include missing template files in npm publish
 
-### 1.0.0 - 1.0.2 -- Pre Release 6/27/24
+### 1.0.0 - 1.0.2 -- Pre Release 6/26/24
 - Basic functionality
 - minor bug fixes
 - documentation

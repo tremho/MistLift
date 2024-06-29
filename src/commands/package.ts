@@ -17,6 +17,10 @@ export async function doPackageAsync (
   args: string[]
 ): Promise<number> {
   const projectPaths = resolvePaths()
+  if(!projectPaths.verified) {
+    console.log(ac.bold.magenta("current directory is not at project root"))
+    return -1;
+  }
   const workPath = path.join(projectPaths.basePath, '.package_temp')
 
   if (fs.existsSync(workPath)) fs.rmSync(workPath, { recursive: true })

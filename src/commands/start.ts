@@ -6,10 +6,11 @@ import functionRouter, { functionBinder } from '../expressRoutes/functionBinder'
 import apiRouter from '../expressRoutes/api'
 import allRouter, { allBinder } from '../expressRoutes/all'
 import { resolvePaths } from '../lib/pathResolve'
+import { doBuildAsync } from './build'
 
 import * as ac from 'ansi-colors'
 
-export function startLocalServer (): void {
+export async function startLocalServer (): Promise<void> {
   const projectPaths = resolvePaths()
   if (!projectPaths.verified) {
     console.log(ac.bold.red('Cannot start local server'))
@@ -17,6 +18,7 @@ export function startLocalServer (): void {
     console.log('')
     return
   }
+  await doBuildAsync([])
   const port = 8081
   allBinder()
   functionBinder()

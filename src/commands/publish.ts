@@ -37,6 +37,10 @@ export async function doPublishAsync (stageName?: string): Promise<number> {
   const retCode = 0
 
   projectPaths = resolvePaths()
+  if(!projectPaths.verified) {
+    console.log(ac.bold.magenta("current directory is not at project root"))
+    return -1;
+  }
 
   await publishApi(stageName ?? 'Dev')
 
@@ -119,7 +123,9 @@ async function publishApi (
   await PutIntegrations(intRequests)
   await DeployApi(apiId ?? '', stageName)
   const region = getSettings()?.awsPreferredRegion ?? ''
-  console.log(ac.green.bold(`\n Successfully deployed to https://${apiId ?? ''}.execute-api.${region}.amazonaws.com/${stageName}`))
+  const publishUrl = `https://${apiId ?? ''}.execute-api.${region}.amazonaws.com/${stageName}`
+  console.log(ac.green.bold(`\n Successfully deployed to ${publishUrl}`))
+  recordLatestPublish(publishUrl)
 }
 function findApiName (): string {
   const infoFile = path.join(projectPaths.functionPath, 'apiService.info.json')
@@ -312,4 +318,13 @@ async function DeployApi (restApiId: string, stageName: string): Promise<void> {
     console.error(ac.red.bold(`Error with deployApi: ${e.message as string}`))
     throw e
   }
+}
+
+function recordLatestPublish(publishUrl:string): void {
+  const publishRecord = {
+    url: publishUrl,
+    time: Date.now()
+  }
+  const publishedFile = path.join(projectPaths.basePath, '.published')
+  fs.writeFileSync(publishedFile, JSON.stringify(publishRecord))
 }

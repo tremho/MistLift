@@ -155,6 +155,9 @@ The publish command takes no arguments.
 In the future, the command may accept an argument specifying the AWS stage to publish to, but
 for the current version, the publish stage is always "Dev".
 
+No building dependency is assumed with this command, so you must be certain your
+functions are deployed prior.
+
 Part of the publish operation is to deploy the api handler and the webroot static files servers.
 The webroot subfolder fileserve handlers are registered at the path of their respective subdirectories and simply redirect
 to the main webroot handler, replacing any '/' characters in the path with '+' so that 
@@ -169,6 +172,9 @@ to AWS and then the integrations for each function are stitched in.
 
 The previous version of the API is destroyed, and the new one is created.
 
+Once published, the url of the published API and the time are written to a JSON file
+named '.published' in the project directory.  This is used by the info command.
+
 Each publish produces a new API resource, with a new URL.  
 
 ---
@@ -180,8 +186,6 @@ The help command outputs documentation for MistLift.
 
 `lift help <command_name>` gives detail on the named command.
 
-
-
 ---
 ## start
 
@@ -190,13 +194,10 @@ This command starts the built-in Express server
 The source code for this action can be found in the start command itself with
 route handling in src/ExpressRoutes.
 
-
-
 ---
 ## test
 
 This command invokes the Tap test framework for running unit tests
-
 
 ---
 ## doctor
@@ -204,10 +205,15 @@ This command invokes the Tap test framework for running unit tests
 This command inspects the status of the dependencies necessary to run MistLift
 and reports the version numbers of each component.
 
+---
+## info
+
+This command reports the last url that the api was published to and the date/time 
+it was published.  It also lists the names of the deployed functions that this api
+should contain.  Functions deployed after the last publish will not appear in this list.
 
 
-No building dependency is assumed with this command, so you must be certain your
-functions are deployed prior.
+
 
 
 

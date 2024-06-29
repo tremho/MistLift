@@ -18,6 +18,7 @@ import { doPublishAsync } from './commands/publish'
 import { doDoctor } from './commands/doctor'
 import { startLocalServer } from './commands/start'
 import { doSettings } from './commands/settings'
+import { doInfo} from './commands/info'
 
 const command = process.argv[2] ?? 'help'
 const args = process.argv.slice(3)
@@ -68,6 +69,9 @@ async function processCommand (): Promise<void> {
       return
     case 'settings':
       await doSettings()
+      return
+    case 'info':
+      await doInfo()
       return
   }
   return doUnknown(command)
