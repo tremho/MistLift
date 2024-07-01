@@ -21,7 +21,8 @@ import { interrogateUserForPackageJsonSettings } from './actions/initQuestions'
 import { addPackageScripts, installPackage, installDevPackage } from './actions/setupPackageJson'
 
 export async function doInit (
-  folder?: string
+  folder?: string,
+  defaults?: boolean
 ): Promise<void> {
   if (folder === undefined || folder === '') {
     helpInit()
@@ -51,7 +52,7 @@ export async function doInit (
     fs.copyFileSync(path.join(swaggerSrcDir, 'swagger-ui-standalone-preset.js'), path.join(webrootDocs, 'swagger-ui-standalone-preset.js'))
   }
 
-  await interrogateUserForPackageJsonSettings(refPath)
+  await interrogateUserForPackageJsonSettings(refPath, defaults)
   await addPackageScripts(refPath)
   await installDevPackage(refPath, '@types/node')
   await installDevPackage(refPath, 'typescript')

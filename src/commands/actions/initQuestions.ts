@@ -7,7 +7,8 @@ import { executeCommand } from '../../lib/executeCommand'
 import { ask } from '../../lib/askQuestion'
 
 export async function interrogateUserForPackageJsonSettings (
-  projectPath: string
+  projectPath: string,
+  defaults?: boolean
 ): Promise<void> {
   // get existing package.json or {}
   // name of project - module name, display name, short name
@@ -27,55 +28,56 @@ export async function interrogateUserForPackageJsonSettings (
   let copyright = pkgJson.copyright ?? defaultCopyright(author)
   let spdx = pkgJson.license ?? 'MIT'
 
-  let ok = false
-  while (!ok) {
-    name = ask('Module name of this project',
-      'module name',
-      name
-    )
-    ok = name !== undefined && name.indexOf(' ') === -1
+  if (defaults !== true) {
+    let ok = false
+    while (!ok) {
+      name = ask('Module name of this project',
+        'module name',
+        name
+      )
+      ok = name !== undefined && name.indexOf(' ') === -1
+    }
+    ok = false
+    while (!ok) {
+      version = ask('Project version. Use prerelease suffix for development versions. Use Semantic Versioning (https://semver.org).',
+        'version',
+        version ?? '0.1.0-prerelease.1'
+      )
+      ok = version !== undefined && version.indexOf('.') !== -1
+    }
+    ok = false
+    while (!ok) {
+      description = ask('Give a brief description of what this project does / what it is for',
+        'description',
+        description ?? ''
+      )
+      ok = description !== ''
+    }
+    ok = false
+    while (!ok) {
+      author = ask('Identify yourself as the author of this project',
+        'name',
+        author
+      )
+      ok = author !== ''
+    }
+    ok = false
+    while (!ok) {
+      copyright = ask('Specify a displayable copyright notice',
+        'Copyright',
+        copyright
+      )
+      ok = copyright !== ''
+    }
+    ok = false
+    while (!ok) {
+      spdx = ask('Specify the appropriate SPDX license identifier for this project. See https://spdx.org/licenses/ for more info.',
+        'spdx identifier',
+        spdx
+      )
+      ok = spdx !== ''
+    }
   }
-  ok = false
-  while (!ok) {
-    version = ask('Project version. Use prerelease suffix for development versions. Use Semantic Versioning (https://semver.org).',
-      'version',
-      version ?? '0.1.0-prerelease.1'
-    )
-    ok = version !== undefined && version.indexOf('.') !== -1
-  }
-  ok = false
-  while (!ok) {
-    description = ask('Give a brief description of what this project does / what it is for',
-      'description',
-      description ?? ''
-    )
-    ok = description !== ''
-  }
-  ok = false
-  while (!ok) {
-    author = ask('Identify yourself as the author of this project',
-      'name',
-      author
-    )
-    ok = author !== ''
-  }
-  ok = false
-  while (!ok) {
-    copyright = ask('Specify a displayable copyright notice',
-      'Copyright',
-      copyright
-    )
-    ok = copyright !== ''
-  }
-  ok = false
-  while (!ok) {
-    spdx = ask('Specify the appropriate SPDX license identifier for this project. See https://spdx.org/licenses/ for more info.',
-      'spdx identifier',
-      spdx
-    )
-    ok = spdx !== ''
-  }
-
   pkgJson.name = name
   pkgJson.version = version
   pkgJson.description = description
