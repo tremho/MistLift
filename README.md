@@ -46,6 +46,7 @@ To get started using MistLift, please see the [QuickStart Guide](https://github.
 - insure commands issued at project root
 - build if necessary before starting local server
 - fix local request handling treatment of body
+- fix package definition cross-over bug
 
 
 ### 1.1.0 -- 6/28/24
