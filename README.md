@@ -40,14 +40,14 @@ To get started using MistLift, please see the [QuickStart Guide](https://github.
 
 ## Changelog
 
-### 1.1.1 -- 7/1/24
+### 1.1.1, 1.1.2 -- 7/1/24
 
 - documentation updates
 - insure commands issued at project root
 - build if necessary before starting local server
 - fix local request handling treatment of body
 - fix package definition cross-over bug
-
+- add lint and test targets
 
 ### 1.1.0 -- 6/28/24
 - add `info` command

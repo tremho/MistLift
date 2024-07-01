@@ -22,29 +22,29 @@ async function test (t: any): Promise<void> {
   await doInit('QSTest', true)
 
   // verify project got made
-  t.ok(fs.existsSync('./QSTest'), 'created test project', '')
+  t.ok(fs.existsSync('./QSTest'), 'created test project')
   // verify we have a functions dir
-  t.ok(fs.existsSync(path.join('./QSTest', 'functions')), '')
+  t.ok(fs.existsSync(path.join('./QSTest', 'functions')), 'functions exists')
   // verify we have a node_modules dir
-  t.ok(fs.existsSync(path.join('./QSTest', 'node_modules')), '')
+  t.ok(fs.existsSync(path.join('./QSTest', 'node_modules')), 'node_modules exists')
   // verify we have a webroot dir
-  t.ok(fs.existsSync(path.join('./QSTest', 'webroot')), '')
+  t.ok(fs.existsSync(path.join('./QSTest', 'webroot')), 'webroot exists')
   // verify we have a package.json
-  t.ok(fs.existsSync(path.join('./QSTest', 'package.json')), '')
+  t.ok(fs.existsSync(path.join('./QSTest', 'package.json')), 'package.json exists')
   // verify we have webroot/docs
-  t.ok(fs.existsSync(path.join('./QSTest', 'webroot', 'docs', 'apidoc.yaml')), '')
-  t.ok(fs.existsSync(path.join('./QSTest', 'webroot', 'docs', 'swagger-ui-bundle.js')), '')
-  t.ok(fs.existsSync(path.join('./QSTest', 'webroot', 'docs', 'swagger-ui-standalone-preset.js')), '')
-  t.ok(fs.existsSync(path.join('./QSTest', 'webroot', 'docs', 'swagger-ui.css')), '')
+  t.ok(fs.existsSync(path.join('./QSTest', 'webroot', 'docs', 'apidoc.yaml')), 'yaml exists')
+  t.ok(fs.existsSync(path.join('./QSTest', 'webroot', 'docs', 'swagger-ui-bundle.js')), 'js exists')
+  t.ok(fs.existsSync(path.join('./QSTest', 'webroot', 'docs', 'swagger-ui-standalone-preset.js')), 'js exists')
+  t.ok(fs.existsSync(path.join('./QSTest', 'webroot', 'docs', 'swagger-ui.css')), 'css exists')
 
   // create
   process.chdir('./QSTest')
   await doCreate('IntegrationTest')
-  t.ok(fs.existsSync(path.join('functions', 'IntegrationTest')), '')
-  t.ok(fs.existsSync(path.join('functions', 'IntegrationTest', 'src', 'definition.json')), '')
-  t.ok(fs.existsSync(path.join('functions', 'IntegrationTest', 'src', 'local.ts')), '')
-  const maints = path.join('functions', 'IntegrationTest', 'src', 'main.ts', '')
-  t.ok(fs.existsSync(maints))
+  t.ok(fs.existsSync(path.join('functions', 'IntegrationTest')), 'function exists')
+  t.ok(fs.existsSync(path.join('functions', 'IntegrationTest', 'src', 'definition.json')), 'definition.json exists')
+  t.ok(fs.existsSync(path.join('functions', 'IntegrationTest', 'src', 'local.ts')), 'local.ts exists')
+  const maints = path.join('functions', 'IntegrationTest', 'src', 'main.ts')
+  t.ok(fs.existsSync(maints), 'main.ts exists')
   const content = fs.readFileSync(maints).toString().replace('Hello,  World!', testMessage)
   fs.writeFileSync(maints, content)
 
@@ -58,13 +58,13 @@ async function test (t: any): Promise<void> {
   const publishedJson = fs.readFileSync('.published').toString()
   const publishedInfo = JSON.parse(publishedJson)
   const apiUrl: string = publishedInfo.url
-  t.ok(apiUrl.length > 0)
+  t.ok(apiUrl.length > 0, 'url exists')
   const testUrl = apiUrl + '/integrationtest'
 
   const resp: any = await axios.get(testUrl)
-  t.ok(resp.status === 200)
+  t.ok(resp.status === 200, 'status is 200')
   const data: string = resp.data.toString()
-  t.ok(data === testMessage, 'data expected to be ' + testMessage + ' but it was ' + data)
+  t.ok(data === testMessage, 'saw expected data')
 
   t.end()
 }

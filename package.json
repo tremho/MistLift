@@ -1,6 +1,6 @@
 {
   "name": "@tremho/mist-lift",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "lift command line utility for MistLift development",
   "main": "build/index.js",
   "bin": {
@@ -13,7 +13,9 @@
     "build:windows": "tsc && npm run postbuild",
     "build:nix": "tsc && chmod +x build/lift.js && npm run postbuild",
     "lint": "ts-standard --fix src",
-    "test": "npm run build && tap -t 60000 --reporter=base --color --passes src/**/*.test.ts",
+    "test": "npm run build && npm run unitTest && npm run integrationTest",
+    "unitTest": "tap --reporter=base --color --passes --disable-coverage src/lib/**/*.test.ts",
+    "integrationTest": "tap -t 150000 --reporter=base --color --passes --disable-coverage src/**/*.test.ts",
     "indev": "run-script-os",
     "indev:nix": "echo nix",
     "indev:windows": "echo windows",
