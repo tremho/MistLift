@@ -7,16 +7,16 @@ import { resolvePaths } from '../lib/pathResolve'
 import { recurseDirectory } from '../lib/DirectoryUtils'
 import { isNewer } from '../lib/fileCompare'
 import { executeCommand } from '../lib/executeCommand'
-import {mkdirSync} from "fs";
+import { mkdirSync } from 'fs'
 
 // Build command
 export async function doBuildAsync (
   args: string[] // zero or more functions to build.  zero means build all
 ): Promise<number> {
   const projectPaths = resolvePaths()
-  if(!projectPaths.verified) {
-    console.log(ac.bold.magenta("current directory is not at project root"))
-    return -1;
+  if (!projectPaths.verified) {
+    console.log(ac.bold.magenta('current directory is not at project root'))
+    return -1
   }
   const funcsToBuild: string[] = []
   const options: string[] = []
@@ -63,7 +63,7 @@ async function buildSingleFunction (
   options: string[]
 ): Promise<number> {
   const funcName = funcDir.substring(funcDir.lastIndexOf('/') + 1)
-  const buildPath =  path.normalize(path.join(funcDir, '..', '..', 'build', 'functions', funcName))
+  const buildPath = path.normalize(path.join(funcDir, '..', '..', 'build', 'functions', funcName))
   if (options.includes('--clean')) {
     if (fs.existsSync(buildPath)) {
       fs.rmSync(buildPath, { recursive: true })
@@ -141,7 +141,7 @@ function doPostBuildSteps (
   const dstdef = path.join(buildPath, 'src', 'definition.json')
   if (fs.existsSync(srcdef)) {
     const destFolder = path.dirname(dstdef)
-    if(!fs.existsSync((destFolder))) mkdirSync(destFolder, {recursive: true})
+    if (!fs.existsSync((destFolder))) mkdirSync(destFolder, { recursive: true })
     fs.copyFileSync(srcdef, dstdef)
   } else {
     console.error(ac.red.bold('no definition file found at ' + srcdef))

@@ -7,7 +7,7 @@ import { resolvePaths } from '../lib/pathResolve'
 import express from 'express'
 import { gatherFunctionDefinitions } from '../lib/openAPI/ApiBuildCollector'
 import { buildOpenApi } from '../lib/openAPI/openApiConstruction'
-import {Log} from '@tremho/inverse-y'
+import { Log } from '@tremho/inverse-y'
 
 const clearModule = require('clear-module')
 const router = express.Router()
@@ -51,9 +51,8 @@ export function functionBinder (): void {
           } else {
             console.log(ac.red.bold('Cannot map method ') + ac.blue.bold(method))
           }
-        }
-        catch(e:any) {
-          Log.Error(ac.bold.red(e.message.split('\n')[0]));
+        } catch (e: any) {
+          Log.Error(ac.bold.red(e.message.split('\n')[0]))
         }
       }
     }
@@ -69,9 +68,9 @@ function requestToEvent (template: string, req: any): any {
   let host: string = path.substring(0, ei)
   if (ptci < 3) {
     host = req.headers?.host ?? req.headers?.origin ?? req.headers?.referer ?? ''
-    if(!host.startsWith('http')) {
-      if(!host.startsWith('https')) {
-        host = 'http://'+host;
+    if (!host.startsWith('http')) {
+      if (!host.startsWith('https')) {
+        host = 'http://' + host
       }
     }
   }

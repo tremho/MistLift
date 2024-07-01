@@ -17,9 +17,9 @@ export async function doPackageAsync (
   args: string[]
 ): Promise<number> {
   const projectPaths = resolvePaths()
-  if(!projectPaths.verified) {
-    console.log(ac.bold.magenta("current directory is not at project root"))
-    return -1;
+  if (!projectPaths.verified) {
+    console.log(ac.bold.magenta('current directory is not at project root'))
+    return -1
   }
   const workPath = path.join(projectPaths.basePath, '.package_temp')
 
@@ -53,17 +53,17 @@ export async function doPackageAsync (
 
   let error = 0
 
-  const recurse = async (i:number) => {
-    if(i >= funcsToPackage.length) return;
+  const recurse = async (i: number): Promise<any> => {
+    if (i >= funcsToPackage.length) return
     const funcName = funcsToPackage[i]
     const pe = await packageFunction(funcName)
-    if(pe !== 0) {
-      error = pe;
-      return error;
+    if (pe !== 0) {
+      error = pe
+      return error
     }
-    await recurse(++i);
+    await recurse(++i)
   }
-  recurse(0)
+  await recurse(0)
   return error
 }
 

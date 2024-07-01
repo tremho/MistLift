@@ -17,9 +17,9 @@ export function doCreate (
     console.log(ac.green.bold('Creating new function named ') + funcName)
 
     const projectPaths = resolvePaths()
-    if(!projectPaths.verified) {
-      console.log(ac.bold.magenta("current directory is not at project root"))
-      return;
+    if (!projectPaths.verified) {
+      console.log(ac.bold.magenta('current directory is not at project root'))
+      return
     }
     const funcPath = path.join(projectPaths.functionPath, funcName)
     if (!fs.existsSync(funcPath)) fs.mkdirSync(funcPath)

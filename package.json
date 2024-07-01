@@ -12,7 +12,7 @@
     "build": "run-script-os",
     "build:windows": "tsc && npm run postbuild",
     "build:nix": "tsc && chmod +x build/lift.js && npm run postbuild",
-    "test": "tap --reporter=base --color --passes --disable-coverage src/lib/Tests/**/*.test.ts",
+    "test": "ts-standard --fix src && tap --reporter=base --color --passes --disable-coverage src/lib/Tests/**/*.test.ts",
     "indev": "run-script-os",
     "indev:nix": "echo nix",
     "indev:windows": "echo windows",

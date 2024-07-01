@@ -172,7 +172,7 @@ export function helpDoctor (): void {
   console.log('use ' + ac.bold('lift doctor') + ' to report the status of your MistLift installation and dependencies')
 }
 
-export function helpInfo(): void {
+export function helpInfo (): void {
   printBanner('info')
   console.log('use ' + ac.bold('lift info') + ' to report the last published url and the time of its publishing along with the associated deployed functions')
 }

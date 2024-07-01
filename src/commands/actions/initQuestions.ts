@@ -94,7 +94,7 @@ async function findGitAuthor (
     const rrt: { retcode: number | undefined, stdStr: string | undefined, errStr: string | undefined } = rt
     let name: string | undefined = ''
     if (rrt?.retcode !== 0) {
-      console.error(`Error ${rrt.retcode}`, rrt.errStr)
+      console.error(`Error ${rrt?.retcode ?? ''}`, rrt?.errStr)
     } else {
       name = rrt?.stdStr?.trim().toLowerCase()
     }

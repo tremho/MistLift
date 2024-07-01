@@ -37,9 +37,9 @@ export async function doPublishAsync (stageName?: string): Promise<number> {
   const retCode = 0
 
   projectPaths = resolvePaths()
-  if(!projectPaths.verified) {
-    console.log(ac.bold.magenta("current directory is not at project root"))
-    return -1;
+  if (projectPaths.verified !== true) {
+    console.log(ac.bold.magenta('current directory is not at project root'))
+    return -1
   }
 
   await publishApi(stageName ?? 'Dev')
@@ -320,7 +320,7 @@ async function DeployApi (restApiId: string, stageName: string): Promise<void> {
   }
 }
 
-function recordLatestPublish(publishUrl:string): void {
+function recordLatestPublish (publishUrl: string): void {
   const publishRecord = {
     url: publishUrl,
     time: Date.now()

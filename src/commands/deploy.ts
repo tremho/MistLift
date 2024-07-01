@@ -29,9 +29,9 @@ export async function doDeployAsync (
   args: string[]
 ): Promise<number> {
   projectPaths = resolvePaths()
-  if(!projectPaths.verified) {
-    console.log(ac.bold.magenta("current directory is not at project root"))
-    return -1;
+  if (!projectPaths.verified) {
+    console.log(ac.bold.magenta('current directory is not at project root'))
+    return -1
   }
   const deploymentRecordPath = path.join(projectPaths.basePath, '.deployed')
   try { deploymentRecord = JSON.parse(fs.readFileSync(deploymentRecordPath).toString()) } catch {}
