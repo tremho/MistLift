@@ -25,4 +25,21 @@ install these packages like normal at the project root with `npm install <packag
 
 When your functions are packaged, these dependencies will be migrated for use in the cloud.
 
+## Calling functions from within functions
+
+Avoid making web request function calls to other functions within your api. 
+This does not behave well in an AWS deployment.  Instead, structure your code so that
+the function itself can be called programmatically and place this is a common library.
+
+Then call this at code level where needed. 
+
+A good pattern in general is to put all your API functionality into a common location,
+even if it will not be shared between other functions, and make the actual service
+handler just call this code to complete the service.  This allows for better flexibility
+and establishes a consistent and more maintainable pattern of construction.
+
+## Resources
+If your function needs non-code resources to work with, you can create a directory in your
+function directory, alongside the `src` folder, named `resources`.  This folder tree will be copied
+to the build directory as a post-build step.  Other directory names will not be copied.
 

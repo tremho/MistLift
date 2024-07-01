@@ -51,15 +51,20 @@ export async function doPackageAsync (
     })
   }
 
-  const all: Array<Promise<any>> = []
-  const error = 0
+  let error = 0
 
-  for (const funcName of funcsToPackage) {
-    all.push(packageFunction(funcName))
+  const recurse = async (i:number) => {
+    if(i >= funcsToPackage.length) return;
+    const funcName = funcsToPackage[i]
+    const pe = await packageFunction(funcName)
+    if(pe !== 0) {
+      error = pe;
+      return error;
+    }
+    await recurse(++i);
   }
-  return await Promise.all(all).then(() => {
-    return error
-  })
+  recurse(0)
+  return error
 }
 
 async function packageFunction (funcName: string): Promise<number> {

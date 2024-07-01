@@ -123,19 +123,19 @@ async function buildFunctionModules (
         }
       }
     }
+    fails += doPostBuildSteps(funcDir, buildPath)
     return false
   })
   return await Promise.all(all).then(async () => {
-    fails += await doPostBuildSteps(funcDir, buildPath)
     return fails
   })
 }
 
 // do the steps after the build (file copies, etc)
-async function doPostBuildSteps (
+function doPostBuildSteps (
   funcDir: string,
   buildPath: string
-): Promise<number> {
+): number {
   // copy the definitions,json file over
   const srcdef = path.join(funcDir, 'src', 'definition.json')
   const dstdef = path.join(buildPath, 'src', 'definition.json')
@@ -147,10 +147,10 @@ async function doPostBuildSteps (
     console.error(ac.red.bold('no definition file found at ' + srcdef))
     return 1
   }
-  // copy the __files__ folder if it exists
-  const filedirPath = path.join(funcDir, '__files__')
+  // copy the resources folder if it exists
+  const filedirPath = path.join(funcDir, 'resources')
   if (fs.existsSync(filedirPath)) {
-    const bfiles = path.join(buildPath, '__files__')
+    const bfiles = path.join(buildPath, 'resources')
     if (!fs.existsSync(bfiles)) fs.mkdirSync(bfiles, { recursive: true })
     recurseDirectory(filedirPath, (filepath, stats) => {
       let relPath = filepath.substring(funcDir.length)
