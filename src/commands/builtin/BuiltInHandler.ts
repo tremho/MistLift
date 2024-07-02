@@ -18,7 +18,7 @@ export async function DeployWebrootBuiltIn
 export async function DeployRootFileserves
 (
 ): Promise<void> {
-  // console.log("Deploy Root Fileserves")
+  console.log("Deploy Root Fileserves")
   // Get root paths
   const roots = GetWebrootServePaths()
   // for each, deploy under the name of each

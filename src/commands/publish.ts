@@ -113,6 +113,7 @@ async function publishApi (
   } catch (e: any) {
     console.error(ac.bold.red(e.message))
   }
+
   // const apidoc = new TextDecoder().decode(apiBytes)
   // console.log(apidoc)
   if (apiId === '') return
