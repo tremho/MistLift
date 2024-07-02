@@ -1,8 +1,8 @@
 {
   "name": "@tremho/mist-lift",
-  "version": "1.1.4",
+  "version": "1.1.5-pre-release.1",
   "description": "lift command line utility for MistLift development",
-  "main": "build/index.js",
+  "main": "build/lift.js",
   "bin": {
     "lift": "build/lift.js"
   },
