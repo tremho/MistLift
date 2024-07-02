@@ -38,9 +38,9 @@ export function addBuiltInDefinitions (defs: any[]): void {
   // console.log("roots", roots)
   for (const root of roots) {
     if (root !== '') {
-      let rootName = root
-      let rootPath = root.replace(path.sep, '/');
-      while (rootName.includes(path.sep)) rootName = rootName.replace(path.sep, '').toLowerCase().trim()
+      let rootPath = root.replace(path.sep, '/')
+      let rootName = rootPath
+      while (rootName.includes('/')) rootName = rootPath.replace('/', '').toLowerCase().trim()
       const fileserve = Object.assign({}, fileServeDef) // copy
       fileserve.name = 'fileserve_' + rootName
       fileserve.pathMap = `${rootPath}/{path}`
