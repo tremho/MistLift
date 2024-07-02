@@ -30,7 +30,6 @@ export async function doInit (
   }
   const cwd = process.cwd()
   const refPath = path.isAbsolute(folder) ? path.normalize(folder) : path.normalize(path.join(cwd, folder))
-  console.log(refPath)
   if (!fs.existsSync(refPath)) {
     fs.mkdirSync(refPath, { recursive: true })
   }

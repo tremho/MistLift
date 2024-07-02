@@ -1,10 +1,10 @@
 {
   "name": "@tremho/mist-lift",
-  "version": "1.1.5",
+  "version": "1.1.6-pre-release.5",
   "description": "lift command line utility for MistLift development",
-  "main": "build/src//lift.js",
+  "main": "build/lift.js",
   "bin": {
-    "lift": "build/src/lift.js"
+    "lift": "build/lift.js"
   },
   "scripts": {
     "prepublish": "run-script-os",
@@ -23,8 +23,7 @@
     "indev:windows": "echo windows",
     "postbuild" : "run-script-os",
     "postbuild:nix": "cp -r src/commands/builtin/prebuilt-zips build/commands/builtin",
-    "postbuild:windows": "robocopy src/commands/builtin/prebuilt-zips build/commands/builtin/prebuilt-zips /e > NUL 2>&1",
-    "installCli": "npm run build && cp build/lift.js ~/.nvm/versions/node/`node --version`/bin/lift"
+    "postbuild:windows": "robocopy src/commands/builtin/prebuilt-zips build/commands/builtin/prebuilt-zips /e > NUL 2>&1"
   },
   "files": [
     "build/**/*",
