@@ -28,6 +28,8 @@ then try `tsc -v`
 You should also check to see if you have the 'unzip' command installed on your system,
 try `unzip -v` to receive version info.
 
+to install unzip, use Brew for Mac, or Choco for Windows.  This common command is available via these
+package managers.
 
 To use the cloud features, you will need to set up an AWS account.
 See [Getting set up with AWS](./Getting%20set%20up%20with%20AWS.md) for 
