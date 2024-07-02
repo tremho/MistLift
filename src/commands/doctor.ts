@@ -15,6 +15,7 @@ export async function doDoctor (): Promise<boolean> {
   const nodeVersion = await fetchNodeVersion() ?? ''
   const npmVersion = await fetchNpmVersion() ?? ''
   const gitVersion = await fetchGitVersion() ?? ''
+  const unzipVersion = await fetchUnzipVersion() ?? ''
   const settingsAvail = areSettingsAvailable()
 
   console.log('Checking installed dependencies:')
@@ -24,6 +25,7 @@ export async function doDoctor (): Promise<boolean> {
   const isWin:boolean = process.platform === 'win32'
   ok = ok && report('Npm', npmVersion, isWin ? '9.6.4' : '10.3.0')
   report('Git', gitVersion, '2.0.0')
+  report('unzip', unzipVersion, '1.0.0')
   if (!settingsAvail) {
     console.log('')
     console.log(ac.yellow.dim.bold('Cloud Settings are not set. ') + ac.blue('run ' + ac.bold('lift settings')))
@@ -86,6 +88,15 @@ async function fetchGitVersion (
   if (result.retcode !== 0) return 'Git not found'
   const vstr = versionTrim(result.stdStr)
   return vstr
+}
+
+async function fetchUnzipVersion (
+
+): Promise<string> {
+  const result = await executeCommand('unzip', ['-v'])
+  if(result.retcode !== 0) return 'unzip not found'
+  let vstr = result.stdStr.split('\n')[0].split(' ')[1]
+  return versionTrim(vstr)
 }
 
 // compare to a minimum and report ok or error

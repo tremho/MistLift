@@ -59,8 +59,7 @@ export class VersionInfo {
 
 // read version from Lift's package.json
 export function getLiftVersion (): VersionInfo {
-  let pkg = path.join(__dirname, '..','..', 'package.json')
-  if(process.platform === 'win32') pkg = path.join(__dirname, '..', '..', '..', 'package.json')
+  const pkg = path.join(__dirname, '..', '..', '..', 'package.json')
   return readPackageVersion(pkg)
 }
 // read version from project's package.json

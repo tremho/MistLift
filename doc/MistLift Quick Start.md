@@ -9,7 +9,7 @@ however, a straight installation of node will work just as well.
 You should install the latest LTS version of Node, which as of this writing is
 at v20.15.0
 
-_If you are on Windows, the direct install is probably your best bet -- there are other alternatives, but many of them seem broken -- this used to be so simple -- visit the [NodeJS download prebuilt-installers page](https://nodejs.org/en/download/prebuilt-installer) and download the latest LTS version (e.g. 20.15.0).  Follow the instructions which may include installation of other components._
+_If you are on Windows, however, the direct install is probably your best bet -- there are other alternatives, but many of them seem broken -- this used to be so simple -- visit the [NodeJS download prebuilt-installers page](https://nodejs.org/en/download/prebuilt-installer) and download the latest LTS version (e.g. 20.15.0).  Follow the instructions which may include installation of other components._
 
 Once installed, check your versions
 `node -v`
@@ -21,6 +21,13 @@ npm version should be 9.6.4 or greater on Windows, or 10.3.0 or greater on Mac /
 
 Installing MistLift will also install Typescript if you don't already have it.
 You should be using Typescript 5.3.3 or higher.
+
+Install typescript with `npm install -g typescript`
+then try `tsc -v`
+
+You should also check to see if you have the 'unzip' command installed on your system,
+try `unzip -v` to receive version info.
+
 
 To use the cloud features, you will need to set up an AWS account.
 See [Getting set up with AWS](./Getting%20set%20up%20with%20AWS.md) for 
