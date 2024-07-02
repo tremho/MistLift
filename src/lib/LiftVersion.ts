@@ -60,8 +60,6 @@ export class VersionInfo {
 // read version from Lift's package.json
 export function getLiftVersion (): VersionInfo {
   let pkg = path.join(__dirname, '..','..', 'package.json')
-  // pkg = path.join(__dirname, '..', '..', '..', 'package.json')
-  console.log("$$>>pkg", pkg)
   return readPackageVersion(pkg)
 }
 // read version from project's package.json
