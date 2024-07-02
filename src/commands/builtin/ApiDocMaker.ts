@@ -2,6 +2,8 @@ import { gatherFunctionDefinitions } from '../../lib/openAPI/ApiBuildCollector'
 import { buildOpenApi } from '../../lib/openAPI/openApiConstruction'
 import { GetWebrootServePaths } from '../../lib/openAPI/WebrootFileSupport'
 
+import path from 'path'
+
 export async function MakePublicApiDoc
 (
 ): Promise<Uint8Array> {
@@ -37,10 +39,12 @@ export function addBuiltInDefinitions (defs: any[]): void {
   for (const root of roots) {
     if (root !== '') {
       let rootName = root
-      while (rootName.includes('/')) rootName = rootName.replace('/', '').toLowerCase().trim()
+      let rootPath = root.replace(path.sep, '/');
+      while (rootName.includes(path.sep)) rootName = rootName.replace(path.sep, '').toLowerCase().trim()
+      console.log("$$$$>> rootPath, rootName", rootPath, rootName)
       const fileserve = Object.assign({}, fileServeDef) // copy
       fileserve.name = 'fileserve_' + rootName
-      fileserve.pathMap = `${root}/{path}`
+      fileserve.pathMap = `${rootPath}/{path}`
       defs.push(fileserve)
     }
   }

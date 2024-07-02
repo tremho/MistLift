@@ -17,28 +17,30 @@ import axios from 'axios'
 async function test (t: any): Promise<void> {
   const testMessage = `test on ${Date.now()}`
   // start clean
-  fs.rmSync('./QSTest', { recursive: true })
+  if(fs.existsSync('QSTest')) {
+    fs.rmSync('QSTest', { recursive: true })
+  }
   // init
   await doInit('QSTest', true)
 
   // verify project got made
-  t.ok(fs.existsSync('./QSTest'), 'created test project')
+  t.ok(fs.existsSync('QSTest'), 'created test project')
   // verify we have a functions dir
-  t.ok(fs.existsSync(path.join('./QSTest', 'functions')), 'functions exists')
+  t.ok(fs.existsSync(path.join('QSTest', 'functions')), 'functions exists')
   // verify we have a node_modules dir
-  t.ok(fs.existsSync(path.join('./QSTest', 'node_modules')), 'node_modules exists')
+  t.ok(fs.existsSync(path.join('QSTest', 'node_modules')), 'node_modules exists')
   // verify we have a webroot dir
-  t.ok(fs.existsSync(path.join('./QSTest', 'webroot')), 'webroot exists')
+  t.ok(fs.existsSync(path.join('QSTest', 'webroot')), 'webroot exists')
   // verify we have a package.json
-  t.ok(fs.existsSync(path.join('./QSTest', 'package.json')), 'package.json exists')
+  t.ok(fs.existsSync(path.join('QSTest', 'package.json')), 'package.json exists')
   // verify we have webroot/docs
-  t.ok(fs.existsSync(path.join('./QSTest', 'webroot', 'docs', 'apidoc.yaml')), 'yaml exists')
-  t.ok(fs.existsSync(path.join('./QSTest', 'webroot', 'docs', 'swagger-ui-bundle.js')), 'js exists')
-  t.ok(fs.existsSync(path.join('./QSTest', 'webroot', 'docs', 'swagger-ui-standalone-preset.js')), 'js exists')
-  t.ok(fs.existsSync(path.join('./QSTest', 'webroot', 'docs', 'swagger-ui.css')), 'css exists')
+  t.ok(fs.existsSync(path.join('QSTest', 'webroot', 'docs', 'apidoc.yaml')), 'yaml exists')
+  t.ok(fs.existsSync(path.join('QSTest', 'webroot', 'docs', 'swagger-ui-bundle.js')), 'js exists')
+  t.ok(fs.existsSync(path.join('QSTest', 'webroot', 'docs', 'swagger-ui-standalone-preset.js')), 'js exists')
+  t.ok(fs.existsSync(path.join('QSTest', 'webroot', 'docs', 'swagger-ui.css')), 'css exists')
 
   // create
-  process.chdir('./QSTest')
+  process.chdir('QSTest')
   await doCreate('IntegrationTest')
   t.ok(fs.existsSync(path.join('functions', 'IntegrationTest')), 'function exists')
   t.ok(fs.existsSync(path.join('functions', 'IntegrationTest', 'src', 'definition.json')), 'definition.json exists')

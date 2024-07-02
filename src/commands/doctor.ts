@@ -21,7 +21,8 @@ export async function doDoctor (): Promise<boolean> {
   let ok = report('MistLift', liftVersion, '0.1.0')
   ok = ok && report('Typescript', typescriptVersion, '5.3.3')
   ok = ok && report('Node', nodeVersion, '20.11.0')
-  ok = ok && report('Npm', npmVersion, '10.3.0')
+  const isWin:boolean = process.platform === 'win32'
+  ok = ok && report('Npm', npmVersion, isWin ? '9.6.4' : '10.3.0')
   report('Git', gitVersion, '2.0.0')
   if (!settingsAvail) {
     console.log('')

@@ -9,11 +9,13 @@ import { isNewer } from '../lib/fileCompare'
 import { executeCommand } from '../lib/executeCommand'
 import { mkdirSync } from 'fs'
 
+let projectPaths:any = {}
+
 // Build command
 export async function doBuildAsync (
   args: string[] // zero or more functions to build.  zero means build all
 ): Promise<number> {
-  const projectPaths = resolvePaths()
+  projectPaths = resolvePaths();
   if (!projectPaths.verified) {
     console.log(ac.bold.magenta('current directory is not at project root'))
     return -1
@@ -62,8 +64,9 @@ async function buildSingleFunction (
   funcDir: string,
   options: string[]
 ): Promise<number> {
-  const funcName = funcDir.substring(funcDir.lastIndexOf('/') + 1)
-  const buildPath = path.normalize(path.join(funcDir, '..', '..', 'build', 'functions', funcName))
+  const funcName = funcDir.substring(funcDir.lastIndexOf(path.sep) + 1)
+  const buildPath = path.join(projectPaths.basePath, 'build', 'functions', funcName)
+
   if (options.includes('--clean')) {
     if (fs.existsSync(buildPath)) {
       fs.rmSync(buildPath, { recursive: true })
@@ -90,7 +93,7 @@ async function buildFunctionModules (
   recurseDirectory(funcDir, (filepath, stats) => {
     if (path.extname(filepath) === '.ts') {
       let relPath = filepath.substring(funcDir.length)
-      relPath = relPath.substring(0, relPath.lastIndexOf('/'))
+      relPath = relPath.substring(0, relPath.lastIndexOf(path.sep))
       const outDir = path.join(buildPath, relPath)
 
       if (!(fails > 0 && failFast)) {
@@ -141,7 +144,7 @@ function doPostBuildSteps (
   const dstdef = path.join(buildPath, 'src', 'definition.json')
   if (fs.existsSync(srcdef)) {
     const destFolder = path.dirname(dstdef)
-    if (!fs.existsSync((destFolder))) mkdirSync(destFolder, { recursive: true })
+    if (!fs.existsSync(destFolder)) mkdirSync(destFolder, { recursive: true })
     fs.copyFileSync(srcdef, dstdef)
   } else {
     console.error(ac.red.bold('no definition file found at ' + srcdef))
@@ -154,7 +157,7 @@ function doPostBuildSteps (
     if (!fs.existsSync(bfiles)) fs.mkdirSync(bfiles, { recursive: true })
     recurseDirectory(filedirPath, (filepath, stats) => {
       let relPath = filepath.substring(funcDir.length)
-      relPath = relPath.substring(0, relPath.lastIndexOf('/'))
+      relPath = relPath.substring(0, relPath.lastIndexOf(path.sep))
       const outDir = path.join(buildPath, relPath)
       const target = path.join(outDir, path.basename(filepath))
       if (stats.isDirectory() && !fs.existsSync(target)) {

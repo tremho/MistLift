@@ -113,7 +113,7 @@ function defaultCopyright (
 function nameFromProjectPath (
   refPath: string
 ): string {
-  const n = refPath.lastIndexOf('/') + 1
+  const n = refPath.lastIndexOf(path.sep) + 1
   return refPath.substring(n)
 }
 
