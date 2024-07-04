@@ -11,7 +11,7 @@ export function GetWebrootServePaths (): string[] {
   recurseDirectory(webroot, (filepath, stats) => {
     if (stats.isDirectory()) {
       let relpath = filepath.substring(webroot.length)
-      if(process.platform == 'win32') while(relpath.includes(path.sep)) relpath = relpath.replace(path.sep, '/')
+      if (process.platform === 'win32') while (relpath.includes(path.sep)) relpath = relpath.replace(path.sep, '/')
       if (!list.includes(relpath)) list.push(relpath)
     }
     return false

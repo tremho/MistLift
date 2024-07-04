@@ -17,7 +17,7 @@ import axios from 'axios'
 async function test (t: any): Promise<void> {
   const testMessage = `test on ${Date.now()}`
   // start clean
-  if(fs.existsSync('QSTest')) {
+  if (fs.existsSync('QSTest')) {
     fs.rmSync('QSTest', { recursive: true })
   }
   // init
@@ -67,6 +67,10 @@ async function test (t: any): Promise<void> {
   t.ok(resp.status === 200, 'status is 200')
   const data: string = resp.data.toString()
   t.ok(data === testMessage, 'saw expected data')
+
+  // clean up
+  process.chdir('..')
+  fs.rmSync('QSTest', { recursive: true })
 
   t.end()
 }

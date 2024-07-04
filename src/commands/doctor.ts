@@ -22,7 +22,7 @@ export async function doDoctor (): Promise<boolean> {
   let ok = report('MistLift', liftVersion, '0.1.0')
   ok = ok && report('Typescript', typescriptVersion, '5.3.3')
   ok = ok && report('Node', nodeVersion, '20.11.0')
-  const isWin:boolean = process.platform === 'win32'
+  const isWin: boolean = process.platform === 'win32'
   ok = ok && report('Npm', npmVersion, isWin ? '9.6.4' : '10.3.0')
   report('Git', gitVersion, '2.0.0')
   report('unzip', unzipVersion, '1.0.0')
@@ -94,8 +94,8 @@ async function fetchUnzipVersion (
 
 ): Promise<string> {
   const result = await executeCommand('unzip', ['-v'])
-  if(result.retcode !== 0) return 'unzip not found'
-  let vstr = result.stdStr.split('\n')[0].split(' ')[1]
+  if (result.retcode !== 0) return 'unzip not found'
+  const vstr = result.stdStr.split('\n')[0].split(' ')[1]
   return versionTrim(vstr)
 }
 

@@ -40,7 +40,7 @@ To get started using MistLift, please see the [QuickStart Guide](https://github.
 
 ## Changelog
 
-### 1.1.5, 1.1.6 -- 7/2/24
+### 1.1.5, 1.1.6, 1.1.7 -- 7/2/24
 
 - A number of Windows-related fixes 
 

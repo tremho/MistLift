@@ -9,14 +9,14 @@ import { isNewer } from '../lib/fileCompare'
 import { executeCommand } from '../lib/executeCommand'
 import { mkdirSync } from 'fs'
 
-let projectPaths:any = {}
+let projectPaths: any = {}
 
 // Build command
 export async function doBuildAsync (
   args: string[] // zero or more functions to build.  zero means build all
 ): Promise<number> {
-  projectPaths = resolvePaths();
-  if (!projectPaths.verified) {
+  projectPaths = resolvePaths()
+  if (projectPaths.verified !== true) {
     console.log(ac.bold.magenta('current directory is not at project root'))
     return -1
   }
