@@ -19,6 +19,7 @@ export async function StageWebrootZip
   const webroot = path.join(projectPaths.basePath, 'webroot')
   const packageTemp = path.join(projectPaths.basePath, '.package_temp')
   const zipFilesPath = path.join(packageTemp, 'Webroot', '__files__')
+  await fs.mkdirSync(zipFilesPath, { recursive: true })
   await recurseDirectory(webroot, (filepath, stats) => {
     const relPath = filepath.substring(webroot.length)
     if (stats.isDirectory()) {
