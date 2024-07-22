@@ -9,8 +9,9 @@ export type RecurseCB = (filepath: string, stats: Stats) => boolean
 export function recurseDirectory (dirpath: string, callback?: RecurseCB): void {
   fs.readdirSync(dirpath).forEach((file: string) => {
     const fpath = path.join(dirpath, file)
-    const stat = fs.lstatSync(fpath)
+    const stat = fs.statSync(fpath)
     if ((callback != null) && !callback(fpath, stat)) {
+      console.log('recurse directory / isSymLink ', fpath, stat.isSymbolicLink())
       if (stat.isDirectory()) {
         recurseDirectory(fpath, callback)
       }
