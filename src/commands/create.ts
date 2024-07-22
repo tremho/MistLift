@@ -29,6 +29,13 @@ export function doCreate (
     if (!fs.existsSync(path.join(funcPath, testdirname))) fs.mkdirSync(path.join(funcPath, testdirname))
     if (!fs.existsSync(path.join(funcPath, 'src'))) fs.mkdirSync(path.join(funcPath, 'src'))
 
+    // create link to common lib
+    if(!fs.existsSync(path.join(funcPath, 'src', 'commonLib'))) {
+      const funcSrc = path.join(funcPath, 'src')
+      const relPath = path.relative(funcSrc, projectPaths.basePath)
+      fs.symlinkSync(path.join(relPath, 'commonLib'),path.join(funcSrc, 'lib'), 'dir')
+    }
+
     let localsrc = fs.readFileSync(path.join(dataDir, 'function-local-ts')).toString()
     while (localsrc.includes('$$FUNCTION_NAME$$')) {
       localsrc = localsrc.replace('$$FUNCTION_NAME$$', funcName)

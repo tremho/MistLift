@@ -39,6 +39,11 @@ export async function doInit (
     fs.mkdirSync(funcDir)
   }
 
+  const libDir = path.join(refPath, 'commonLib')
+  if (!fs.existsSync(libDir)) {
+    fs.mkdirSync(libDir)
+  }
+
   // make webroot with docs folder and placeholder yaml
   const webrootDocs = path.join(refPath, 'webroot', 'docs')
   if (!fs.existsSync(webrootDocs)) {
