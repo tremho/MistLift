@@ -11,7 +11,6 @@ export function recurseDirectory (dirpath: string, callback?: RecurseCB): void {
     const fpath = path.join(dirpath, file)
     const stat = fs.statSync(fpath)
     if ((callback != null) && !callback(fpath, stat)) {
-      console.log('recurse directory / isSymLink ', fpath, stat.isSymbolicLink())
       if (stat.isDirectory()) {
         recurseDirectory(fpath, callback)
       }
