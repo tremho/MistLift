@@ -20,6 +20,15 @@ export function functionBinder (): void {
     for (const def of defs) {
       let { name, pathMap, method } = def
       try {
+        if(!method) {
+          console.log(ac.red('no method defined for ' + name));
+          if(def.allowedMethods) {
+            console.log(ac.bgBlack.yellowBright('DEPRECATED')+ac.blue(' As of v1.1.8, The use of ')+ac.black.italic('allowedMethods')+ac.blue(' is replaced by the single' +
+                ac.black.italic(' method ')+ac.blue('property.')+ac.black.bold('Please update your definition file')));
+            method = def.allowedMethods.split(',')[0]
+          }
+        }
+
         method = method.trim().toLowerCase()
         const rpath = path.join(projectPaths.buildPath, 'functions', name, 'src', 'main.js')
         clearModule(rpath)

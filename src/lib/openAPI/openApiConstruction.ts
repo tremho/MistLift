@@ -5,6 +5,7 @@ import { OpenApiBuilder } from 'openapi3-ts/oas30'
 import fs from 'fs'
 import path from 'path'
 import { resolvePaths } from '../pathResolve'
+import * as ac from 'ansi-colors'
 
 export async function buildOpenApi (
   defs: any[],
@@ -50,6 +51,14 @@ export async function buildOpenApi (
 
     const parameters = def.parameters ?? []
     let method = def.method
+    if(!def.method) {
+      console.log(ac.red('no method defined for ' + def.name));
+      if(def.allowedMethods) {
+        console.log(ac.bgBlack.yellowBright('DEPRECATED')+ac.blue(' As of v1.1.8, The use of ')+ac.black.italic('allowedMethods')+ac.blue(' is replaced by the single' +
+            ac.black.italic(' method ')+ac.blue('property.')+ac.black.bold('Please update your definition file')));
+        def.method = def.allowedMethods.split(',')[0]
+      }
+    }
     const schemas = def.schemas ?? {}
     for (const schemaName of Object.getOwnPropertyNames(schemas)) {
       const schema = schemas[schemaName]
