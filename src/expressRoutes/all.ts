@@ -84,12 +84,14 @@ export function allBinder (): void {
           return res.sendStatus(200)
         }
       }
-      filepath = path.resolve(path.join(projectPaths.basePath, 'webroot', filepath)) // .. out of build
-      if (fs.existsSync(filepath)) {
-        return res.sendFile(filepath)
-      } else {
-        console.log(ac.red.bold("can't find " + filepath))
-        return res.sendStatus(404)
+      if (!filepath.endsWith('.websocket')) {
+        filepath = path.resolve(path.join(projectPaths.basePath, 'webroot', filepath)) // .. out of build
+        if (fs.existsSync(filepath)) {
+          return res.sendFile(filepath)
+        } else {
+          console.log(ac.red.bold("can't find " + filepath))
+          return res.sendStatus(404)
+        }
       }
     }
     // if none of the above, tickle enumerator so we can process other paths
