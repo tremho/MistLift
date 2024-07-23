@@ -1,23 +1,15 @@
 # MistLift Tips and Techniques
 
 ## Common code and libraries
-You can create a web API consisting of several functions that serve a related purpose, of course.
-Use the `lift create` command for each new function name.
+### local commonLib
+As of 1.2.0, a `commonLib` directory is created parallel to the `functions` folder with `lift init`.
+Each function created with `lift create` will include a symlink to this folder in its `src` directory, locally
+called `lib`.
 
-If you have common code to share between functions, follow this pattern
+Place code in the `commonLib` location that is visible to all your functions and
+import it within your function modules as `import {myExports} from './lib/MyLibModule`
+in each of the functions that uses it.
 
-1. Create a sudirectory for your library code outside the 'functions' directory, so that `lib` is a sibling directory to 'functions'
-<br/>
-   Within the `src` folder of each function that will be referencing this common code,
-   create a softlink to the `lib` folder from the `src` folder.
-   <br/><br/>
-On Linux or Mac the command is `ln -s ../../../lib lib`
-   <br>
-On Windows the command is `mklink lib ../../../lib`
-   <br>
-   <br>
-
-2. import the modules in at the lib path from within the src code that uses it with the path `./lib/...`
 
 ### npm packages
 Your code can of course use any npm packages available.
@@ -29,7 +21,7 @@ When your functions are packaged, these dependencies will be migrated for use in
 
 Avoid making web request function calls to other functions within your api. 
 This does not behave well in an AWS deployment.  Instead, structure your code so that
-the function itself can be called programmatically and place this is a common library.
+the function itself can be called programmatically and place this in the common library.
 
 Then call this at code level where needed. 
 

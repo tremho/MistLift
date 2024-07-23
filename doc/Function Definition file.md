@@ -17,7 +17,7 @@ URI - based parameters may be specified here, for example:
 would indicate that a uri of `/report/comp-sci/matheson` would pass the value 'comp-sci' to the parameter 'classroom'
 and the value 'matheson' to the parameter 'student'
 
-- __allowedMethods__ - comma-separated list of HTTP methods this function may be called by (GET, POST, PUT, DELETE, PATCH).
+- __method__ - HTTP method this function is to be called by (GET, POST, PUT, DELETE, PATCH). 
 
 - __schemas__ - defines optional schemas describing object types of the function. Schemas may be referred to by name for return types.
 

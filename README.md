@@ -40,6 +40,18 @@ To get started using MistLift, please see the [QuickStart Guide](https://github.
 
 ## Changelog
 
+### 1.2.0
+
+- __Minor Breaking Change__ service definition _allowedMethods_ changed to just _method_. No more pretense of supporting multiple methods for the same function.
+This is breaking because any previous service definition files need to change this property name to continue to work with this version or later.
+
+- Support for a common library shared by functions (_see [Tips and Techniques](./doc/Tips%20and%20Techiques.md))
+- Support for esbuild (e.g. React) (_see [ESBuild and React support](./doc/ESBuild and React support.md))
+
+### 1.1.8
+
+- Fixed a bug with certain forms of JSON responses on AWS
+
 ### 1.1.5, 1.1.6, 1.1.7 -- 7/2/24
 
 - A number of Windows-related fixes 

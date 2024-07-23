@@ -49,18 +49,16 @@ export async function buildOpenApi (
     if (def.private === true && !includePrivate) continue // skip private
 
     const parameters = def.parameters ?? []
-    const methods = def.allowedMethods.split(',')
+    let method = def.method
     const schemas = def.schemas ?? {}
     for (const schemaName of Object.getOwnPropertyNames(schemas)) {
       const schema = schemas[schemaName]
       addTypeSchema(builder, schemaName, schema)
     }
-    for (let method of methods) {
-      method = method.trim().toLowerCase()
-      addFunctionMethod(pathDef, method, def)
-      for (const param of parameters) {
-        addParameter(pathDef, param)
-      }
+    method = method.trim().toLowerCase()
+    addFunctionMethod(pathDef, method, def)
+    for (const param of parameters) {
+      addParameter(pathDef, param)
     }
     addCORSOptionMethod(pathDef)
     builder.addPath((def.pathMap ?? '/' + (def.name as string)), pathDef)

@@ -199,7 +199,7 @@ class PrereqInfo {
         // console.log("resourceMethods", api.resourceMethods)
         const methodList = Object.getOwnPropertyNames(api.resourceMethods)
         // ClogTrace("methodList", methodList)
-        for (const meth of allowedMethods.toUpperCase().split(',')) {
+        for (const meth of allowedMethods.toUpperCase().split(',')) { // NOTE: we no longer try to support multiples, but this still works as is.
           // console.log("meth", meth)
           if (methodList.includes(meth)) {
             (api).method = meth
@@ -226,7 +226,7 @@ class PrereqInfo {
     const out: PutIntegrationRequest[] = []
     for (const d of this.defs) {
       const def = (d)
-      const api = this.findApi(def.pathMap, def.allowedMethods)
+      const api = this.findApi(def.pathMap, def.methods)
       const arn = this.findARN(def.name) ?? ''
       if (arn === '') {
         console.log(`>>> No ARN for ${(def.name as string)} ${(def.pathMap as string)}, ${(api.id as string)}`)

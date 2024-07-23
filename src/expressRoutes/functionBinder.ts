@@ -18,42 +18,39 @@ export function functionBinder (): void {
     const projectPaths = resolvePaths()
 
     for (const def of defs) {
-      const { name, pathMap, allowedMethods } = def
-      const methods = allowedMethods.split(',')
-      for (let method of methods) {
-        try {
-          method = method.trim().toLowerCase()
-          const rpath = path.join(projectPaths.buildPath, 'functions', name, 'src', 'main.js')
-          clearModule(rpath)
-          const { start } = require(rpath)
+      let { name, pathMap, method } = def
+      try {
+        method = method.trim().toLowerCase()
+        const rpath = path.join(projectPaths.buildPath, 'functions', name, 'src', 'main.js')
+        clearModule(rpath)
+        const { start } = require(rpath)
 
-          let entryRoot: string = pathMap
-          const n = entryRoot.indexOf('/{')
-          if (n !== -1) entryRoot = entryRoot.substring(0, n) + '/*'
+        let entryRoot: string = pathMap
+        const n = entryRoot.indexOf('/{')
+        if (n !== -1) entryRoot = entryRoot.substring(0, n) + '/*'
 
-          const callHandler = (pathMap: string, req: any, res: any): void => {
-            const event = requestToEvent(pathMap, req)
-            Promise.resolve(start(event, null, null)).then(respOut => {
-              handleResponse(res, respOut)
-            }).catch<any>((reason: any) => undefined)
-          }
-
-          if (method === 'get') {
-            router.get(entryRoot, (req, res) => callHandler(pathMap, req, res))
-          } else if (method === 'post') {
-            router.post(entryRoot, (req, res) => callHandler(pathMap, req, res))
-          } else if (method === 'put') {
-            router.put(entryRoot, (req, res) => callHandler(pathMap, req, res))
-          } else if (method === 'patch') {
-            router.patch(entryRoot, (req, res) => callHandler(pathMap, req, res))
-          } else if (method === 'delete') {
-            router.delete(entryRoot, (req, res) => callHandler(pathMap, req, res))
-          } else {
-            console.log(ac.red.bold('Cannot map method ') + ac.blue.bold(method))
-          }
-        } catch (e: any) {
-          Log.Error(ac.bold.red(e.message.split('\n')[0]))
+        const callHandler = (pathMap: string, req: any, res: any): void => {
+          const event = requestToEvent(pathMap, req)
+          Promise.resolve(start(event, null, null)).then(respOut => {
+            handleResponse(res, respOut)
+          }).catch<any>((reason: any) => undefined)
         }
+
+        if (method === 'get') {
+          router.get(entryRoot, (req, res) => callHandler(pathMap, req, res))
+        } else if (method === 'post') {
+          router.post(entryRoot, (req, res) => callHandler(pathMap, req, res))
+        } else if (method === 'put') {
+          router.put(entryRoot, (req, res) => callHandler(pathMap, req, res))
+        } else if (method === 'patch') {
+          router.patch(entryRoot, (req, res) => callHandler(pathMap, req, res))
+        } else if (method === 'delete') {
+          router.delete(entryRoot, (req, res) => callHandler(pathMap, req, res))
+        } else {
+          console.log(ac.red.bold('Cannot map method ') + ac.blue.bold(method))
+        }
+      } catch (e: any) {
+        Log.Error(ac.bold.red(e.message.split('\n')[0]))
       }
     }
   }).catch<any>((reason: any) => undefined)
