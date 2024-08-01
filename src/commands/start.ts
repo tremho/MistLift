@@ -50,21 +50,19 @@ export async function startLocalServer (): Promise<void> {
   app.use('/api', apiRouter)
   app.use('*', allRouter)
 
+ 
   startServers()
 
   funcWatcher(path.join(projectPaths.basePath, 'functions'), path.join(projectPaths.basePath, 'webroot'));
+  // sleep(5000).then(() => esbuilder())
   esbuilder()
 
 }
 function startServers() {
   startWebSocketConnection(app)
-  try {
-    server = app.listen(serverConfig.port, function () {
-      console.log(`http listening on port ${serverConfig.port ?? defaultPort}`)
-    })
-  } catch(e:any) {
-    // console.error(e)
-  }
+  server = app.listen(serverConfig.port, function () {
+    console.log(`http listening on port ${serverConfig.port ?? defaultPort}`)
+  })
 }
 
 function readServerConfig() {
@@ -144,17 +142,22 @@ async function triggerRebuild() {
   }
 }
 
-function triggerBrowserRestart() {
-  // console.log("Trigger Browser Restart")
+let closing = false
+
+async function triggerBrowserRestart() {
+  if(closing) {
+    console.warn('restarting...')
+    return
+  }
   if(server) {
-    socketClose();
-    server.close(() => {
-      startServers()
-    })
-    // console.log("server close initiated")
-  } else {
-    // console.log("first start of servers")
+    closing = true;
+    await socketClose();
+    await server.close();
+    await sleep(1000)
+    closing = false
     startServers()
+  } else {
+    closing = false
   }
 }
 

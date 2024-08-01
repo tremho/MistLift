@@ -33,7 +33,14 @@ export function doCreate (
     if(!fs.existsSync(path.join(funcPath, 'src', 'commonLib'))) {
       const funcSrc = path.join(funcPath, 'src')
       const relPath = path.relative(funcSrc, projectPaths.basePath)
-      fs.symlinkSync(path.join(relPath, 'commonLib'),path.join(funcSrc, 'lib'), 'dir')
+      let from = path.join(relPath, 'commonLib');
+      let to = path.join(funcSrc, 'lib')
+      if(path.sep !== '/') {
+        while(from.indexOf('/') !== -1) from = from.replace('/', path.sep)
+        while(to.indexOf('/') !== -1) to = to.replace('/', path.sep)
+      }
+
+      fs.symlinkSync(from, to, 'dir')
     }
 
     let localsrc = fs.readFileSync(path.join(dataDir, 'function-local-ts')).toString()
