@@ -226,7 +226,7 @@ class PrereqInfo {
     const out: PutIntegrationRequest[] = []
     for (const d of this.defs) {
       const def = (d)
-      const api = this.findApi(def.pathMap, def.methods)
+      const api = this.findApi(def.pathMap, def.method)
       const arn = this.findARN(def.name) ?? ''
       if (arn === '') {
         console.log(`>>> No ARN for ${(def.name as string)} ${(def.pathMap as string)}, ${(api.id as string)}`)

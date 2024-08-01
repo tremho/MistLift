@@ -17,11 +17,15 @@ import * as ac from 'ansi-colors'
 import path from 'path'
 import fs from 'fs'
 
+import {Log} from "@tremho/inverse-y"
+
+const defaultPort = 8081
+const serverConfig = readServerConfig();
 let server:any = null
-const port = 8081
 const app = express()
 
 export async function startLocalServer (): Promise<void> {
+  // console.warn('startLocalServer')
   const projectPaths = resolvePaths()
   if (!projectPaths.verified) {
     console.log(ac.bold.red('Cannot start local server'))
@@ -29,9 +33,13 @@ export async function startLocalServer (): Promise<void> {
     console.log('')
     return
   }
+
+  // first build will exit on an error regardless of config
   await doBuildAsync([])
-  allBinder()
-  functionBinder()
+  await allBinder()
+  // Log.Trace('calling functionBinder')
+  await functionBinder()
+  // Log.Trace('done calling functionBinder')
   // for JSON posts
   // app.use(bodyParser.json({limit: '50mb'}))
   app.use(express.json())
@@ -42,57 +50,54 @@ export async function startLocalServer (): Promise<void> {
   app.use('/api', apiRouter)
   app.use('*', allRouter)
 
+  if(!serverConfig.refreshBrowserOnWebrootChange && !serverConfig.rebuildFunctionsOnChange) {
+    startServers()
+  }
+
   funcWatcher(path.join(projectPaths.basePath, 'functions'), path.join(projectPaths.basePath, 'webroot'));
   esbuilder();
 
-  // startServers()
 }
 function startServers() {
-
   startWebSocketConnection(app)
-  server = app.listen(port, function () {
-    console.log(`http listening on port ${port}`)
+  server = app.listen(serverConfig.port, function () {
+    console.log(`http listening on port ${serverConfig.port ?? defaultPort}`)
   })
+}
+
+function readServerConfig() {
+  // console.log('readServerConfig...')
+  const projectPaths = resolvePaths()
+  const confFile = path.join(projectPaths.basePath, 'localServerConfig.json')
+  if(!fs.existsSync(confFile)) return {}
+
+  const conf:any = JSON.parse(fs.readFileSync(confFile).toString())
+  // console.log("server configuration", conf)
+  return conf
 }
 
 async function esbuilder() {
 
-  console.log("esbuilder --")
+  if(!serverConfig.esbuild) return;
 
-  const projectPaths = resolvePaths()
-  const confFile = path.join(projectPaths.basePath, 'esbuildConfig.json')
-  if(!fs.existsSync(confFile)) return;
-
-  console.log("setting up esbuild...")
-  const conf:any = JSON.parse(fs.readFileSync(confFile).toString())
-  console.log("configuration", conf)
-
-  const entryPoints = conf.entryPoints ?? []
-  const outDir = conf.outdir ?? 'webroot'
-  const watch = conf.watch ?? false
-  const breakOnError = conf.breakOnError ?? false
-  const breakOnWarn = conf.breakOnWarn ?? false
+  const entryPoints = serverConfig.esbuild.entryPoints ?? []
+  const outDir = serverConfig.esbuild.outdir ?? 'webroot'
+  const watch = serverConfig.esbuild.watch ?? false
+  const breakOnError = serverConfig.esbuild.breakOnError ?? false
+  const breakOnWarn = serverConfig.esbuild.breakOnWarn ?? false
 
   let ctx = await esbuild.context({
     entryPoints,
     bundle: true,
     outdir: outDir
   })
+  // console.log('esbuild...')
+
   let result = await ctx.rebuild()
   let more = watch
   do {
     await sleep(500)
-    for(let warn in result.warnings) {
-      console.log(warn)
-      more = !breakOnWarn
-    }
-    for(let err in result.errors) {
-      console.error(err)
-      more = !breakOnError
-    }
-    if(more) {
-      result = await ctx.rebuild()
-    }
+    result = await ctx.rebuild()
   } while(more)
 }
 
@@ -105,15 +110,21 @@ function sleep(ms:number)
 
 async function funcWatcher(watchPath:string, webrootPath:string) {
 
+  if(serverConfig.rebuildFunctionsOnChange !== true) return;
+  // console.log('watching for changes in functions')
   watch(watchPath, {recursive:true}, onWatch1)
-  watch(webrootPath, {recursive:true}, onWatch2)
+
+  if(serverConfig.refreshBrowserOnWebrootChange) {
+    // console.log('watching for webroot changes')
+    watch(webrootPath, {recursive: true}, onWatch2)
+  }
 }
 function onWatch1(evt:string, name:string) {
-  console.log("funcWatch Event seen", {evt, name})
+  // console.log("funcWatch Event seen", {evt, name})
   triggerRebuild()
 }
 function onWatch2(evt:string, name:string) {
-  console.log("Webroot Watch Event seen", {evt, name})
+  // console.log("Webroot Watch Event seen", {evt, name})
   triggerBrowserRestart()
 }
 
@@ -121,22 +132,26 @@ let alreadyBuilding = false
 async function triggerRebuild() {
   if(!alreadyBuilding) {
     alreadyBuilding = true;
-    await doBuildAsync([]);
+    const errRet = await doBuildAsync([]);
+    if(errRet) {
+      process.exit(errRet)
+    }
     alreadyBuilding = false;
-    triggerBrowserRestart()
+    if(serverConfig.refreshBrowserOnFunctionChange)
+      triggerBrowserRestart()
   }
 }
 
 function triggerBrowserRestart() {
-  console.log("Trigger Browser Restart")
+  // console.log("Trigger Browser Restart")
   if(server) {
     socketClose();
     server.close(() => {
       startServers()
     })
-    console.log("server close initiated")
+    // console.log("server close initiated")
   } else {
-    console.log("first start of servers")
+    // console.log("first start of servers")
     startServers()
   }
 }
@@ -151,12 +166,12 @@ var socketClose:any = () => {}
 
 function startWebSocketConnection(app:any)
 {
-  console.log("Starting WebSocket Connection Listener")
+  // console.log("Starting WebSocket Connection Listener")
   const ews = expressWS(app)
   const wsapp = ews.app
 
   socketClose = (e:any) => {
-    console.log("close wss", e)
+    // console.log("close wss", e)
     ews.getWss().close()
   }
 
@@ -167,16 +182,16 @@ function startWebSocketConnection(app:any)
   // })
 
   wsapp.get('/watch', (req:any, res:any, next:any) => {
-    console.log('get route', req.testing)
+    // console.log('get route', req.testing)
   })
 
   wsapp.ws('/watch', (ws:any, req:any) => {
     ws.on('message', (msg:string)=> {
-      console.log('Received WS Message: ' + msg)
+      // console.log('Received WS Message: ' + msg)
       ws.send(msg)
     })
     ws.on('close', () => {
-      console.log("Websocket connection closed")
+      // console.log("Websocket connection closed")
     })
   })
 }

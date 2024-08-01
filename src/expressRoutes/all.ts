@@ -29,11 +29,13 @@ export function allBinder (): void {
      */
   router.all('*', (req, res, next) => {
     // any PHP requests should be ignored
-    // ClogTrace('incoming: '+req.originalUrl)
     if (req.originalUrl.includes('.php')) {
       return res.send('')
     }
     if (req.originalUrl.includes('.env')) {
+      return res.send('')
+    }
+    if(req.originalUrl.endsWith('webroot/favicon.ico')) {
       return res.send('')
     }
 

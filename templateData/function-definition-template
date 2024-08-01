@@ -3,7 +3,7 @@
   "description": "",
   "version": "1.0.0",
   "pathMap": "$$PATHMAP$$",
-  "allowedMethods": "GET",
+  "method": "GET",
   "schemas": {
   },
   "parameters": [

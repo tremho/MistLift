@@ -19,6 +19,7 @@ export function functionBinder (): void {
 
     for (const def of defs) {
       let { name, pathMap, method } = def
+      let rpath = ''
       try {
         if(!method) {
           console.log(ac.red('no method defined for ' + name));
@@ -30,7 +31,8 @@ export function functionBinder (): void {
         }
 
         method = method.trim().toLowerCase()
-        const rpath = path.join(projectPaths.buildPath, 'functions', name, 'src', 'main.js')
+        rpath = path.join(projectPaths.buildPath, 'functions', name, 'src', 'main.js')
+        console.warn('loading function', name)
         clearModule(rpath)
         const { start } = require(rpath)
 
@@ -59,7 +61,10 @@ export function functionBinder (): void {
           console.log(ac.red.bold('Cannot map method ') + ac.blue.bold(method))
         }
       } catch (e: any) {
-        Log.Error(ac.bold.red(e.message.split('\n')[0]))
+        // Log.Error(ac.bold.red(e.message.split('\n')[0]))0
+        // throw new Error("Unable to load and bind function code at "+ rpath)
+        Log.Error("Unable load and bind function code", rpath)
+        Log.Exception(e)
       }
     }
   }).catch<any>((reason: any) => undefined)
