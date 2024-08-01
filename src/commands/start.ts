@@ -50,19 +50,21 @@ export async function startLocalServer (): Promise<void> {
   app.use('/api', apiRouter)
   app.use('*', allRouter)
 
-  if(!serverConfig.refreshBrowserOnWebrootChange && !serverConfig.rebuildFunctionsOnChange) {
-    startServers()
-  }
+  startServers()
 
   funcWatcher(path.join(projectPaths.basePath, 'functions'), path.join(projectPaths.basePath, 'webroot'));
-  esbuilder();
+  esbuilder()
 
 }
 function startServers() {
   startWebSocketConnection(app)
-  server = app.listen(serverConfig.port, function () {
-    console.log(`http listening on port ${serverConfig.port ?? defaultPort}`)
-  })
+  try {
+    server = app.listen(serverConfig.port, function () {
+      console.log(`http listening on port ${serverConfig.port ?? defaultPort}`)
+    })
+  } catch(e:any) {
+    // console.error(e)
+  }
 }
 
 function readServerConfig() {
