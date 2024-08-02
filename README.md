@@ -3,6 +3,22 @@
 
 _CLI tools and structured project support for easy-access cloud development_
 
+[![NPM version][npm-image]][npm-url] 
+[![Downloads][downloads-image]][npm-url]
+[![TotalDownloads][total-downloads-image]][npm-url]
+
+[build-status]: https://travis-ci.org/tremho/mist-lift.svg?branch=master
+
+[build-url]: https://travis-ci.org/tremho/mist-lift
+
+[npm-image]: http://img.shields.io/npm/v/mist-lift.svg
+
+[npm-url]: https://npmjs.org/package/mist-lift
+
+[downloads-image]: http://img.shields.io/npm/dm/mist-lift.svg
+
+[total-downloads-image]: http://img.shields.io/npm/dt/mist-lift.svg?label=total%20downloads
+
 MistLift, aka [@tremho/mist-lift at npm](https://www.npmjs.com/package/@tremho/mist-lift) is an OpenSource project aimed at providing an easy and seamless platform for developers
 to quickly develop cloud services locally and then migrating to cloud with a simple and
 lightweight Command Line API that avoids some of the more intimidating aspects of 
@@ -39,6 +55,11 @@ To get started using MistLift, please see the [QuickStart Guide](https://github.
 
 
 ## Changelog
+
+### 2.0.0
+- Revised logging implementation using [@tremho/gen-logger](https://www.npmjs.com/package/@tremho/gen-logger)
+- Numerous bug fixes
+- Additional documentation for 1.2.0 changes
 
 ### 1.2.0
 
@@ -80,6 +101,7 @@ This is breaking because any previous service definition files need to change th
 
 
 
+ 
  
  
  
