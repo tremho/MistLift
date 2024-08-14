@@ -64,6 +64,10 @@ To get started using MistLift, please see the [QuickStart Guide](https://github.
 
 ## Changelog
 
+### 2.0.2
+- includes webroot template files for esbuild and watcher support
+- adds support for timeoutSeconds in definitions.json
+
 ### 2.0.1
 - Fixes sourcemap issues, via @tremho/gen-logger 2.0.1
 

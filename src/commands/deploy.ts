@@ -3,7 +3,7 @@ import {
   LambdaClient,
   CreateFunctionCommand,
   DeleteFunctionCommand,
-  AddPermissionCommand
+  AddPermissionCommand, UpdateFunctionConfigurationCommand
 } from '@aws-sdk/client-lambda'
 
 import md5 from 'md5'
@@ -94,6 +94,9 @@ export async function deployPackage (
   // first off, anchor a base directory
   zipFile ??= path.join(projectPaths.basePath, 'MistLift_Zips', funcName + '.zip')
 
+  const defFile = path.join(projectPaths.functionPath, funcName, 'src', 'definition.json')
+  const def = JSON.parse(fs.readFileSync(defFile).toString())
+  const timeout = def.timeoutSeconds ?? 0 // zero will mean default (3 seconds on AWS)
   // funcname gets decorated with current instance identifier
   const idsrc = md5((getProjectName() ?? '') + (getProjectVersion()?.toString() ?? ''))
   const dFuncName = funcName + '_' + idsrc
@@ -110,7 +113,7 @@ export async function deployPackage (
   // console.log(ac.green.italic("deploying ")+ac.green.bold(funcName)+"...")
 
   try {
-    const response: any = await CreateCloudFunction(dFuncName, zipFile)
+    const response: any = await CreateCloudFunction(dFuncName, zipFile, timeout)
     const parts = response.FunctionArn.split(':')
     const principal = parts[4]
     await AddPermissions(client, dFuncName, principal)
@@ -121,7 +124,8 @@ export async function deployPackage (
 }
 async function CreateCloudFunction (
   funcName: string,
-  zipFile: string
+  zipFile: string,
+  timeout: number
 
 ): Promise<any> {
   const settings = getSettings()
@@ -136,7 +140,8 @@ async function CreateCloudFunction (
     Handler: 'runmain.handler',
     Code: {
       ZipFile: zipFileBase64
-    }
+    },
+    Timeout: timeout > 0 ? timeout : undefined
   })
   const resp = await client.send(command) // response
   return resp
