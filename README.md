@@ -3,21 +3,29 @@
 
 _CLI tools and structured project support for easy-access cloud development_
 
+[![AWSLogo][aws-logo]][aws-url]
+[![AWSFeature][aws-feature]][lambda-url]
+
 [![NPM version][npm-image]][npm-url] 
 [![Downloads][downloads-image]][npm-url]
 [![TotalDownloads][total-downloads-image]][npm-url]
+
+[aws-url]: https://aws.amazon.com
+[lambda-url]: https://aws.amazon.com/lambda
+[aws-logo]: https://img.shields.io/badge/-white?logo=amazonwebservices&logoColor=black
+[aws-feature]: https://img.shields.io/badge/lambda-blue
 
 [build-status]: https://travis-ci.org/tremho/mist-lift.svg?branch=master
 
 [build-url]: https://travis-ci.org/tremho/mist-lift
 
-[npm-image]: http://img.shields.io/npm/v/mist-lift.svg
+[npm-image]: http://img.shields.io/npm/v/@tremho/mist-lift.svg
 
-[npm-url]: https://npmjs.org/package/mist-lift
+[npm-url]: https://npmjs.org/package/@tremho/mist-lift
 
-[downloads-image]: http://img.shields.io/npm/dm/mist-lift.svg
+[downloads-image]: http://img.shields.io/npm/dm/@tremho/mist-lift.svg
 
-[total-downloads-image]: http://img.shields.io/npm/dt/mist-lift.svg?label=total%20downloads
+[total-downloads-image]: http://img.shields.io/npm/dt/@tremho/mist-lift.svg?label=total%20downloads
 
 MistLift, aka [@tremho/mist-lift at npm](https://www.npmjs.com/package/@tremho/mist-lift) is an OpenSource project aimed at providing an easy and seamless platform for developers
 to quickly develop cloud services locally and then migrating to cloud with a simple and
@@ -55,6 +63,9 @@ To get started using MistLift, please see the [QuickStart Guide](https://github.
 
 
 ## Changelog
+
+### 2.0.1
+- Fixes sourcemap issues, via @tremho/gen-logger 2.0.1
 
 ### 2.0.0
 - Revised logging implementation using [@tremho/gen-logger](https://www.npmjs.com/package/@tremho/gen-logger)
@@ -101,6 +112,7 @@ This is breaking because any previous service definition files need to change th
 
 
 
+ 
  
  
  
