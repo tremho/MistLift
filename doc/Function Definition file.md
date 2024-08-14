@@ -19,6 +19,8 @@ and the value 'matheson' to the parameter 'student'
 
 - __method__ - HTTP method this function is to be called by (GET, POST, PUT, DELETE, PATCH). 
 
+- __timeoutSeconds__ -- number of seconds for timeout before function returns a response. If 0 or less, or not provided, the default is used (AWS default is 3). Has no effect on local server.
+
 - __schemas__ - defines optional schemas describing object types of the function. Schemas may be referred to by name for return types.
 
 example:

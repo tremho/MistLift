@@ -94,6 +94,9 @@ export function helpCreate (): void {
   console.log('')
   console.log(ac.grey("The default function will display a'Hello World!' message when built and run"))
   console.log(ac.grey('Modify the code to suit the needs of your function application'))
+  console.log('')
+  console.log(ac.italic.blue('For Windows, this command must be issued in from a Command or Powershell window in Administrator mode'))
+
 }
 export function helpBuild (): void {
   printBanner('build')

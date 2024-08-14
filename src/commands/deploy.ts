@@ -92,10 +92,13 @@ export async function deployPackage (
   zipFile?: string
 ): Promise<void> {
   // first off, anchor a base directory
+  projectPaths = resolvePaths()
   zipFile ??= path.join(projectPaths.basePath, 'MistLift_Zips', funcName + '.zip')
-
-  const defFile = path.join(projectPaths.functionPath, funcName, 'src', 'definition.json')
-  const def = JSON.parse(fs.readFileSync(defFile).toString())
+  const defFile = path.join(projectPaths.basePath, 'functions', funcName, 'src', 'definition.json')
+  let def:any = {}
+  try {
+    def = JSON.parse(fs.readFileSync(defFile).toString())
+  } catch(e:any) {}
   const timeout = def.timeoutSeconds ?? 0 // zero will mean default (3 seconds on AWS)
   // funcname gets decorated with current instance identifier
   const idsrc = md5((getProjectName() ?? '') + (getProjectVersion()?.toString() ?? ''))
