@@ -1,0 +1,12 @@
+{
+  "port": 8081,
+  "rebuildFunctionsOnChange": false,
+  "refreshBrowserOnFunctionChange": false,
+  "refreshBrowserOnWebrootChange": false,
+  "esbuild": {
+    "watch": false,
+    "entryPoints": [
+    ],
+    "outdir": "webroot"
+  }
+}

@@ -45,7 +45,8 @@ export async function doInit (
   }
 
   // make webroot with docs folder and placeholder yaml
-  const webrootDocs = path.join(refPath, 'webroot', 'docs')
+  const webroot = path.join(refPath, 'webroot');
+  const webrootDocs = path.join(webroot, 'docs')
   if (!fs.existsSync(webrootDocs)) {
     fs.mkdirSync(webrootDocs, { recursive: true })
     const yaml = path.join(webrootDocs, 'apidoc.yaml')
@@ -54,6 +55,14 @@ export async function doInit (
     fs.copyFileSync(path.join(swaggerSrcDir, 'swagger-ui.css'), path.join(webrootDocs, 'swagger-ui.css'))
     fs.copyFileSync(path.join(swaggerSrcDir, 'swagger-ui-bundle.js'), path.join(webrootDocs, 'swagger-ui-bundle.js'))
     fs.copyFileSync(path.join(swaggerSrcDir, 'swagger-ui-standalone-preset.js'), path.join(webrootDocs, 'swagger-ui-standalone-preset.js'))
+
+    const webrootSrcDir = path.join(swaggerSrcDir, 'webroot')
+    fs.copyFileSync(path.join(webrootSrcDir, 'index.html'), path.join(webroot, 'index.html'))
+    fs.copyFileSync(path.join(webrootSrcDir, 'app.js'), path.join(webroot, 'app.js'))
+    fs.copyFileSync(path.join(webrootSrcDir, 'app.css'), path.join(webroot, 'app.css'))
+    fs.copyFileSync(path.join(webrootSrcDir, 'watcher.js'), path.join(webroot, 'watcher.js'))
+
+    fs.copyFileSync(path.join(swaggerSrcDir, 'localServerConfig.json'), path.join(refPath, 'localServerConfig.json'))
   }
 
   await interrogateUserForPackageJsonSettings(refPath, defaults)

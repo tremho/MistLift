@@ -78,7 +78,9 @@ function readServerConfig() {
 
 async function esbuilder() {
 
-  if(!serverConfig.esbuild) return;
+  if(!serverConfig.esbuild) {
+    return triggerRebuild() // forces real start
+  }
 
   const entryPoints = serverConfig.esbuild.entryPoints ?? []
   const outDir = serverConfig.esbuild.outdir ?? 'webroot'
