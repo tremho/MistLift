@@ -83,11 +83,23 @@ The 'functions' folder is where MistLift service functions will be created, deve
 
 #### A Front-end only example
 
+_If there is no existing index.html file:_
+
 Navigate to the webroot folder of your new project and create a file named `index.html` with the following content:
 
     <html><head><title>Hello</title></head><body><h1>Hello, World!</h1></body></html>
 
 _yes, you saw this one coming 😉_
+
+_Since version 2.0.2, a placeholder index.html is automatically created for you when  you
+create a MistLift Project.  This placeholder supports an ESBuild hot-watch design (if adopted)
+You can read more about that [here](./ESBuild%20and%20React%20support.md).
+For initial quickstart purposes, however, simply edit this existing file to add_
+```html
+<h1>Hello, World!</h1>
+```
+_before the `<\body>` closing tag_
+
 
 Now type
 
@@ -118,9 +130,9 @@ and look at the file definitions.json
 - it is a GET method function
 - it takes no parameters
 
-Look now a the file main.ts in this directory.
+Look now at the file main.ts in this directory.
 
-- it logs a messsage
+- it logs a message
 - it returns a string "Hello, World"
 
 For a real function for your application,
