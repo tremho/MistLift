@@ -64,6 +64,13 @@ To get started using MistLift, please see the [QuickStart Guide](https://github.
 
 ## Changelog
 
+### 2.0.3
+ - Changed structure of function unit test files.  No longer couching into a separate directory,
+as this limited ability to access function code directly.
+ - Including [TapAssert](https://www.npmjs.com/package/@tremho/tap-assert) as part of test solution and
+creating a new .test.ts file that demonstrates its use for the placeholder source created.
+ - Updated built-in methods to use latest dependencies.
+
 ### 2.0.2
 - includes webroot template files for esbuild and watcher support
 - adds support for timeoutSeconds in definitions.json

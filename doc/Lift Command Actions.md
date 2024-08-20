@@ -41,6 +41,7 @@ Finally, the destination project is set up with the following dev-only dependenc
 - _@types/node_ -- For typescript support under NodeJS
 - _typescript_ -- The typescript transpiler
 - _tap_ -- TapJS test framework
+- _@tremho/tap-assert_ -- helper assertion library designed for this use
 
 and one runtime dependency:
 - _@tremho/inverse-y_ -- handles lambda function support and logging.
@@ -57,7 +58,7 @@ The create command accepts the name of the function to create as its argument.
 If no name is given, help for the command is offered.
 
 The create command finds the function directory in the project and creates a folder of the new function name.
-It then creates the subdirectories for 'src' and 'tests' within this directory.
+It then creates the subdirectories for 'src' within this directory, and it adds the example .test.ts file for the new function.
 It then performs a series of copies from the MistLift templateData location to the correct locations in the project,
 replacing templated text with apppropriate values as it does.
 
@@ -65,7 +66,6 @@ replacing templated text with apppropriate values as it does.
 - _src/local.ts_ -- (templateData/function-local-ts) - This is the launch file that starts the main function for serverless local run / debugging.
 - _src/main.ts_ -- (templateData/function-main-ts) - The function entry point.
 - _src/runmain.mjs_ -- (templateData/function-runmain-mjs) - a bootstrapping launch file used at AWS
-- _<functionName>-tests/Sanity.test.ts (templateData/function-test-template) - a no-op example Tap unit test file
 
 ## build
 
@@ -198,6 +198,13 @@ route handling in src/ExpressRoutes.
 ## test
 
 This command invokes the Tap test framework for running unit tests
+Tests are in files ending in .test.ts.  One is created for you on a `create` operation for each function. Extend this one or
+create additional files.
+
+Using the [TapAssert](https://www.npmjs.com/package/@tremho/tap-assert) library will simplify your test writing. In the model adopted here,
+each test function is run as a new test suite. By default, the suite is identified by the name of the test file.
+
+Please read more about using Tap in the [Tap Docs](https://node-tap.org)
 
 ---
 ## doctor
@@ -210,7 +217,7 @@ and reports the version numbers of each component.
 
 This command reports the last url that the api was published to and the date/time 
 it was published.  It also lists the names of the deployed functions that this api
-should contain.  Functions deployed after the last publish will not appear in this list.
+contains.  Functions deployed after the last publish will not appear in this list.
 
 
 

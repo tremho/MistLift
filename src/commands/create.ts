@@ -4,7 +4,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import * as ac from 'ansi-colors'
 import { resolvePaths } from '../lib/pathResolve'
-import { camelCase } from '../lib/CaseUtils'
+import { pascalCase } from '../lib/CaseUtils'
 import { helpCreate } from './help'
 
 /// Create command
@@ -25,8 +25,7 @@ export function doCreate (
     if (!fs.existsSync(funcPath)) fs.mkdirSync(funcPath)
     const dataDir = path.join(__dirname, '..', '..', 'templateData')
 
-    const testdirname = camelCase(funcName) + '-tests'
-    if (!fs.existsSync(path.join(funcPath, testdirname))) fs.mkdirSync(path.join(funcPath, testdirname))
+    const testFileName = pascalCase(funcName) + '.test.ts'
     if (!fs.existsSync(path.join(funcPath, 'src'))) fs.mkdirSync(path.join(funcPath, 'src'))
 
     // create link to common lib
@@ -60,7 +59,7 @@ export function doCreate (
       mainsrc = mainsrc.replace('$$TemplateName$$', funcName)
     }
     fs.writeFileSync(path.join(funcPath, 'src', 'main.ts'), mainsrc)
-    fs.copyFileSync(path.join(dataDir, 'function-test-template'), path.join(funcPath, testdirname, 'Sanity.test.ts'))
+    fs.copyFileSync(path.join(dataDir, 'function-test-template'), path.join(funcPath, testFileName))
     fs.copyFileSync(path.join(dataDir, 'function-runmain-mjs'), path.join(funcPath, 'runmain.mjs'))
   }
 }

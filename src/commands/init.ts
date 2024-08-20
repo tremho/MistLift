@@ -70,5 +70,6 @@ export async function doInit (
   await installDevPackage(refPath, '@types/node')
   await installDevPackage(refPath, 'typescript')
   await installDevPackage(refPath, 'tap')
+  await installDevPackage(refPath, '@tremho/tap-assert')
   await installPackage(refPath, '@tremho/inverse-y')
 }

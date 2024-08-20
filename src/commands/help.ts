@@ -116,8 +116,11 @@ export function helpTest (): void {
   printBanner('test')
   console.log('use ' + ac.bold('lift test') + ' to invoke the testing framework and run unit tests for all functions')
   console.log('')
-  console.log('Tests should be written in files within the named test folder for each created function. test files are given the suffix .test.ts')
-  console.log("The test framework used is 'Tap' (https://node-tap.org)")
+  console.log('Tests should be written in files for each created function. test files are given the suffix .test.ts.')
+  console.log('A placeholder is automatically created on create that successfully tests the "Hello, World!" placeholder function.')
+  console.log('Modify/replace this to suit your function.')
+  console.log("The test framework used is 'Tap' (https://node-tap.org).")
+  console.log("The 'TapAssert' (https://www.npmjs.com/package/@tremho/tap-assert) assertion library designed for this  is also installed and used in example for your convenience.")
   console.log('')
 }
 export function helpStart (): void {

@@ -7,7 +7,7 @@ export async function doTestAsync (args: string[]): Promise<number> {
   let ret = 0
   for (const funcName of args) {
     const result = await executeCommand('tap', [
-            `build/functions/${funcName}/*-tests/*.js`,
+            `build/functions/${funcName}/*.test.js`,
             /*
                              - base -- looks a lot like terse
                              - terse -- pass/fail counts

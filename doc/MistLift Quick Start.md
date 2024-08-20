@@ -249,9 +249,8 @@ Then run the command with a parameter, such as
 
 Local unit testing is supported by the test framework TAP (https://node-tap.org)
 Files with the extension `.test.ts` (compiled to `.test.js`) are found and
-executed across the project.  The framework creates a test folder within the
-function directory for an api function as a convenience, and to keep these files
-separated from the functional source files.
+executed across the project.  The framework creates a test placeholder within the
+function directory for an api function as a convenience.
 The command `lift test` will initiate the tap testing.
 
 ### Debugging
@@ -268,6 +267,14 @@ the target JS file to `build/functions/HelloWorld/src/local.js`.
 Set a breakpoint at the start of your function in "main.ts" (where the Log.Info statement is) and run in the debugger.  You should hit the
 breakpoint you set.  With this, you can step through and investigate your code execution.
 
+#### Running test code
+Of course, you can (and should) write unit tests that check the behaviors of your code with the .test.ts files.  Use `lift test` or `lift test` &lt;functionName&gt;
+to run the test(s).
+
+#### Debugging test code
+One of the advantages of Node Tap is that the test program is just a normal program.  While it helps for reporting, etc. to run it under the 
+Tap framework, it can be executed on its own like any other Node app.  This is great if you need to debug your test code.  Just point your debugger
+at the test program like you would any other file to debug.
 
 #### Debugging using logs
 Debugging using logs is available both locally and once deployed to cloud.
