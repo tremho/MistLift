@@ -45,7 +45,7 @@ export async function doInit (
   }
 
   // make webroot with docs folder and placeholder yaml
-  const webroot = path.join(refPath, 'webroot');
+  const webroot = path.join(refPath, 'webroot')
   const webrootDocs = path.join(webroot, 'docs')
   if (!fs.existsSync(webrootDocs)) {
     fs.mkdirSync(webrootDocs, { recursive: true })

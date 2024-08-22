@@ -3,7 +3,7 @@ import {
   LambdaClient,
   CreateFunctionCommand,
   DeleteFunctionCommand,
-  AddPermissionCommand, UpdateFunctionConfigurationCommand
+  AddPermissionCommand
 } from '@aws-sdk/client-lambda'
 
 import md5 from 'md5'
@@ -95,10 +95,10 @@ export async function deployPackage (
   projectPaths = resolvePaths()
   zipFile ??= path.join(projectPaths.basePath, 'MistLift_Zips', funcName + '.zip')
   const defFile = path.join(projectPaths.basePath, 'functions', funcName, 'src', 'definition.json')
-  let def:any = {}
+  let def: any = {}
   try {
     def = JSON.parse(fs.readFileSync(defFile).toString())
-  } catch(e:any) {}
+  } catch (e: any) {}
   const timeout = def.timeoutSeconds ?? 0 // zero will mean default (3 seconds on AWS)
   // funcname gets decorated with current instance identifier
   const idsrc = md5((getProjectName() ?? '') + (getProjectVersion()?.toString() ?? ''))

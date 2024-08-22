@@ -18,14 +18,17 @@ export function functionBinder (): void {
     const projectPaths = resolvePaths()
 
     for (const def of defs) {
-      let { name, pathMap, method } = def
+      const name: string = def.name
+      const pathMap: string = def.pathMap
+      let method: string = def.method
       let rpath = ''
       try {
-        if(!method) {
-          console.log(ac.red('no method defined for ' + name));
-          if(def.allowedMethods) {
-            console.log(ac.bgBlack.yellowBright('DEPRECATED')+ac.blue(' As of v1.1.8, The use of ')+ac.black.italic('allowedMethods')+ac.blue(' is replaced by the single' +
-                ac.black.italic(' method ')+ac.blue('property.')+ac.black.bold('Please update your definition file')));
+        if (method === undefined) {
+          const nstr: string = name?.toString() ?? ''
+          console.log(ac.red(`no method defined for ${nstr}`))
+          if (def.allowedMethods !== undefined) {
+            console.log(ac.bgBlack.yellowBright('DEPRECATED') + ac.blue(' As of v1.1.8, The use of ') + ac.black.italic('allowedMethods') + ac.blue(' is replaced by the single' +
+                ac.black.italic(' method ') + ac.blue('property.') + ac.black.bold('Please update your definition file')))
             method = def.allowedMethods.split(',')[0]
           }
         }
@@ -63,7 +66,7 @@ export function functionBinder (): void {
       } catch (e: any) {
         // Log.Error(ac.bold.red(e.message.split('\n')[0]))0
         // throw new Error("Unable to load and bind function code at "+ rpath)
-        Log.Error("Unable load and bind function code", rpath)
+        Log.Error('Unable load and bind function code', rpath)
         Log.Exception(e)
       }
     }

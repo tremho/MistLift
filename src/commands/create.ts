@@ -29,14 +29,14 @@ export function doCreate (
     if (!fs.existsSync(path.join(funcPath, 'src'))) fs.mkdirSync(path.join(funcPath, 'src'))
 
     // create link to common lib
-    if(!fs.existsSync(path.join(funcPath, 'src', 'commonLib'))) {
+    if (!fs.existsSync(path.join(funcPath, 'src', 'commonLib'))) {
       const funcSrc = path.join(funcPath, 'src')
       const relPath = path.relative(funcSrc, projectPaths.basePath)
-      let from = path.join(relPath, 'commonLib');
+      let from = path.join(relPath, 'commonLib')
       let to = path.join(funcSrc, 'lib')
-      if(path.sep !== '/') {
-        while(from.indexOf('/') !== -1) from = from.replace('/', path.sep)
-        while(to.indexOf('/') !== -1) to = to.replace('/', path.sep)
+      if (path.sep !== '/') {
+        while (from.includes('/')) from = from.replace('/', path.sep)
+        while (to.includes('/')) to = to.replace('/', path.sep)
       }
 
       fs.symlinkSync(from, to, 'dir')

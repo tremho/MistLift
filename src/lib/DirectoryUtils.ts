@@ -10,12 +10,12 @@ export function recurseDirectory (dirpath: string, callback?: RecurseCB): void {
   fs.readdirSync(dirpath).forEach((file: string) => {
     const fpath = path.join(dirpath, file)
     // if(fpath.indexOf('node_modules') === -1) {
-      const stat = fs.statSync(fpath)
-      if ((callback != null) && !callback(fpath, stat)) {
-        if (stat.isDirectory()) {
-          recurseDirectory(fpath, callback)
-        }
+    const stat = fs.statSync(fpath)
+    if ((callback != null) && !callback(fpath, stat)) {
+      if (stat.isDirectory()) {
+        recurseDirectory(fpath, callback)
       }
+    }
     // }
   })
 }

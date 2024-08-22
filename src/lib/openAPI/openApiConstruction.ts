@@ -51,11 +51,11 @@ export async function buildOpenApi (
 
     const parameters = def.parameters ?? []
     let method = def.method
-    if(!def.method) {
-      console.log(ac.red('no method defined for ' + def.name));
-      if(def.allowedMethods) {
-        console.log(ac.bgBlack.yellowBright('DEPRECATED')+ac.blue(' As of v1.1.8, The use of ')+ac.black.italic('allowedMethods')+ac.blue(' is replaced by the single' +
-            ac.black.italic(' method ')+ac.blue('property.')+ac.black.bold('Please update your definition file')));
+    if (def.method === undefined) {
+      console.log(ac.red(`no method defined for ${def.name as string}`))
+      if (def.allowedMethods !== undefined) {
+        console.log(ac.bgBlack.yellowBright('DEPRECATED') + ac.blue(' As of v1.1.8, The use of ') + ac.black.italic('allowedMethods') + ac.blue(' is replaced by the single' +
+            ac.black.italic(' method ') + ac.blue('property.') + ac.black.bold('Please update your definition file')))
         def.method = def.allowedMethods.split(',')[0]
       }
     }

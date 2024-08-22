@@ -35,7 +35,7 @@ export function allBinder (): void {
     if (req.originalUrl.includes('.env')) {
       return res.send('')
     }
-    if(req.originalUrl.endsWith('webroot/favicon.ico')) {
+    if (req.originalUrl.endsWith('webroot/favicon.ico')) {
       return res.send('')
     }
 

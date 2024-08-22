@@ -2,7 +2,7 @@
 import express from 'express'
 
 import * as esbuild from 'esbuild'
-import watch from 'node-watch';
+import watch from 'node-watch'
 import expressWS from 'express-ws'
 
 import functionRouter, { functionBinder } from '../expressRoutes/functionBinder'
@@ -17,11 +17,9 @@ import * as ac from 'ansi-colors'
 import path from 'path'
 import fs from 'fs'
 
-import {Log} from "@tremho/inverse-y"
-
 const defaultPort = 8081
-const serverConfig = readServerConfig();
-let server:any = null
+const serverConfig = readServerConfig()
+let server: any = null
 const app = express()
 
 export async function startLocalServer (): Promise<void> {
@@ -44,117 +42,113 @@ export async function startLocalServer (): Promise<void> {
   // app.use(bodyParser.json({limit: '50mb'}))
   app.use(express.json())
   // for form posts
-  app.use(express.urlencoded({extended: true}))
+  app.use(express.urlencoded({ extended: true }))
 
   app.use('/', functionRouter)
   app.use('/api', apiRouter)
   app.use('*', allRouter)
 
- 
   startServers()
 
-  funcWatcher(path.join(projectPaths.basePath, 'functions'), path.join(projectPaths.basePath, 'webroot'));
+  void funcWatcher(path.join(projectPaths.basePath, 'functions'), path.join(projectPaths.basePath, 'webroot'))
   // sleep(5000).then(() => esbuilder())
-  esbuilder()
-
+  void esbuilder()
 }
-function startServers() {
+function startServers (): void {
   startWebSocketConnection(app)
   server = app.listen(serverConfig.port, function () {
-    console.log(`http listening on port ${serverConfig.port ?? defaultPort}`)
+    const port: number = serverConfig?.port ?? defaultPort
+    console.log(`http listening on port ${port}`)
   })
 }
 
-function readServerConfig() {
+function readServerConfig (): any {
   // console.log('readServerConfig...')
   const projectPaths = resolvePaths()
   const confFile = path.join(projectPaths.basePath, 'localServerConfig.json')
-  if(!fs.existsSync(confFile)) return {}
+  if (!fs.existsSync(confFile)) return {}
 
-  const conf:any = JSON.parse(fs.readFileSync(confFile).toString())
+  const conf: any = JSON.parse(fs.readFileSync(confFile).toString())
   // console.log("server configuration", conf)
   return conf
 }
 
-async function esbuilder() {
-
-  if(!serverConfig.esbuild) {
-    return triggerRebuild() // forces real start
+async function esbuilder (): Promise<void> {
+  if (serverConfig.esbuild !== true) {
+    return await triggerRebuild() // forces real start
   }
 
   const entryPoints = serverConfig.esbuild.entryPoints ?? []
   const outDir = serverConfig.esbuild.outdir ?? 'webroot'
   const watch = serverConfig.esbuild.watch ?? false
-  const breakOnError = serverConfig.esbuild.breakOnError ?? false
-  const breakOnWarn = serverConfig.esbuild.breakOnWarn ?? false
+  // const breakOnError = serverConfig.esbuild.breakOnError ?? false
+  // const breakOnWarn = serverConfig.esbuild.breakOnWarn ?? false
 
-  let ctx = await esbuild.context({
+  const ctx = await esbuild.context({
     entryPoints,
     bundle: true,
     outdir: outDir
   })
   // console.log('esbuild...')
 
-  let result = await ctx.rebuild()
-  let more = watch
+  /* let result = */ await ctx.rebuild()
+  let more: boolean = watch === true
   do {
     await sleep(500)
-    result = await ctx.rebuild()
-  } while(more)
+    /* result = */ await ctx.rebuild()
+    more = watch === true
+  } while (more)
 }
 
-function sleep(ms:number)
-{
-  return new Promise(resolve => {
+async function sleep (ms: number): Promise<void> {
+  return await new Promise(resolve => {
     setTimeout(resolve, ms)
   })
 }
 
-async function funcWatcher(watchPath:string, webrootPath:string) {
-
-  if(serverConfig.rebuildFunctionsOnChange !== true) return;
+async function funcWatcher (watchPath: string, webrootPath: string): Promise<void> {
+  if (serverConfig.rebuildFunctionsOnChange !== true) return
   // console.log('watching for changes in functions')
-  watch(watchPath, {recursive:true}, onWatch1)
+  watch(watchPath, { recursive: true }, onWatch1)
 
-  if(serverConfig.refreshBrowserOnWebrootChange) {
+  if (serverConfig.refreshBrowserOnWebrootChange === true) {
     // console.log('watching for webroot changes')
-    watch(webrootPath, {recursive: true}, onWatch2)
+    watch(webrootPath, { recursive: true }, onWatch2)
   }
 }
-function onWatch1(evt:string, name:string) {
+function onWatch1 (evt: string, name: string): void {
   // console.log("funcWatch Event seen", {evt, name})
-  triggerRebuild()
+  void triggerRebuild()
 }
-function onWatch2(evt:string, name:string) {
+function onWatch2 (evt: string, name: string): void {
   // console.log("Webroot Watch Event seen", {evt, name})
-  triggerBrowserRestart()
+  void triggerBrowserRestart()
 }
 
 let alreadyBuilding = false
-async function triggerRebuild() {
-  if(!alreadyBuilding) {
-    alreadyBuilding = true;
-    const errRet = await doBuildAsync([]);
-    if(errRet) {
+async function triggerRebuild (): Promise<void> {
+  if (!alreadyBuilding) {
+    alreadyBuilding = true
+    const errRet: number = await doBuildAsync([])
+    if (errRet !== 0) {
       process.exit(errRet)
     }
-    alreadyBuilding = false;
-    if(serverConfig.refreshBrowserOnFunctionChange)
-      triggerBrowserRestart()
+    alreadyBuilding = false
+    if (serverConfig.refreshBrowserOnFunctionChange === true) { void triggerBrowserRestart() }
   }
 }
 
 let closing = false
 
-async function triggerBrowserRestart() {
-  if(closing) {
+async function triggerBrowserRestart (): Promise<void> {
+  if (closing) {
     console.warn('restarting...')
     return
   }
-  if(server) {
-    closing = true;
-    await socketClose();
-    await server.close();
+  if (server !== null) {
+    closing = true
+    await socketClose()
+    await server.close()
     await sleep(1000)
     closing = false
     startServers()
@@ -163,37 +157,35 @@ async function triggerBrowserRestart() {
   }
 }
 
-class WSConnection {
-  on: any
-  sendUTF: any
-  remoteAddress:string = ''
-}
+// class WSConnection {
+//   on: any
+//   sendUTF: any
+//   remoteAddress: string = ''
+// }
 
-var socketClose:any = () => {}
+let socketClose: any = () => {}
 
-function startWebSocketConnection(app:any)
-{
+function startWebSocketConnection (app: any): void {
   // console.log("Starting WebSocket Connection Listener")
   const ews = expressWS(app)
   const wsapp = ews.app
 
-  socketClose = (e:any) => {
+  socketClose = (e: any) => {
     // console.log("close wss", e)
     ews.getWss().close()
   }
-
 
   // wsapp.use((err:any, req:any, res:any, next:any) => {
   //   console.error(err.stack);
   //   res.status(500).send('Something broke!');
   // })
 
-  wsapp.get('/watch', (req:any, res:any, next:any) => {
+  wsapp.get('/watch', (req: any, res: any, next: any) => {
     // console.log('get route', req.testing)
   })
 
-  wsapp.ws('/watch', (ws:any, req:any) => {
-    ws.on('message', (msg:string)=> {
+  wsapp.ws('/watch', (ws: any, req: any) => {
+    ws.on('message', (msg: string) => {
       // console.log('Received WS Message: ' + msg)
       ws.send(msg)
     })
