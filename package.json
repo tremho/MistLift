@@ -1,15 +1,13 @@
 {
   "name": "@tremho/mist-lift",
-  "version": "2.0.4-pre-release.1",
+  "version": "2.0.4",
   "description": "lift command line utility for MistLift development",
   "main": "build/lift.js",
   "bin": {
     "lift": "build/lift.js"
   },
   "scripts": {
-    "prepublish": "run-script-os",
-    "prepublish:nix": "npx rimraf build && npm run build && npm run indev",
-    "prepublish:windows": "npx rimraf build & npm run build & npm run indev",
+    "prepublish": "npx rimraf build && npm run build && npm run lint",
     "clean": "npx rimraf build ; npx rimraf node_modules ; npm install",
     "build": "run-script-os",
     "build:windows": "tsc & npm run postbuild",
@@ -67,6 +65,7 @@
     "zip-dir": "^2.0.0"
   },
   "devDependencies": {
+    "@tremho/tap-assert": "^1.0.4-pre-release.2",
     "@types/express": "^4.17.21",
     "@types/express-ws": "^3.0.4",
     "@types/md5": "^2.3.5",

@@ -64,6 +64,9 @@ To get started using MistLift, please see the [QuickStart Guide](https://github.
 
 ## Changelog
 
+### 2.0.4
+ - FIXED BUILTINS That were broken in the 2.0.3 release. Now file access and api are working again.
+
 ### 2.0.3
  - Changed structure of function unit test files.  No longer couching into a separate directory,
 as this limited ability to access function code directly.

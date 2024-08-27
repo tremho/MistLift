@@ -2,6 +2,7 @@
 /* eslint @typescript-eslint/no-floating-promises: "off" */
 
 import Tap from 'tap'
+import { TapAssert } from '@tremho/tap-assert'
 
 import fs from 'fs'
 import path from 'path'
@@ -15,6 +16,7 @@ import { doPublishAsync } from '../commands/publish'
 import axios from 'axios'
 
 async function test (t: any): Promise<void> {
+  const assert = new TapAssert(t)
   const testMessage = `test on ${Date.now()}`
   // start clean
   if (fs.existsSync('QSTest')) {
@@ -24,30 +26,33 @@ async function test (t: any): Promise<void> {
   await doInit('QSTest', true)
 
   // verify project got made
-  t.ok(fs.existsSync('QSTest'), 'created test project')
+  assert.isTrue(fs.existsSync('QSTest'), 'created test project')
   // verify we have a functions dir
-  t.ok(fs.existsSync(path.join('QSTest', 'functions')), 'functions exists')
+  assert.isTrue(fs.existsSync(path.join('QSTest', 'functions')), 'functions exist')
   // verify we have a node_modules dir
-  t.ok(fs.existsSync(path.join('QSTest', 'node_modules')), 'node_modules exists')
+  assert.isTrue(fs.existsSync(path.join('QSTest', 'node_modules')), 'node_modules exist')
   // verify we have a webroot dir
-  t.ok(fs.existsSync(path.join('QSTest', 'webroot')), 'webroot exists')
+  assert.isTrue(fs.existsSync(path.join('QSTest', 'webroot')), 'webroot exists')
   // verify we have a package.json
-  t.ok(fs.existsSync(path.join('QSTest', 'package.json')), 'package.json exists')
+  assert.isTrue(fs.existsSync(path.join('QSTest', 'package.json')), 'package.json exists')
   // verify we have webroot/docs
-  t.ok(fs.existsSync(path.join('QSTest', 'webroot', 'docs', 'apidoc.yaml')), 'yaml exists')
-  t.ok(fs.existsSync(path.join('QSTest', 'webroot', 'docs', 'swagger-ui-bundle.js')), 'js exists')
-  t.ok(fs.existsSync(path.join('QSTest', 'webroot', 'docs', 'swagger-ui-standalone-preset.js')), 'js exists')
-  t.ok(fs.existsSync(path.join('QSTest', 'webroot', 'docs', 'swagger-ui.css')), 'css exists')
+  assert.isTrue(fs.existsSync(path.join('QSTest', 'webroot', 'docs', 'apidoc.yaml')), 'yaml exists')
+  assert.isTrue(fs.existsSync(path.join('QSTest', 'webroot', 'docs', 'swagger-ui-bundle.js')), 'js exists')
+  assert.isTrue(fs.existsSync(path.join('QSTest', 'webroot', 'docs', 'swagger-ui-standalone-preset.js')), 'js exists')
+  assert.isTrue(fs.existsSync(path.join('QSTest', 'webroot', 'docs', 'swagger-ui.css')), 'css exists')
 
   // create
   process.chdir('QSTest')
   await doCreate('IntegrationTest')
-  t.ok(fs.existsSync(path.join('functions', 'IntegrationTest')), 'function exists')
-  t.ok(fs.existsSync(path.join('functions', 'IntegrationTest', 'src', 'definition.json')), 'definition.json exists')
-  t.ok(fs.existsSync(path.join('functions', 'IntegrationTest', 'src', 'local.ts')), 'local.ts exists')
+  assert.isTrue(fs.existsSync(path.join('functions', 'IntegrationTest')), 'function exists')
+  assert.isTrue(fs.existsSync(path.join('functions', 'IntegrationTest', 'src', 'definition.json')), 'definition.json exists')
+  assert.isTrue(fs.existsSync(path.join('functions', 'IntegrationTest', 'src', 'local.ts')), 'local.ts exists')
   const maints = path.join('functions', 'IntegrationTest', 'src', 'main.ts')
-  t.ok(fs.existsSync(maints), 'main.ts exists')
-  const content = fs.readFileSync(maints).toString().replace('Hello,  World!', testMessage)
+  assert.isTrue(fs.existsSync(maints), 'main.ts exists')
+  let content = fs.readFileSync(maints).toString()
+  assert.contains(content, 'Hello, World!', 'Content has expected Hello, World! to start with')
+  content = content.replace('Hello, World!', testMessage)
+  assert.contains(content, testMessage, 'Contents successfully replaced with test message')
   fs.writeFileSync(maints, content)
 
   // build
@@ -60,13 +65,13 @@ async function test (t: any): Promise<void> {
   const publishedJson = fs.readFileSync('.published').toString()
   const publishedInfo = JSON.parse(publishedJson)
   const apiUrl: string = publishedInfo.url
-  t.ok(apiUrl.length > 0, 'url exists')
+  assert.isTrue(apiUrl.length > 0, 'url exists')
   const testUrl = apiUrl + '/integrationtest'
 
   const resp: any = await axios.get(testUrl)
-  t.ok(resp.status === 200, 'status is 200')
+  assert.isEqual(resp.status, 200, 'status is 200')
   const data: string = resp.data.toString()
-  t.ok(data === testMessage, 'saw expected data')
+  assert.isEqual(data, testMessage, 'saw expected data')
 
   // clean up
   process.chdir('..')
