@@ -150,6 +150,12 @@ function doPostBuildSteps (
     console.error(ac.red.bold('no definition file found at ' + srcdef))
     return 1
   }
+  // Copy the runmain.mjs file over
+  const srcrun = path.join(funcDir, 'runmain.mjs')
+  const dstrun = path.join(buildPath, 'runmain.mjs')
+  if (fs.existsSync(srcrun)) {
+    fs.copyFileSync(srcrun, dstrun)
+  }
   // copy the resources folder if it exists
   const filedirPath = path.join(funcDir, 'resources')
   if (fs.existsSync(filedirPath)) {
