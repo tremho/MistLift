@@ -25,7 +25,6 @@ export function addBuiltInDefinitions (defs: any[]): void {
   // console.warn("NOT ADDING ANY BUILTIN API INTEGRATIONS")
   // console.log("ADDING apiDef");
   defs.push(apiDef)
-  // console.log("ADDING webrootDef");
   defs.push(webrootDef)
 
   // console.warn("Adding webroot literals");

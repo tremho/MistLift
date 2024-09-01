@@ -98,7 +98,14 @@ export async function deployPackage (
   let def: any = {}
   try {
     def = JSON.parse(fs.readFileSync(defFile).toString())
-  } catch (e: any) {}
+  } catch (e: any) {
+    // hack for assigning a definition -- the defs from ApiDocMaker don't appear here
+    if(funcName === 'Webroot') {
+      def.name = 'Webroot'
+      def.timeoutSeconds = 8
+      def.memorySize = 1024
+    }
+  }
   const timeout = def.timeoutSeconds ?? 0 // zero will mean default (3 seconds on AWS)
   const memorySize = def.memorySize ?? 0 // zero is default (128 [mb] for AWS)
   // funcname gets decorated with current instance identifier

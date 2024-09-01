@@ -21,6 +21,8 @@ and the value 'matheson' to the parameter 'student'
 
 - __timeoutSeconds__ -- number of seconds for timeout before function returns a response. If 0 or less, or not provided, the default is used (AWS default is 3). Has no effect on local server.
 
+- __memorySize__ -- Size in megabytes to assign to this function. For AWS, minimum is 128 and maximum is 10240. Id <=0 or not provided, the default is used (128)
+
 - __schemas__ - defines optional schemas describing object types of the function. Schemas may be referred to by name for return types.
 
 example:
