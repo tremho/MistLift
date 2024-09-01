@@ -93,6 +93,8 @@ const webrootDef = {
   version: '1.0.0',
   pathMap: '/{path}',
   method: 'get',
+  timeout: 8,
+  memorySize: 1024,
   logLevel: 'Debug',
   sessionRequired: false,
   userRequired: false,

@@ -100,6 +100,7 @@ export async function deployPackage (
     def = JSON.parse(fs.readFileSync(defFile).toString())
   } catch (e: any) {}
   const timeout = def.timeoutSeconds ?? 0 // zero will mean default (3 seconds on AWS)
+  const memorySize = def.memorySize ?? 0 // zero is default (128 [mb] for AWS)
   // funcname gets decorated with current instance identifier
   const idsrc = md5((getProjectName() ?? '') + (getProjectVersion()?.toString() ?? ''))
   const dFuncName = funcName + '_' + idsrc
@@ -116,7 +117,7 @@ export async function deployPackage (
   // console.log(ac.green.italic("deploying ")+ac.green.bold(funcName)+"...")
 
   try {
-    const response: any = await CreateCloudFunction(dFuncName, zipFile, timeout)
+    const response: any = await CreateCloudFunction(dFuncName, zipFile, timeout, memorySize)
     const parts = response.FunctionArn.split(':')
     const principal = parts[4]
     await AddPermissions(client, dFuncName, principal)
@@ -128,7 +129,8 @@ export async function deployPackage (
 async function CreateCloudFunction (
   funcName: string,
   zipFile: string,
-  timeout: number
+  timeout: number,
+  memorySize: number
 
 ): Promise<any> {
   const settings = getSettings()
@@ -144,7 +146,8 @@ async function CreateCloudFunction (
     Code: {
       ZipFile: zipFileBase64
     },
-    Timeout: timeout > 0 ? timeout : undefined
+    Timeout: timeout > 0 ? timeout : undefined,
+    MemorySize: memorySize > 0 ? memorySize: undefined
   })
   const resp = await client.send(command) // response
   return resp
