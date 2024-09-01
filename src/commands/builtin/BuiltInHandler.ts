@@ -39,7 +39,6 @@ export async function DeployRootFileserves
 export async function DeployApiBuiltin
 (
 ): Promise<any> {
-  console.log('Deploy API Builtin')
   // get the prebuilt zip location
   const apiZip = path.join(__dirname, 'prebuilt-zips', 'API.zip')
   await DeployBuiltInZip('api', apiZip)
