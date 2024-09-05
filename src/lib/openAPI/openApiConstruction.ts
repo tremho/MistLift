@@ -36,7 +36,7 @@ export async function buildOpenApi (
   }
   // spdx = svcInfo.contact?.spdx ?? spdx
 
-  const stagePathSegment = '/Dev/' // todo: at some point this should be configurable somewhere (maybe svcInfo). It's used in several places.
+  // const stagePathSegment = '/Dev' // todo: at some point this should be in config somewhere. it is used in many places.
 
   const info = {
     title: svcInfo.name ?? title,
@@ -72,7 +72,9 @@ export async function buildOpenApi (
       addParameter(pathDef, param)
     }
     addCORSOptionMethod(pathDef)
-    builder.addPath((def.pathMap ?? '/' + (def.name as string)), pathDef)
+    let pathMap = def.pathMap ?? '/' + (def.name as string)
+    // pathMap = stagePathSegment + pathMap
+    builder.addPath(pathMap, pathDef)
 
     builder.addSchema('Empty', {
       title: 'Empty Schema',

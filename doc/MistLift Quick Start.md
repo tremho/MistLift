@@ -214,6 +214,17 @@ the changes to the cloud.
 
 If you make a change to the api definitions, or to any of the webroot content, you must use the `publish` command again. But note that this invalidates the previous url and produces a new one.
 
+_Note_:<br/>
+If you access the "Swagger" API page at your publish url  (e.g. https://xxxxxxxxxx.execute-api.us-west-1.amazonaws.com/Dev/api)
+
+you will see the api documented, but the 'Try it out' feature will have the incorrect url, as it will exclude the `/Dev` _stage_ component.
+This is unavoidable due to the way AWS hosts API urls and the way the swagger page constructs itself.
+
+To test your api, copy the curl command shown and change the url to include the `/Dev` component, as
+you will only get a 403 (forbidden) response from the page link itself.
+
+The "Try it out" feature works as expected when run locally.
+
 ## Testing and Debugging
 It is a rare project that doesn't need to be tested and debugged in one way or another.
 One of the advantages to using `lift` is that you can do most of your testing and debugging locally

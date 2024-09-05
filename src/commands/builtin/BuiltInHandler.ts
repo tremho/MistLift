@@ -12,8 +12,8 @@ export async function DeployWebrootBuiltIn
   // console.log("Deploy Webroot Builtin from "+wrZip)
   await DeployBuiltInZip('Webroot', wrZip)
   // remove temp zip when done
-  console.warn("a.zip is left behind")
-  // fs.rmSync(wrZip, { recursive: true })
+  // console.warn("a.zip is left behind")
+  fs.rmSync(wrZip, { recursive: true })
 }
 
 export async function DeployRootFileserves
