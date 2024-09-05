@@ -4,7 +4,8 @@
   "version": "1.0.0",
   "pathMap": "$$PATHMAP$$",
   "method": "GET",
-  "timeoutSeconds": 3,
+  "timeoutSeconds": 0,
+  "memorySize": 0,
   "schemas": {
   },
   "parameters": [

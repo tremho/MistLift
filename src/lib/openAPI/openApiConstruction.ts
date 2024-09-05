@@ -36,6 +36,8 @@ export async function buildOpenApi (
   }
   // spdx = svcInfo.contact?.spdx ?? spdx
 
+  const stagePathSegment = '/Dev/' // todo: at some point this should be configurable somewhere (maybe svcInfo). It's used in several places.
+
   const info = {
     title: svcInfo.name ?? title,
     // summary: summary,

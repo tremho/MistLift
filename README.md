@@ -64,9 +64,13 @@ To get started using MistLift, please see the [QuickStart Guide](https://github.
 
 ## Changelog
 
+### 2.0.6
+ - additional fixes for API built-in
+ - minor update for memorySize and timeout reporting
+
 ### 2.0.5 
- - add support for memsize in definitions.json
- - increase memsize for webroot built-in to 1024
+ - add support for memorySize in definitions.json
+ - increase memorySize for webroot built-in to 1024
 
 ### 2.0.4
  - FIXED BUILTINS That were broken in the 2.0.3 release. Now file access and api are working again.

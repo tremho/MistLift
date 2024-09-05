@@ -19,6 +19,7 @@ import { getProjectName, getProjectVersion } from '../lib/LiftVersion'
 import { delay } from '../lib/utils'
 import { doPackageAsync } from './package'
 import { getAWSCredentials, getSettings, RuntimeType } from '../lib/LiftConfig'
+import {executeCommand} from "../lib/executeCommand";
 
 let projectPaths: { basePath: string, buildPath: string, functionPath: string, packagePath: string, verified: boolean }
 
@@ -100,14 +101,14 @@ export async function deployPackage (
     def = JSON.parse(fs.readFileSync(defFile).toString())
   } catch (e: any) {
     // hack for assigning a definition -- the defs from ApiDocMaker don't appear here
-    if(funcName === 'Webroot') {
+    if (funcName === 'Webroot') {
       def.name = 'Webroot'
       def.timeoutSeconds = 8
-      def.memorySize = 1024
+      def.memorySize = 256
     }
   }
-  const timeout = def.timeoutSeconds ?? 0 // zero will mean default (3 seconds on AWS)
-  const memorySize = def.memorySize ?? 0 // zero is default (128 [mb] for AWS)
+  const timeout: number = def.timeoutSeconds ?? 0 // zero will mean default (3 seconds on AWS)
+  const memorySize: number = def.memorySize ?? 0 // zero is default (128 [mb] for AWS)
   // funcname gets decorated with current instance identifier
   const idsrc = md5((getProjectName() ?? '') + (getProjectVersion()?.toString() ?? ''))
   const dFuncName = funcName + '_' + idsrc
@@ -121,14 +122,29 @@ export async function deployPackage (
   }).catch((e: any) => {
   })
 
-  // console.log(ac.green.italic("deploying ")+ac.green.bold(funcName)+"...")
+  // Use to detect runmain.mjs in zips (including built-ins)
+  // console.log(ac.green.italic("deploying ")+ac.green.bold(funcName)+" from "+zipFile)
+  // await executeCommand('unzip', ['-t', zipFile, '|', 'grep runmain.mjs'], '', true);
 
   try {
     const response: any = await CreateCloudFunction(dFuncName, zipFile, timeout, memorySize)
     const parts = response.FunctionArn.split(':')
     const principal = parts[4]
     await AddPermissions(client, dFuncName, principal)
-    console.log(ac.green.bold(`Successfully deployed ${funcName}`))
+    let deployMsg: string = `Successfully deployed ${funcName}`
+    if (memorySize > 0 || timeout > 0) {
+      deployMsg += ac.grey.italic(' with ')
+      const useAnd = memorySize > 9 && timeout > 0
+      if (memorySize > 0) {
+        deployMsg += ac.grey(`memorySize ${memorySize}mb`)
+        if (useAnd) deployMsg += ac.grey.italic(' and ')
+      }
+      if (timeout > 0) {
+        deployMsg += ac.grey(`timeout ${timeout} seconds`)
+      }
+    }
+
+    console.log(ac.green.bold(deployMsg))
   } catch (e: any) {
     console.error(ac.red.bold.italic('Error deploying ' + funcName), e)
   }
@@ -154,7 +170,7 @@ async function CreateCloudFunction (
       ZipFile: zipFileBase64
     },
     Timeout: timeout > 0 ? timeout : undefined,
-    MemorySize: memorySize > 0 ? memorySize: undefined
+    MemorySize: memorySize > 0 ? memorySize : undefined
   })
   const resp = await client.send(command) // response
   return resp
