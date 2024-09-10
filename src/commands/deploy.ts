@@ -19,7 +19,7 @@ import { getProjectName, getProjectVersion } from '../lib/LiftVersion'
 import { delay } from '../lib/utils'
 import { doPackageAsync } from './package'
 import { getAWSCredentials, getSettings, RuntimeType } from '../lib/LiftConfig'
-import {executeCommand} from "../lib/executeCommand";
+// import { executeCommand } from '../lib/executeCommand'
 
 let projectPaths: { basePath: string, buildPath: string, functionPath: string, packagePath: string, verified: boolean }
 

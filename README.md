@@ -64,6 +64,10 @@ To get started using MistLift, please see the [QuickStart Guide](https://github.
 
 ## Changelog
 
+### 2.0.7
+ - misc fixes
+ - improved esbuild start/watch
+
 ### 2.0.6
  - additional fixes for API built-in
  - minor update for memorySize and timeout reporting
@@ -99,8 +103,8 @@ creating a new .test.ts file that demonstrates its use for the placeholder sourc
 - __Minor Breaking Change__ service definition _allowedMethods_ changed to just _method_. No more pretense of supporting multiple methods for the same function.
 This is breaking because any previous service definition files need to change this property name to continue to work with this version or later.
 
-- Support for a common library shared by functions (_see [Tips and Techniques](./doc/Tips%20and%20Techiques.md))
-- Support for esbuild (e.g. React) (_see [ESBuild and React support](./doc/ESBuild and React support.md))
+- Support for a common library shared by functions (_see [Tips and Techniques](./doc/Tips%20and%20Techiques.md)_)
+- Support for esbuild (e.g. React) (_see [ESBuild and React support](./doc/ESBuild and React support.md)_)
 
 ### 1.1.8
 

@@ -5,8 +5,8 @@ import * as fs from 'fs'
 import { resolvePaths } from '../../lib/pathResolve'
 import { recurseDirectory } from '../../lib/DirectoryUtils'
 import { FolderToZip, UnzipToFolder } from '../../lib/utils'
-import {executeCommand} from "../../lib/executeCommand";
-import {rmSync} from "fs";
+// import { executeCommand } from '../../lib/executeCommand'
+import { rmSync } from 'fs'
 
 export async function StageWebrootZip
 (
@@ -18,7 +18,7 @@ export async function StageWebrootZip
   const stagedWebrootFolder = path.join(packageTemp, 'Webroot')
   const zipFilesPath = path.join(stagedWebrootFolder, '__files__')
   // console.log(">>>> paths", {webroot, packageTemp, stagedWebrootFolder, zipFilesPath})
-  if(fs.existsSync(stagedWebrootFolder)) rmSync(stagedWebrootFolder, {recursive:true})
+  if (fs.existsSync(stagedWebrootFolder)) rmSync(stagedWebrootFolder, { recursive: true })
   await fs.mkdirSync(stagedWebrootFolder)
   // make a public yaml
   await MakePublicApiDoc() // writes apidoc.yaml to docs

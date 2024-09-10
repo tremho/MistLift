@@ -72,7 +72,7 @@ export async function buildOpenApi (
       addParameter(pathDef, param)
     }
     addCORSOptionMethod(pathDef)
-    let pathMap = def.pathMap ?? '/' + (def.name as string)
+    const pathMap = def.pathMap ?? '/' + (def.name as string)
     // pathMap = stagePathSegment + pathMap
     builder.addPath(pathMap, pathDef)
 

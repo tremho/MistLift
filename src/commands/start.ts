@@ -23,7 +23,7 @@ let server: any = null
 const app = express()
 
 export async function startLocalServer (): Promise<void> {
-  // console.warn('startLocalServer')
+  console.warn('startLocalServer')
   const projectPaths = resolvePaths()
   if (!projectPaths.verified) {
     console.log(ac.bold.red('Cannot start local server'))
@@ -74,7 +74,8 @@ function readServerConfig (): any {
 }
 
 async function esbuilder (): Promise<void> {
-  if (serverConfig.esbuild !== true) {
+  console.warn('esbuilder starting...')
+  if (serverConfig.esbuild === undefined) {
     return await triggerRebuild() // forces real start
   }
 
@@ -84,12 +85,14 @@ async function esbuilder (): Promise<void> {
   // const breakOnError = serverConfig.esbuild.breakOnError ?? false
   // const breakOnWarn = serverConfig.esbuild.breakOnWarn ?? false
 
+  console.warn('running esbuild', {entryPoints, outDir, watch})
+
   const ctx = await esbuild.context({
     entryPoints,
     bundle: true,
     outdir: outDir
   })
-  // console.log('esbuild...')
+  console.log('esbuild...')
 
   /* let result = */ await ctx.rebuild()
   let more: boolean = watch === true
@@ -121,7 +124,7 @@ function onWatch1 (evt: string, name: string): void {
   void triggerRebuild()
 }
 function onWatch2 (evt: string, name: string): void {
-  // console.log("Webroot Watch Event seen", {evt, name})
+  console.log("Webroot Watch Event seen", {evt, name})
   void triggerBrowserRestart()
 }
 
@@ -149,7 +152,7 @@ async function triggerBrowserRestart (): Promise<void> {
     closing = true
     await socketClose()
     await server.close()
-    await sleep(1000)
+    // await sleep(1000)
     closing = false
     startServers()
   } else {
