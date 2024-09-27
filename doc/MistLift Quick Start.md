@@ -214,6 +214,9 @@ the changes to the cloud.
 
 If you make a change to the api definitions, or to any of the webroot content, you must use the `publish` command again. But note that this invalidates the previous url and produces a new one.
 
+Starting with version 2.1.0, if you add or make changes to your webroot files, you can use the `update` command to update these files without
+requiring a new api to be created.
+
 _Note_:<br/>
 If you access the "Swagger" API page at your publish url  (e.g. https://xxxxxxxxxx.execute-api.us-west-1.amazonaws.com/Dev/api)
 

@@ -10,6 +10,7 @@ import functionRouter, { functionBinder } from '../expressRoutes/functionBinder'
 import apiRouter from '../expressRoutes/api'
 import allRouter, { allBinder } from '../expressRoutes/all'
 import { resolvePaths } from '../lib/pathResolve'
+import { esbuilder, readServerConfig } from '../lib/ESBuild'
 import { doBuildAsync } from './build'
 
 import * as ac from 'ansi-colors'
@@ -52,60 +53,13 @@ export async function startLocalServer (): Promise<void> {
 
   void funcWatcher(path.join(projectPaths.basePath, 'functions'), path.join(projectPaths.basePath, 'webroot'))
   // sleep(5000).then(() => esbuilder())
-  void esbuilder()
+  void esbuilder(triggerRebuild, false)
 }
 function startServers (): void {
   startWebSocketConnection(app)
   server = app.listen(serverConfig.port, function () {
     const port: number = serverConfig?.port ?? defaultPort
     console.log(`http listening on port ${port}`)
-  })
-}
-
-function readServerConfig (): any {
-  // console.log('readServerConfig...')
-  const projectPaths = resolvePaths()
-  const confFile = path.join(projectPaths.basePath, 'localServerConfig.json')
-  if (!fs.existsSync(confFile)) return {}
-
-  const conf: any = JSON.parse(fs.readFileSync(confFile).toString())
-  // console.log("server configuration", conf)
-  return conf
-}
-
-async function esbuilder (): Promise<void> {
-  console.warn('esbuilder starting...')
-  if (serverConfig.esbuild === undefined) {
-    return await triggerRebuild() // forces real start
-  }
-
-  const entryPoints = serverConfig.esbuild.entryPoints ?? []
-  const outDir = serverConfig.esbuild.outdir ?? 'webroot'
-  const watch = serverConfig.esbuild.watch ?? false
-  // const breakOnError = serverConfig.esbuild.breakOnError ?? false
-  // const breakOnWarn = serverConfig.esbuild.breakOnWarn ?? false
-
-  console.warn('running esbuild', { entryPoints, outDir, watch })
-
-  const ctx = await esbuild.context({
-    entryPoints,
-    bundle: true,
-    outdir: outDir
-  })
-  console.log('esbuild...')
-
-  /* let result = */ await ctx.rebuild()
-  let more: boolean = watch === true
-  do {
-    await sleep(500)
-    /* result = */ await ctx.rebuild()
-    more = watch === true
-  } while (more)
-}
-
-async function sleep (ms: number): Promise<void> {
-  return await new Promise(resolve => {
-    setTimeout(resolve, ms)
   })
 }
 

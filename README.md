@@ -64,6 +64,9 @@ To get started using MistLift, please see the [QuickStart Guide](https://github.
 
 ## Changelog
 
+### 2.1.0
+ - Add `update` command to allow updating of webroot files without a new publish.
+
 ### 2.0.7
  - misc fixes
  - improved esbuild start/watch

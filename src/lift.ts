@@ -15,6 +15,7 @@ import { doTestAsync } from './commands/test'
 import { doPackageAsync } from './commands/package'
 import { doDeployAsync } from './commands/deploy'
 import { doPublishAsync } from './commands/publish'
+import { doUpdateAsync } from './commands/update'
 import { doDoctor } from './commands/doctor'
 import { startLocalServer } from './commands/start'
 import { doSettings } from './commands/settings'
@@ -65,6 +66,11 @@ async function processCommand (): Promise<void> {
     case 'publish': {
       const ret = await doPublishAsync()
       if (ret !== 0) process.exit(ret)
+    }
+      return
+    case 'update': {
+      const ret = await doUpdateAsync()
+      process.exit(ret)
     }
       return
     case 'settings':

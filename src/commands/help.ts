@@ -181,3 +181,16 @@ export function helpInfo (): void {
   printBanner('info')
   console.log('use ' + ac.bold('lift info') + ' to report the last published url and the time of its publishing along with the associated deployed functions')
 }
+
+export function helpUpdate (): void {
+  printBanner('update')
+  console.log('use ' + ac.bold('lift update') + ' to republish the webroot content without forcing a republish')
+  console.log('')
+  console.log('The ' + ac.bold('lift publish') + ' command will create a new api deployment, invalidating any previous endpoint.')
+  console.log('You can use ' + ac.bold('lift deploy') + ' to update functions without a publish,')
+  console.log('but if you make changes to the front end (webroot) files, you may use the ' + ac.bold('lift update') + ' command ')
+  console.log('to update this content without forcing a republish.')
+  console.log('')
+  console.log('Note that if you add a function or change a function calling signature, you ')
+  console.log(ac.italic(' must ') + 'use the ' + ac.bold('lift publish') + ' command to realize these changes')
+}

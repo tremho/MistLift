@@ -76,6 +76,11 @@ The current public link will be reported at the end of the operation.
 Access to functions is possible by appending the function name to the reported
 api root.  (e.g. /helloworld).
 
+Starting with version 2.1.0, there is a new `update` command.  Use `update` to 
+update webroot files for an existing deploy without a destructive re-publish.
+Note that you _must_ republish to support any new functions or changes to existing
+function call signatures.
+
 Within the MistLift repository sources, the code for the various `lift` commmands
 may be found in the src/commands folder.
 

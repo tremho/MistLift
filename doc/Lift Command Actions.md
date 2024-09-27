@@ -178,6 +178,15 @@ named '.published' in the project directory.  This is used by the info command.
 Each publish produces a new API resource, with a new URL.  
 
 ---
+# update
+
+The update command allows webroot files to be updated without requiring a new publish,
+since a publish will invalidate the previous api url.
+
+The update command simply redeploys the fileserve built-ins, but does not continue on
+to update the API definitions and create a new API resource.
+
+---
 ## help
 
 The help command outputs documentation for MistLift.

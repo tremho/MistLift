@@ -1,6 +1,7 @@
 import { StageWebrootZip } from './StageWebrootZip'
 import { DeployBuiltInZip } from './DeployBuiltInZip'
 import { GetWebrootServePaths } from '../../lib/openAPI/WebrootFileSupport'
+import * as ac from 'ansi-colors'
 
 import fs from 'fs'
 import path from 'path'
@@ -30,9 +31,10 @@ export async function DeployRootFileserves
     while (name.includes('/')) {
       name = name.replace('/', '')
     }
+    // console.log('pushing ', {name, fileserveZip})
     all.push(DeployBuiltInZip(name, fileserveZip))
   }
-  // console.log('wait all');
+  console.log(ac.green.italic(`deploying ${all.length} file groups...`))
   await Promise.all(all)
   // console.log('all complete');
 }

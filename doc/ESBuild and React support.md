@@ -78,3 +78,9 @@ root.render(
 I won't go further into the nuances of using React -- I'll leave that to others with more React experience and skill to elaborate on.
 
 But I expect this is enough to get you started.  Have fun,
+
+As of version 2.1.0:
+If you are updating your react project and wish to redeploy it locally, and you have
+not made any changes to your MistLift API functions, you may use the `lift update` command
+to redeploy the webroot files (including an esbuild rebuild of your react app) without a republish.
+
