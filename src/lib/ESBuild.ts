@@ -5,10 +5,11 @@ import fs from 'fs'
 
 const serverConfig = readServerConfig()
 
-export async function esbuilder (triggerRebuild: any = null, oneShot: boolean = true) {
+export async function esbuilder (triggerRebuild: any = null, oneShot: boolean = true): Promise<void> {
   // console.warn('esbuilder starting...')
   if (serverConfig.esbuild === undefined && typeof triggerRebuild === 'function') {
-    return await triggerRebuild() // forces real start
+    const promise: Promise<void> = triggerRebuild()
+    return await promise // forces real start
   }
 
   const entryPoints = serverConfig.esbuild.entryPoints ?? []

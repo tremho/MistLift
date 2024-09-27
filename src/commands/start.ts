@@ -1,7 +1,6 @@
 /** Run Express Server */
 import express from 'express'
 
-import * as esbuild from 'esbuild'
 import watch from 'node-watch'
 import expressWS from 'express-ws'
 
@@ -16,7 +15,6 @@ import { doBuildAsync } from './build'
 import * as ac from 'ansi-colors'
 
 import path from 'path'
-import fs from 'fs'
 
 const defaultPort = 8081
 const serverConfig = readServerConfig()

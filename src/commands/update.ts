@@ -1,16 +1,12 @@
-import * as fs from 'fs'
-import * as path from 'path'
 import * as ac from 'ansi-colors'
 import { resolvePaths } from '../lib/pathResolve'
-import { getProjectName } from '../lib/LiftVersion'
-import { DeployRootFileserves, DeployWebrootBuiltIn } from './builtin/BuiltInHandler'
+import { DeployRootFileserves } from './builtin/BuiltInHandler'
 import { esbuilder } from '../lib/ESBuild'
 
 /// Info command
 export async function doUpdateAsync (
   stageName?: string
 ): Promise<number> {
-  const projectName = getProjectName()
   const projectPaths = resolvePaths()
 
   if (!projectPaths.verified) {
@@ -18,7 +14,7 @@ export async function doUpdateAsync (
     return -1
   }
 
-  if (!stageName) stageName = 'Dev'
+  if (stageName === undefined) stageName = 'Dev'
   console.log(ac.green.bold(`Updating Webroot files to ${stageName}`))
 
   try {
