@@ -85,7 +85,7 @@ async function esbuilder (): Promise<void> {
   // const breakOnError = serverConfig.esbuild.breakOnError ?? false
   // const breakOnWarn = serverConfig.esbuild.breakOnWarn ?? false
 
-  console.warn('running esbuild', {entryPoints, outDir, watch})
+  console.warn('running esbuild', { entryPoints, outDir, watch })
 
   const ctx = await esbuild.context({
     entryPoints,
@@ -124,7 +124,7 @@ function onWatch1 (evt: string, name: string): void {
   void triggerRebuild()
 }
 function onWatch2 (evt: string, name: string): void {
-  console.log("Webroot Watch Event seen", {evt, name})
+  console.log('Webroot Watch Event seen', { evt, name })
   void triggerBrowserRestart()
 }
 
