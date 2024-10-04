@@ -7,7 +7,7 @@ import {
   APIGatewayClient,
   ImportRestApiCommand,
   GetRestApisCommand,
-  GetResourcesCommand, GetResourcesCommandOutput,
+  GetResourcesCommand,
   DeleteRestApiCommand,
   PutIntegrationRequest,
   PutIntegrationCommand,
@@ -92,21 +92,21 @@ async function publishApi (
 
   await RemoveExistingVersions(client)
 
-  const command = new ImportRestApiCommand({
+  const command: any = new ImportRestApiCommand({
     failOnWarnings: false,
     body: apiBytes
   })
-  let apiId
+  let apiId: string = ''
   try {
-    const response = await client.send(command)
+    const response: any = await client.send(command)
     const { name, id, version, warnings } = response
-    console.log(ac.grey(`\n\nAPI ${name ?? ''} version ${version ?? ''}  [${id ?? ''}] schema created`))
+    console.log(ac.grey(`\n\nAPI ${name as string ?? ''} version ${version as string ?? ''}  [${id as string ?? ''}] schema created`))
     apiId = id ?? ''
     if (warnings?.length !== 0) {
-      console.log(ac.magenta(` with ${warnings?.length ?? 0} warnings`))
+      console.log(ac.magenta(` with ${(warnings as string[])?.length ?? 0} warnings`))
       if (warnings !== undefined) {
         for (const warning of warnings) {
-          console.log(ac.grey.italic(`    ${warning}`))
+          console.log(ac.grey.italic(`    ${warning as string}`))
         }
       }
     }
@@ -142,11 +142,8 @@ function findApiName (): string {
 async function RemoveExistingVersions (client: APIGatewayClient): Promise<void> {
   await new Promise(resolve => {
     const ourName = findApiName()
-    // ClogDebug("looking for name "+ ourName)
-    const listCommand = new GetRestApisCommand({})
+    const listCommand: any = new GetRestApisCommand({})
     client.send(listCommand).then((response: any) => {
-      // ClogInfo(`There are ${response.items.length} other APIs`)
-
       const DeleteMatchingApis = async (i: number = 0): Promise<any> => {
         if (i >= response.items.length) {
           resolve(undefined)
@@ -154,19 +151,18 @@ async function RemoveExistingVersions (client: APIGatewayClient): Promise<void> 
         }
         const item: { name: string, id: string } = response.items[i]
         if (item.name === ourName) {
-          // ClogInfo(`Found previous ${ourName}, [${item.id}] -- deleting...`)
-          const deleteCommand = new DeleteRestApiCommand({
+          const deleteCommand: any = new DeleteRestApiCommand({
             restApiId: item.id
           })
-          return await client.send(deleteCommand).then(() => {
-            delay(5000).then(async () => {
-              console.log(ac.magenta.bold(`Removed previous id ${item.id}`))
-              return await DeleteMatchingApis(++i)
-            }).catch<any>((reason: any) => undefined)
-          }).catch<any>((reason: any) => undefined)
-        } else {
-          return await DeleteMatchingApis(++i)
+          try {
+            await client.send(deleteCommand)
+            await delay(5000)
+            console.log(ac.magenta.bold(`Removed previous id ${item.id}`))
+          } catch (e: any) {
+            console.error(`Failed to delete previous id ${item.id}: ${e.message as string}`)
+          }
         }
+        return await DeleteMatchingApis(++i)
       }
       DeleteMatchingApis().catch<any>((reason: any) => undefined)
     }).catch<any>((reason: any) => undefined)
@@ -197,7 +193,7 @@ class PrereqInfo {
     for (const api of this.apis) {
       if (api?.path === pathMap) {
         // console.log("resourceMethods", api.resourceMethods)
-        const methodList = Object.getOwnPropertyNames(api.resourceMethods)
+        const methodList: string[] = Object.getOwnPropertyNames(api.resourceMethods)
         // ClogTrace("methodList", methodList)
         for (const meth of allowedMethods.toUpperCase().split(',')) { // NOTE: we no longer try to support multiples, but this still works as is.
           // console.log("meth", meth)
@@ -282,10 +278,10 @@ async function GetMethodResources (
   info: PrereqInfo
 ): Promise<PrereqInfo> {
   const client = new APIGatewayClient(getAWSCredentials())
-  const listCommand = new GetResourcesCommand({
+  const listCommand: any = new GetResourcesCommand({
     restApiId: id
   })
-  const response: GetResourcesCommandOutput = await client.send(listCommand)
+  const response: any = await client.send(listCommand)
   // ClogInfo("Resources response", response)
   if ((response?.items) != null) info.apis = response.items
 
@@ -296,7 +292,7 @@ async function PutIntegrations (integrations: PutIntegrationRequest[]): Promise<
   const client = new APIGatewayClient(getAWSCredentials())
   for (const input of integrations) {
     try {
-      const command = new PutIntegrationCommand(input)
+      const command: any = new PutIntegrationCommand(input)
       /* const intResp = */ await client.send(command)
       // ClogDebug("integration response", intResp);
       await delay(5000)
@@ -310,7 +306,7 @@ async function PutIntegrations (integrations: PutIntegrationRequest[]): Promise<
 async function DeployApi (restApiId: string, stageName: string): Promise<void> {
   try {
     const client = new APIGatewayClient(getAWSCredentials())
-    const command = new CreateDeploymentCommand({
+    const command: any = new CreateDeploymentCommand({
       restApiId,
       stageName
     })
