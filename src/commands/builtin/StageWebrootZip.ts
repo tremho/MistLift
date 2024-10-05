@@ -54,7 +54,7 @@ export async function StageWebrootZip
   })
   const webrootZip = path.join(projectPaths.basePath, 'a.zip')
   // console.log(">>>> Combined webroot folder at "+stagedWebrootFolder)
-  // await executeCommand('ls', [ '-l', stagedWebrootFolder], '', true)
+  // await executeCommand('ls', [ '-l', stagedWebrootFolder+'/__files__'], '', true)
 
   await FolderToZip(stagedWebrootFolder, webrootZip)
   // return path to this zip

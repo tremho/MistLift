@@ -1,6 +1,6 @@
 import * as ac from 'ansi-colors'
 import { resolvePaths } from '../lib/pathResolve'
-import { DeployRootFileserves } from './builtin/BuiltInHandler'
+import { DeployRootFileserves, DeployWebrootBuiltIn } from './builtin/BuiltInHandler'
 import { esbuilder } from '../lib/ESBuild'
 
 /// Info command
@@ -20,6 +20,7 @@ export async function doUpdateAsync (
   try {
     await esbuilder()
     await DeployRootFileserves()
+    await DeployWebrootBuiltIn()
     return 0
   } catch (e: any) {
     console.log(ac.bold.red('Unexpected failure updating Webroot deployments'))

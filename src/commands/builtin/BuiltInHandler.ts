@@ -9,8 +9,9 @@ import path from 'path'
 export async function DeployWebrootBuiltIn
 (
 ): Promise<void> {
+  // console.warn(">> DeployWebrootBuiltIn")
   const wrZip = await StageWebrootZip()
-  // console.log("Deploy Webroot Builtin from "+wrZip)
+  // console.log(">> Deploy Webroot Builtin from "+wrZip)
   await DeployBuiltInZip('Webroot', wrZip)
   // remove temp zip when done
   // console.warn("a.zip is left behind")

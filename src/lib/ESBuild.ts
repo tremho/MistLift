@@ -31,10 +31,12 @@ export async function esbuilder (triggerRebuild: any = null, oneShot: boolean = 
   let more: boolean = watch === true
   do {
     await sleep(500)
+    // console.log("ctx.rebuild()")
     /* result = */ await ctx.rebuild()
     more = watch === true
     if (oneShot) break
   } while (more)
+  // console.log("done building")
 }
 
 export function readServerConfig (): any {
