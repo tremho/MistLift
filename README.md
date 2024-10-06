@@ -64,9 +64,10 @@ To get started using MistLift, please see the [QuickStart Guide](https://github.
 
 ## Changelog
 
-### 2.1.1, 2.1.2
+### 2.1.1, 2.1.2, 2.1.3, 2.1.4
   - Fixes for fileserve operations that caused failures in custom domain deployments
   - minor updates to publish operation
+  - Fixes for update operation
 
 ### 2.1.0
  - Add `update` command to allow updating of webroot files without a new publish.

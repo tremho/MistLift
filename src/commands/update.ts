@@ -9,6 +9,8 @@ export async function doUpdateAsync (
 ): Promise<number> {
   const projectPaths = resolvePaths()
 
+  // console.warn('>>> Update')
+
   if (!projectPaths.verified) {
     console.log(ac.bold.magenta('current directory is not at project root'))
     return -1
@@ -18,8 +20,11 @@ export async function doUpdateAsync (
   console.log(ac.green.bold(`Updating Webroot files to ${stageName}`))
 
   try {
+    // console.warn(">>> esbuilder")
     await esbuilder()
+    // console.warn(">>> DeployRootFileserves")
     await DeployRootFileserves()
+    // console.warn(">>> DeployWebrootBuiltIn")
     await DeployWebrootBuiltIn()
     return 0
   } catch (e: any) {

@@ -23,9 +23,10 @@ export async function esbuilder (triggerRebuild: any = null, oneShot: boolean = 
   const ctx = await esbuild.context({
     entryPoints,
     bundle: true,
-    outdir: outDir
+    outdir: outDir,
+    platform: 'node'
   })
-  // console.log('esbuild...')
+  // console.log('esbuild...', {ctx})
 
   /* let result = */ await ctx.rebuild()
   let more: boolean = watch === true
