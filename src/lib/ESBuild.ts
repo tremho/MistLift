@@ -23,8 +23,8 @@ export async function esbuilder (triggerRebuild: any = null, oneShot: boolean = 
   const ctx = await esbuild.context({
     entryPoints,
     bundle: true,
-    outdir: outDir,
-    platform: 'node'
+    outdir: outDir //,
+    // platform: 'node'
   })
   // console.log('esbuild...', {ctx})
 
