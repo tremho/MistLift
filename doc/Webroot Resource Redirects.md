@@ -54,10 +54,12 @@ you would create a redirects.json file that looked like this
 
 ```
 
-Note that these files do not need to be present in  your webroot folder.  However, if you have files
+Note that for publishing to the cloud, these files do not need to be present in  your webroot folder.  However, if you have files
 within a folder (as `images` is here in this example), you ___must___ create the folder within webroot so that
 the directory association is made for file service recognition.  The folder can be empty, but it
 must exist at publish time.
+
+For local serving (with `lift start`) the files must exist in their correct webroot locations.  Redirected links are not supported for the local server.
 
 When the content is published (via `lift publish` or `lift update`) references to the paths of the image files
 named in the redirect will be served from the Amplify static site instead.
