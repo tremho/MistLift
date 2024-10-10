@@ -6,7 +6,7 @@ import {
   AddPermissionCommand
 } from '@aws-sdk/client-lambda'
 
-import md5 from 'md5'
+// import md5 from 'md5'
 
 import path from 'path'
 import fs from 'fs'
@@ -15,10 +15,11 @@ import { resolvePaths } from '../lib/pathResolve'
 import * as ac from 'ansi-colors'
 
 import { recurseDirectory } from '../lib/DirectoryUtils'
-import { getProjectName, getProjectVersion } from '../lib/LiftVersion'
+
 import { delay } from '../lib/utils'
 import { doPackageAsync } from './package'
 import { getAWSCredentials, getSettings, RuntimeType } from '../lib/LiftConfig'
+import { decoratedName } from '../lib/IdSrc'
 // import { executeCommand } from '../lib/executeCommand'
 
 let projectPaths: { basePath: string, buildPath: string, functionPath: string, packagePath: string, verified: boolean }
@@ -110,8 +111,7 @@ export async function deployPackage (
   const timeout: number = def.timeoutSeconds ?? 0 // zero will mean default (3 seconds on AWS)
   const memorySize: number = def.memorySize ?? 0 // zero is default (128 [mb] for AWS)
   // funcname gets decorated with current instance identifier
-  const idsrc = md5((getProjectName() ?? '') + (getProjectVersion()?.toString() ?? ''))
-  const dFuncName = funcName + '_' + idsrc
+  const dFuncName = decoratedName(funcName)
 
   // See if function exists
   const client: any = new LambdaClient(getAWSCredentials())

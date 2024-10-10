@@ -218,7 +218,7 @@ function reconcileVersionImports (
       if (isDev) {
         console.error(ac.magenta(`  ${m} import is dev-only, not migrated`))
       } else {
-        if (depsOut[m] !== undefined) console.log(ac.blue.dim(`  ${m} exported as ${r}`))
+        if (depsOut[m] !== r) console.log(ac.blue.dim(`  ${m} exported as ${r}`))
         depsOut[m] = r
       }
     } else {

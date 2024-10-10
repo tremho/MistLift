@@ -26,8 +26,8 @@ import { gatherFunctionDefinitions } from '../lib/openAPI/ApiBuildCollector'
 import { delay } from '../lib/utils'
 import { addBuiltInDefinitions, MakeBuiltinApiDoc } from './builtin/ApiDocMaker'
 import { DeployApiBuiltin, DeployRootFileserves, DeployWebrootBuiltIn } from './builtin/BuiltInHandler'
-import { getProjectName, getProjectVersion } from '../lib/LiftVersion'
-import md5 from 'md5'
+import { esbuilder } from '../lib/ESBuild'
+import { decoratedName, getIdDelimiter } from '../lib/IdSrc'
 
 let projectPaths: any
 
@@ -53,6 +53,9 @@ async function publishApi (
   if (stageName === undefined) stageName = 'Dev'
   console.log(ac.green.bold(`Publishing Api to ${stageName}`))
 
+  // console.log('esbuild...')
+  await esbuilder()
+  // console.log('done')
   // do the built-in deploys
   await DeployWebrootBuiltIn()
   await DeployRootFileserves()
@@ -127,6 +130,7 @@ async function publishApi (
   const publishUrl = `https://${apiId ?? ''}.execute-api.${region}.amazonaws.com/${stageName}`
   console.log(ac.green.bold(`\n Successfully deployed to ${publishUrl}`))
   recordLatestPublish(publishUrl)
+  // process.exit(0) // this was a dumb idea
 }
 function findApiName (): string {
   const infoFile = path.join(projectPaths.functionPath, 'apiService.info.json')
@@ -208,10 +212,15 @@ class PrereqInfo {
   }
 
   public findARN (name: string): string {
+    // console.warn(`>>> finding name ${name} in functions ${JSON.stringify(this.functions)}`)
     for (const f of this.functions ?? []) {
-      const lastus = f.name.lastIndexOf('_')
+      const lastus = f.name.lastIndexOf(getIdDelimiter())
       const fname = f.name.substring(0, lastus)
-      if (fname.toLowerCase() === name.toLowerCase()) return f.arn
+      // console.warn('comparing name, fname, lc ', {lastus, fname, name})
+      if (fname.toLowerCase() === name.toLowerCase()) {
+        // console.warn(">>> Match! ", f)
+        return f.arn
+      }
     }
     console.log("$$$ Couldn't find " + name + ' in ', this.functions)
     return ''
@@ -259,7 +268,7 @@ async function GetFunctionInfo (info: PrereqInfo): Promise<PrereqInfo> {
   const listCommand: any = new ListFunctionsCommand({})
   const response: any = await client.send(listCommand)
 
-  const sfx = '_' + md5((getProjectName() ?? '') + (getProjectVersion()?.toString() ?? ''))
+  const sfx = decoratedName('')
 
   for (const func of response.Functions ?? []) {
     const fName: string = func?.FunctionName ?? ''

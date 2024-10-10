@@ -64,6 +64,12 @@ To get started using MistLift, please see the [QuickStart Guide](https://github.
 
 ## Changelog
 
+### 2.2.0 - webroot redirects
+    
+- See [Webroot redirect documentation](https://github.com/tremho/MistLift/blob/main/doc/Webroot%20Resource%20Redirects.md)
+- esbuild re-generated on publish operation as well as update
+- new [Configuration options for ESBuild]((https://github.com/tremho/MistLift/blob/main/doc/ESBuild%20and%20React%20support.md))
+- changed the identifying suffix of deployed functions to be human readable    
 ### 2.1.5
   - inverse-y library update
 
@@ -72,7 +78,7 @@ To get started using MistLift, please see the [QuickStart Guide](https://github.
   - minor updates to publish operation
   - Fixes for update operation
 
-### 2.1.0
+### 2.1.0 -- Update command
  - Add `update` command to allow updating of webroot files without a new publish.
 
 ### 2.0.7
@@ -104,7 +110,7 @@ creating a new .test.ts file that demonstrates its use for the placeholder sourc
 ### 2.0.1
 - Fixes sourcemap issues, via @tremho/gen-logger 2.0.1
 
-### 2.0.0
+### 2.0.0 - General updates
 - Revised logging implementation using [@tremho/gen-logger](https://www.npmjs.com/package/@tremho/gen-logger)
 - Numerous bug fixes
 - Additional documentation for 1.2.0 changes

@@ -117,7 +117,8 @@ function addFunctionMethod (pathDef: any, method: string, def: any): void {
   const retDef: any = (def.returns)['200']
   const content: any = {}
   const mime = retDef?.content ?? retDef?.mime ?? 'text/plain'
-  content[mime] = {}
+  content[mime] = {
+  }
 
   const methData = {
     summary: def.name,

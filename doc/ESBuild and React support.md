@@ -28,6 +28,7 @@ fast build bundler.
   }
 }
 ```
+
 The `port` property is optional (default is 8081). This defines the service port for the local server.
 The `rebuildFunctionOnChange` property, if true, will automatically rebuild the backend functions if there is a source change.
 The `refeshBrowserOnFunctionChange` property, if true, will also signal the browser to refresh if a function is rebuilt. 
@@ -42,6 +43,21 @@ The `outdir` property is optional, and names the location the resulting bundle w
 The `watch` property, if set `true`, will (very quickly) rebuild the bundle if there are changes made to any of the files it contains.
 Since this will update the corresponding file in the webroot, the browser refresh will signal according to that flag.
 
+#### Other ESBuild options within the "esbuild" section 
+_since 2.2.0_
+
+The "esbuild" section above corresponds to the properties context of ESBuild, so
+in addition to `entryPoints`, and `outdir` (as shown above), other properties
+may be communicated for ESBuild use. Refer to the [ESBuild API](https://esbuild.github.io/api/) for
+a list of the options that might be configurable here.
+
+For example, you may wish to declare `"minify": true` to produce a minified bundle,
+or use `"sourcemap": true` to facilitate source code mapping that is helpful in browser-side debugging.
+
+Note that the `watch` property found within the esbuild section is for MistLift use only.
+This is not a normal ESBuild property.
+
+#### attaching the ESBuild bundle
 ESBuild will compile all the constituent files and put the output into the `webroot` folder (by default, or other directory if so named by the `outfile` property).
 You should then create an endpoint that uses this bundle, for example, `index.html`:
 ```html
@@ -84,3 +100,5 @@ If you are updating your react project and wish to redeploy it locally, and you 
 not made any changes to your MistLift API functions, you may use the `lift update` command
 to redeploy the webroot files (including an esbuild rebuild of your react app) without a republish.
 
+### See also (since 2.2.0)
+- [Webroot resource redirects](Webroot%20Resource%20Redirects.md) 

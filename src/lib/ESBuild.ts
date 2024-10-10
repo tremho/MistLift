@@ -12,20 +12,22 @@ export async function esbuilder (triggerRebuild: any = null, oneShot: boolean = 
     return await promise // forces real start
   }
 
-  const entryPoints = serverConfig.esbuild.entryPoints ?? []
-  const outDir = serverConfig.esbuild.outdir ?? 'webroot'
-  const watch = serverConfig.esbuild.watch ?? false
+  const entryPoints = serverConfig.esbuild?.entryPoints ?? []
+  const outDir = serverConfig.esbuild?.outdir ?? 'webroot'
+  const watch = serverConfig.esbuild?.watch ?? false
   // const breakOnError = serverConfig.esbuild.breakOnError ?? false
   // const breakOnWarn = serverConfig.esbuild.breakOnWarn ?? false
 
   // console.warn('running esbuild', { entryPoints, outDir, watch })
 
-  const ctx = await esbuild.context({
-    entryPoints,
-    bundle: true,
-    outdir: outDir //,
-    // platform: 'node'
-  })
+  const options: any = serverConfig.esbuild  ?? {} // get all the config from the user they want
+  // enforce the ones we need that may have been given defaults
+  delete options.watch // not a real config
+  options.entryPoints = entryPoints
+  if (options.bundle === undefined) options.bundle = true
+  options.outdir = outDir
+
+  const ctx = await esbuild.context(options)
   // console.log('esbuild...', {ctx})
 
   /* let result = */ await ctx.rebuild()
