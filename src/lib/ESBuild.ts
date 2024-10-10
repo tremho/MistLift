@@ -20,7 +20,7 @@ export async function esbuilder (triggerRebuild: any = null, oneShot: boolean = 
 
   // console.warn('running esbuild', { entryPoints, outDir, watch })
 
-  const options: any = serverConfig.esbuild  ?? {} // get all the config from the user they want
+  const options: any = serverConfig.esbuild ?? {} // get all the config from the user they want
   // enforce the ones we need that may have been given defaults
   delete options.watch // not a real config
   options.entryPoints = entryPoints
