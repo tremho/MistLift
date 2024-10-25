@@ -1,8 +1,17 @@
 import { executeCommand } from '../lib/executeCommand'
 import { doBuildAsync } from './build'
+import {isTapInstalled} from "./doctor";
+import * as ac from "ansi-colors";
 
 export async function doTestAsync (args: string[]): Promise<number> {
   if (await doBuildAsync(args) !== 0) return 1 // don't test if build fails
+
+  if(! await isTapInstalled()) {
+      // don't continue if tap unavaiable
+      console.log(ac.yellow.dim.bold.italic('\nTap is necessary for the lift test command.\nInstall with ')+ac.black.bold('npm i -g tap\n'))
+      return 1
+  }
+
   if (args.length === 0) args = ['*']
   let ret = 0
   for (const funcName of args) {
@@ -35,3 +44,4 @@ export async function doTestAsync (args: string[]): Promise<number> {
   }
   return ret
 }
+

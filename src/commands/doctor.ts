@@ -5,6 +5,8 @@ import { executeCommand } from '../lib/executeCommand'
 import { resolvePaths } from '../lib/pathResolve'
 import { areSettingsAvailable } from '../lib/LiftConfig'
 
+const minTapVersion = '19.2.5'
+
 export async function doDoctor (): Promise<boolean> {
   console.log(ac.blue.bold('Lift doctor'))
 
@@ -26,6 +28,11 @@ export async function doDoctor (): Promise<boolean> {
   ok = ok && report('Npm', npmVersion, isWin ? '9.6.4' : '10.3.0')
   report('Git', gitVersion, '2.0.0')
   report('unzip', unzipVersion, '1.0.0')
+
+  if(! await isTapInstalled()) {
+    console.log(ac.yellow.dim.bold.italic('\nTap is necessary for the lift test command.\nInstall with ')+ac.black.bold('npm i -g tap\n'))
+  }
+
   if (!settingsAvail) {
     console.log('')
     console.log(ac.yellow.dim.bold('Cloud Settings are not set. ') + ac.blue('run ' + ac.bold('lift settings')))
@@ -81,6 +88,13 @@ async function fetchNpmVersion (
   return vstr
 }
 
+async function fetchTapVersion (): Promise<string> {
+  const result = await executeCommand('tap', ['-v'])
+  if (result.retcode !== 0) return 'Tap not found'
+  const vstr = versionTrim(result.stdStr)
+  return vstr
+}
+
 async function fetchGitVersion (
 
 ): Promise<string> {
@@ -115,4 +129,11 @@ function report (
     console.log(ac.red.bold('X ') + ac.black.bold(name) + ac.red.bold(' does not meet minimum version of ') + ac.blue(minStr))
   }
   return ok
+}
+
+
+export async function isTapInstalled() {
+  const v = await fetchTapVersion()
+  return await report('tap', v, minTapVersion)
+
 }

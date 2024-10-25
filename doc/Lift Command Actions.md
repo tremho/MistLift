@@ -213,6 +213,8 @@ create additional files.
 Using the [TapAssert](https://www.npmjs.com/package/@tremho/tap-assert) library will simplify your test writing. In the model adopted here,
 each test function is run as a new test suite. By default, the suite is identified by the name of the test file.
 
+the `tap` command must be installed globally to enable tap testing for lift.  To do this, run `npm i -g tap` from the command line.
+
 Please read more about using Tap in the [Tap Docs](https://node-tap.org)
 
 ---

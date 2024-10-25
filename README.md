@@ -64,6 +64,13 @@ To get started using MistLift, please see the [QuickStart Guide](https://github.
 
 ## Changelog
 
+### 2.2.2
+ - updated docs and prompts regarding tap installation
+ - 
+
+### 2.2.1
+- minor logging support updates
+
 ### 2.2.0 - webroot redirects
     
 - See [Webroot redirect documentation](https://github.com/tremho/MistLift/blob/main/doc/Webroot%20Resource%20Redirects.md)
