@@ -53,9 +53,7 @@ async function publishApi (
   if (stageName === undefined) stageName = 'Dev'
   console.log(ac.green.bold(`Publishing Api to ${stageName}`))
 
-  // console.log('esbuild...')
   await esbuilder()
-  // console.log('done')
   // do the built-in deploys
   await DeployWebrootBuiltIn()
   await DeployRootFileserves()
@@ -130,8 +128,8 @@ async function publishApi (
   const publishUrl = `https://${apiId ?? ''}.execute-api.${region}.amazonaws.com/${stageName}`
   console.log(ac.green.bold(`\n Successfully deployed to ${publishUrl}`))
   recordLatestPublish(publishUrl)
-  // process.exit(0) // this was a dumb idea
 }
+
 function findApiName (): string {
   const infoFile = path.join(projectPaths.functionPath, 'apiService.info.json')
   const pkgFile = projectPaths.packagePath
