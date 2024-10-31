@@ -16,8 +16,8 @@ export async function doTestAsync (args: string[]): Promise<number> {
   let ret = 0
   for (const funcName of args) {
     const result = await executeCommand('tap', [
-            `build/functions/${funcName}/*.test.js`,
-            /*
+      `functions/${funcName}/*.test.ts`,
+      /*
                              - base -- looks a lot like terse
                              - terse -- pass/fail counts
                              - min -- errors only
@@ -29,11 +29,11 @@ export async function doTestAsync (args: string[]): Promise<number> {
                              - junit
                              - tap
              */
-            '--reporter=base',
-            '--color',
-            '--passes',
-            '--allow-empty-coverage',
-            '--allow-incomplete-coverage'
+      '--reporter=base',
+      '--color',
+      '--passes',
+      '--allow-empty-coverage',
+      '--allow-incomplete-coverage'
 
     ], '', true)
 

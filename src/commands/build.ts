@@ -85,53 +85,60 @@ async function buildFunctionModules (
 ): Promise<number> {
   const announce = ac.blue.dim(`building ${funcName}...`)
   let announced = false
-  let fails = 0
-  // let builds = 0
+  // let fails = 0
+  const statObj = {
+    fails: 0
+  }
+
   let failFast = options.includes('--failfast')
   if (options.includes('--deferfail')) failFast = false
   const all: Array<Promise<void>> = []
-  recurseDirectory(funcDir, (filepath, stats) => {
+  await recurseDirectory(funcDir, (filepath, stats) => {
     if (path.extname(filepath) === '.ts') {
       let relPath = filepath.substring(funcDir.length)
       relPath = relPath.substring(0, relPath.lastIndexOf(path.sep))
       const outDir = path.join(buildPath, relPath)
 
-      if (!(fails > 0 && failFast)) {
+      if (!(statObj.fails > 0 && failFast)) {
         if (isNewer(filepath, outDir)) {
           if (!announced) {
             announced = true
             console.log(announce)
           }
-          // builds++
-          all.push(executeCommand('tsc', [
-            '--esModuleInterop', 'true',
-            '--target', 'ES2015',
-            '--module', 'commonjs',
-            '--lib', 'dom,es2015,scripthost,es2015.proxy',
-            '--strict', 'true',
-            '--noImplicitAny', 'false',
-            '--skipLibCheck', 'true',
-            '--forceConsistentCasingInFileNames', 'true',
-            '--sourceMap', 'true',
-            '--outdir', outDir,
-            filepath
-          ], '', true).then((result: { retcode: number | undefined, stdOut: string, stdErr: string }) => {
-            if (result.retcode !== 0) {
-              fails++
-              // console.log("error detected", fails)
-              const now = new Date()
-              fs.utimesSync(filepath, now, now) // touch file so it is not skipped next build
-            }
-          }))
+          if (!filepath.endsWith('test.ts')) {
+              all.push(buildFile(filepath, outDir, statObj))
+          }
         }
       }
     }
-    fails += doPostBuildSteps(funcDir, buildPath)
     return false
   })
-  return await Promise.all(all).then(async () => {
-    return fails
-  })
+  statObj.fails += doPostBuildSteps(funcDir, buildPath)
+  await Promise.all(all)
+  return statObj.fails
+}
+
+async function buildFile (filepath: string, outDir: string, statObj: any): Promise<void> {
+  const result: any = await executeCommand('tsc', [
+    '--esModuleInterop', 'true',
+    '--target', 'ES2015',
+    '--module', 'commonjs',
+    '--lib', 'dom,es2015,scripthost,es2015.proxy',
+    '--strict', 'true',
+    '--noImplicitAny', 'false',
+    '--skipLibCheck', 'true',
+    '--forceConsistentCasingInFileNames', 'true',
+    '--sourceMap', 'true',
+    '--outdir', outDir,
+    filepath
+  ], '', true)
+
+  if (result.retcode !== 0) {
+    if (statObj !== null && statObj !== undefined) statObj.fails++
+    // console.log("error detected", fails)
+    const now = new Date()
+    fs.utimesSync(filepath, now, now) // touch file so it is not skipped next build
+  }
 }
 
 // do the steps after the build (file copies, etc)

@@ -64,6 +64,9 @@ To get started using MistLift, please see the [QuickStart Guide](https://github.
 
 ## Changelog
 
+### 2.2.3
+ - fixes problematic bug w/rt test, build, and package consistency. 
+
 ### 2.2.2
  - updated docs and prompts regarding tap installation
  - addressed hanging issue on publish command
