@@ -10,6 +10,12 @@ Place code in the `commonLib` location that is visible to all your functions and
 import it within your function modules as `import {myExports} from './lib/MyLibModule`
 in each of the functions that uses it.
 
+##### IMPORTANT use of _lib_ local directory
+Be sure to use the `lib` symlink for your import statements, and never link directly to
+`../../../commonLib` or to any other directory outside of your `src` directory of your function.
+This has to do with the way the typescript compiler will construct the resulting object tree and
+may produce undesireable consequences on the packaged function.
+
 
 ### npm packages
 Your code can of course use any npm packages available.
