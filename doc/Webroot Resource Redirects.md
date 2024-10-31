@@ -67,6 +67,18 @@ named in the redirect will be served from the Amplify static site instead.
 Again, the locations of  your redirected files can be any valid public url source.
 The file path structure and the file names need not match the mapped references, although this is generally more convenient.
 
+#### Redirections may not work
+Depending upon your web app and how you are using the assets, redirection like this
+may not always work to load the assets as expected.
+In this case you may choose to load the assets directly from the remote source.
+
+Note also that CORS restrictions may come into play as well.
+Your remote server source may need to have its Access-Control-Allow-Origin header set to allow
+your web app domain access.
+
+Other alternatives for assets include loading from an S3 URL (this works much like the remote server, in the end),
+or using DataURLs if the assets are small enough.
+
 
 
 

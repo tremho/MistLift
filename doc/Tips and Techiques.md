@@ -35,3 +35,18 @@ If your function needs non-code resources to work with, you can create a directo
 function directory, alongside the `src` folder, named `resources`.  This folder tree will be copied
 to the build directory as a post-build step.  Other directory names will not be copied.
 
+## Webroot files and directories
+It can be convenient to organize asset files under the webroot directory
+in the same manner as one might do for a conventional web server.
+However, there are limitations and ramifications to doing this you should be aware of.
+First, please see the article [Webroot Resource Redirects](./Webroot%20Resource%20Redirects.md)
+to understand how large files, binary files, or certain files designed for streaming
+should come from another static server location and be redirected as though they
+originated at webroot.
+The second thing to understand is that every directory and subdirectory made within the
+webroot tree forces the deployment of a new _fileserve_ handler.  This is necessary because of the
+way AWS path resolution and routing behaves.  As much as possible, try to keep all of your
+files within a single directory to minimize this overhead. Too many nested directories may cause a problem in deployment.
+
+
+

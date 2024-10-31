@@ -27,7 +27,7 @@ import { delay } from '../lib/utils'
 import { addBuiltInDefinitions, MakeBuiltinApiDoc } from './builtin/ApiDocMaker'
 import { DeployApiBuiltin, DeployRootFileserves, DeployWebrootBuiltIn } from './builtin/BuiltInHandler'
 import { esbuilder } from '../lib/ESBuild'
-import { decoratedName, getIdDelimiter } from '../lib/IdSrc'
+import { getIdSrc, getIdDelimiter } from '../lib/IdSrc'
 
 let projectPaths: any
 
@@ -53,16 +53,23 @@ async function publishApi (
   if (stageName === undefined) stageName = 'Dev'
   console.log(ac.green.bold(`Publishing Api to ${stageName}`))
 
-  await esbuilder()
+  // console.log(ac.gray.dim('>> esbuilder '))
+  await esbuilder(null, true)
   // do the built-in deploys
+  // console.log(ac.gray.dim('>> webroot '))
   await DeployWebrootBuiltIn()
+  // console.log(ac.gray.dim('>> fileserves '))
   await DeployRootFileserves()
+  // console.log(ac.gray.dim('>> api built in '))
   await DeployApiBuiltin()
+  // console.log(ac.gray.dim('>> past api built in '))
 
   // make a private api
   // const fs = require('fs')
   // const os = require('os')
   // const path = require('path')
+
+  // console.log(ac.gray.dim('>> create staging folder '))
 
   let tmpDir
   let apiBytes
@@ -73,7 +80,9 @@ async function publishApi (
     mkdirSync(tmpDir, { recursive: true })
 
     const yamlFile = path.join(tmpDir, 'papi.yaml')
+    // console.log(ac.gray.dim('>> Make builtin ApiDoc '))
     await MakeBuiltinApiDoc(yamlFile)
+    // console.log(ac.gray.dim('>> Past making builtin ApiDoc '))
     // console.log("reading "+yamlFile)
     apiBytes = fs.readFileSync(yamlFile)
   } catch (e: any) {
@@ -88,9 +97,11 @@ async function publishApi (
       console.error(`An error has occurred while removing the temp folder at ${tmpDir ?? ''}. Please remove it manually. Error: ${(e.message as string)}`)
     }
   }
+  // console.log(ac.gray.dim('>> past that part, onto API Gateway '))
 
   const client = new APIGatewayClient(getAWSCredentials())
 
+  // console.log(ac.gray.dim('>> remove Existing versions '))
   await RemoveExistingVersions(client)
 
   const command: any = new ImportRestApiCommand({
@@ -121,7 +132,9 @@ async function publishApi (
 
   console.log(ac.grey('Continuing with binding...'))
   const prereq = await PrequisiteValues(apiId ?? '')
+  // console.log(ac.gray.dim('>> making intRequests'))
   const intRequests = prereq.MakeRequests()
+  // console.log(ac.magenta.dim('>> putting integration'), intRequests)
   await PutIntegrations(intRequests)
   await DeployApi(apiId ?? '', stageName)
   const region = getSettings()?.awsPreferredRegion ?? ''
@@ -196,7 +209,7 @@ class PrereqInfo {
       if (api?.path === pathMap) {
         // console.log("resourceMethods", api.resourceMethods)
         const methodList: string[] = Object.getOwnPropertyNames(api.resourceMethods)
-        // ClogTrace("methodList", methodList)
+        // console.log("methodList", methodList)
         for (const meth of allowedMethods.toUpperCase().split(',')) { // NOTE: we no longer try to support multiples, but this still works as is.
           // console.log("meth", meth)
           if (methodList.includes(meth)) {
@@ -210,9 +223,11 @@ class PrereqInfo {
   }
 
   public findARN (name: string): string {
-    // console.warn(`>>> finding name ${name} in functions ${JSON.stringify(this.functions)}`)
+    let lastus = name.lastIndexOf(getIdDelimiter())
+    if (lastus !== -1) name = name.substring(0, lastus)
+    // console.warn(`>>> finding name ${name} in ${this.functions.length} functions`)
     for (const f of this.functions ?? []) {
-      const lastus = f.name.lastIndexOf(getIdDelimiter())
+      lastus = f.name.lastIndexOf(getIdDelimiter())
       const fname = f.name.substring(0, lastus)
       // console.warn('comparing name, fname, lc ', {lastus, fname, name})
       if (fname.toLowerCase() === name.toLowerCase()) {
@@ -220,21 +235,26 @@ class PrereqInfo {
         return f.arn
       }
     }
-    console.log("$$$ Couldn't find " + name + ' in ', this.functions)
+    console.error(ac.red.bold("$$ Couldn't find " + name + ' in integration list'))
+    process.exit(1)
     return ''
   }
 
   public MakeRequests (): PutIntegrationRequest[] {
     const region = getSettings()?.awsPreferredRegion ?? ''
     const out: PutIntegrationRequest[] = []
+
     for (const d of this.defs) {
       const def = (d)
+      // console.log(ac.magenta.dim('>> finding api and arn for '), {pathMap:def.pathMap, name: def.name})
       const api = this.findApi(def.pathMap, def.method)
       const arn = this.findARN(def.name) ?? ''
       if (arn === '') {
-        console.log(`>>> No ARN for ${(def.name as string)} ${(def.pathMap as string)}, ${(api.id as string)}`)
+        console.log(ac.red.dim(`>>> No ARN for ${(def.name as string)} ${(def.pathMap as string)}, ${(api.id as string)}`))
+        process.exit(1)
       }
-      if (api !== undefined) {
+      // console.log(ac.magenta.dim.italic('>> api for '+arn), api)
+      if (api !== null && api !== undefined && arn !== '') {
         out.push({
           restApiId: this.requestApiId,
           resourceId: api.id, // api.parentId
@@ -266,11 +286,13 @@ async function GetFunctionInfo (info: PrereqInfo): Promise<PrereqInfo> {
   const listCommand: any = new ListFunctionsCommand({})
   const response: any = await client.send(listCommand)
 
-  const sfx = decoratedName('')
+  const sfx = getIdSrc()
 
   for (const func of response.Functions ?? []) {
     const fName: string = func?.FunctionName ?? ''
-    if (fName.endsWith(sfx)) {
+    // console.log(ac.gray.dim('>> checking if '+fName+' has our suffix '+sfx))
+    if (fName.includes(sfx)) {
+      // console.log(ac.gray.dim('>>> Yes'))
       info.functions.push({
         name: func.FunctionName ?? '',
         arn: func.FunctionArn ?? ''
@@ -319,8 +341,8 @@ async function DeployApi (restApiId: string, stageName: string): Promise<void> {
     })
     await client.send(command)
   } catch (e: any) {
-    console.error(ac.red.bold(`Error with deployApi: ${e.message as string}`))
-    throw e
+    console.error(ac.red.bold(`Fatal Error with deployApi: ${e.message as string}`))
+    process.exit(-1)
   }
 }
 

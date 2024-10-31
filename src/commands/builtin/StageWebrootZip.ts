@@ -7,6 +7,7 @@ import { recurseDirectory } from '../../lib/DirectoryUtils'
 import { FolderToZip, UnzipToFolder } from '../../lib/utils'
 // import { executeCommand } from '../../lib/executeCommand'
 import { rmSync } from 'fs'
+// import * as ac from 'ansi-colors'
 
 export async function StageWebrootZip
 (
@@ -41,14 +42,27 @@ export async function StageWebrootZip
   // console.log(">>>> making zipFilesPath "+zipFilesPath)
   await fs.mkdirSync(zipFilesPath)
 
+  // todo: read the redirects.json file
+  let redirected: string[] = []
+  try {
+    const redir = JSON.parse(fs.readFileSync(path.join(webroot, 'redirects.json')).toString())
+    redirected = Object.getOwnPropertyNames(redir)
+    // console.log(ac.grey.dim('>> redirected files '), redirected)
+  } catch (e: any) {
+    // console.log(ac.grey.dim('>> exception reading redirects.json'), e)
+  }
+
   // console.log(">>>> enumerating "+webroot)
   await recurseDirectory(webroot, (filepath, stats) => {
     const relPath = filepath.substring(webroot.length)
     if (stats.isDirectory()) {
       fs.mkdirSync(zipFilesPath + relPath, { recursive: true })
     } else {
-      // console.log(">>>> copying "+filepath+" to "+zipFilesPath+relPath)
-      fs.copyFileSync(filepath, zipFilesPath + relPath)
+      // console.log(ac.grey.dim('>> considering ' + relPath))
+      if (!redirected.includes(relPath.substring(1))) {
+        // console.log(ac.grey.dim('>> copying...'))
+        fs.copyFileSync(filepath, zipFilesPath + relPath) // copy only if not in redirected list
+      }
     }
     return false
   })

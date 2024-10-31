@@ -2,6 +2,7 @@ import { StageWebrootZip } from './StageWebrootZip'
 import { DeployBuiltInZip } from './DeployBuiltInZip'
 import { GetWebrootServePaths } from '../../lib/openAPI/WebrootFileSupport'
 import * as ac from 'ansi-colors'
+import { decoratedName } from '../../lib/IdSrc'
 
 import fs from 'fs'
 import path from 'path'
@@ -28,7 +29,8 @@ export async function DeployRootFileserves
   const all: Array<Promise<any>> = []
   for (let root of roots) {
     root = root.trim()
-    let name = 'fileserve_' + root
+    let name = decoratedName('fileserve_' + root)
+    // console.log(ac.gray.dim('>> '+root+' > '+name))
     while (name.includes('/')) {
       name = name.replace('/', '')
     }

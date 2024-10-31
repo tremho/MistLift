@@ -29,8 +29,8 @@ export async function doDoctor (): Promise<boolean> {
   report('Git', gitVersion, '2.0.0')
   report('unzip', unzipVersion, '1.0.0')
 
-  if(! await isTapInstalled()) {
-    console.log(ac.yellow.dim.bold.italic('\nTap is necessary for the lift test command.\nInstall with ')+ac.black.bold('npm i -g tap\n'))
+  if (!await isTapInstalled()) {
+    console.log(ac.yellow.dim.bold.italic('\nTap is necessary for the lift test command.\nInstall with ') + ac.black.bold('npm i -g tap\n'))
   }
 
   if (!settingsAvail) {
@@ -131,9 +131,7 @@ function report (
   return ok
 }
 
-
-export async function isTapInstalled() {
+export async function isTapInstalled (): Promise<boolean> {
   const v = await fetchTapVersion()
-  return await report('tap', v, minTapVersion)
-
+  return report('tap', v, minTapVersion)
 }

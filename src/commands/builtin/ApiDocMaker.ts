@@ -3,6 +3,8 @@ import { buildOpenApi } from '../../lib/openAPI/openApiConstruction'
 import { GetWebrootServePaths } from '../../lib/openAPI/WebrootFileSupport'
 
 import path from 'path'
+// import * as ac from 'ansi-colors'
+import { decoratedName } from '../../lib/IdSrc'
 
 export async function MakePublicApiDoc
 (
@@ -16,33 +18,48 @@ export async function MakeBuiltinApiDoc
   yamlFile: string
 
 ): Promise<Uint8Array> {
+  // console.log(ac.gray.dim('>>> gatherFunctionDefinitions '))
   const defs = gatherFunctionDefinitions()
+  // console.log(ac.gray.dim('>> after gatherfunctions'), defs)
+  // console.log(ac.gray.dim('>>> addBuiltInDefinitions '))
   addBuiltInDefinitions(defs)
+  // console.log(ac.gray.dim('>> after addBuiltIns'), defs)
+  // console.log(ac.gray.dim('>>> buildOpenApi '))
   return await buildOpenApi(defs, false, yamlFile) //, true)
 }
 
 export function addBuiltInDefinitions (defs: any[]): void {
   // console.warn("NOT ADDING ANY BUILTIN API INTEGRATIONS")
   // console.log("ADDING apiDef");
+  // console.log(ac.gray.dim('>>>> pushing apiDef '), apiDef)
   defs.push(apiDef)
+  // console.log(ac.gray.dim('>>>> pushing webrootDef '), webrootDef)
   defs.push(webrootDef)
 
+  // console.log(ac.gray.dim('>>>> Adding webroot literals '))
   // console.warn("Adding webroot literals");
   // do just /docs and see how that goes
+  /*
   const fsdef = Object.assign({}, fileServeDef) // copy
-  fsdef.name = 'fileserve_docs'
+  fsdef.name = decoratedName('fileserve_docs')
   fsdef.pathMap = '/docs/{path}'
   defs.push(fsdef)
+   */
   const roots = GetWebrootServePaths()
   // console.log("roots", roots)
+  // console.log(ac.gray.dim('>>>> roots here: '), roots)
   for (const root of roots) {
+    // console.log(ac.gray.dim('>> top of loop with root '+root))
     if (root !== '') {
       const rootPath = root.replace(path.sep, '/')
       let rootName = rootPath
-      while (rootName.includes('/')) rootName = rootPath.replace('/', '').toLowerCase().trim()
+      // console.log(ac.gray.dim('>> rootName = '+rootName))
+      while (rootName.includes('/')) rootName = rootName.replace('/', '').toLowerCase().trim()
+      // console.log(ac.gray.dim('>> past stupid error = '+rootName))
       const fileserve = Object.assign({}, fileServeDef) // copy
-      fileserve.name = 'fileserve_' + rootName
+      fileserve.name = decoratedName('fileserve_' + rootName)
       fileserve.pathMap = `${rootPath}/{path}`
+      // console.log('pathmap = '+fileserve.pathMap)
       defs.push(fileserve)
     }
   }

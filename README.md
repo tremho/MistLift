@@ -67,7 +67,7 @@ To get started using MistLift, please see the [QuickStart Guide](https://github.
 ### 2.2.2
  - updated docs and prompts regarding tap installation
  - addressed hanging issue on publish command
- - 
+ - addressed fileserve issues
 
 ### 2.2.1
 - minor logging support updates

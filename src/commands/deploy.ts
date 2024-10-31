@@ -68,12 +68,16 @@ export async function doDeployAsync (
     })
   }
 
+  // console.log(ac.gray.dim('>> beginning loop in doDeployAsync '))
+
   for (const funcName of funcsToDeploy) {
     const zipFile = path.join(projectPaths.basePath, 'MistLift_Zips', funcName + '.zip')
     if (fs.existsSync(zipFile)) {
       const zipTime = fs.statSync(zipFile).mtime
       if (zipTime.getTime() > (deploymentRecord[funcName] ?? 0)) {
+        // console.log(ac.gray.dim('>> calling deployPackage '))
         await deployPackage(funcName)
+        // console.log(ac.gray.dim('>> recording result '))
         deploymentRecord[funcName] = Date.now()
       }
     } else {
@@ -84,6 +88,7 @@ export async function doDeployAsync (
 
   try { fs.writeFileSync(deploymentRecordPath, JSON.stringify(deploymentRecord)) } catch {}
 
+  // console.log(ac.gray.dim('>> returning from doDeployAsync '))
   return 0
 }
 
@@ -132,10 +137,13 @@ export async function deployPackage (
     const principal = parts[4]
     await AddPermissions(client, dFuncName, principal)
     let deployMsg: string = `Successfully deployed ${funcName}`
+    // console.log(ac.gray.dim('>> deploy trace 1'))
     if (memorySize > 0 || timeout > 0) {
+      // console.log(ac.gray.dim('>> deploy trace 1a'))
       deployMsg += ac.grey.italic(' with ')
       const useAnd = memorySize > 9 && timeout > 0
       if (memorySize > 0) {
+        // console.log(ac.gray.dim('>> deploy trace 1b'))
         deployMsg += ac.grey(`memorySize ${memorySize}mb`)
         if (useAnd) deployMsg += ac.grey.italic(' and ')
       }
@@ -143,11 +151,13 @@ export async function deployPackage (
         deployMsg += ac.grey(`timeout ${timeout} seconds`)
       }
     }
+    // console.log(ac.gray.dim('>> deploy trace 2'))
 
     console.log(ac.green.bold(deployMsg))
   } catch (e: any) {
     console.error(ac.red.bold.italic('Error deploying ' + funcName), e)
   }
+  // console.log(ac.gray.dim('>> deploy trace 3'))
 }
 async function CreateCloudFunction (
   funcName: string,
