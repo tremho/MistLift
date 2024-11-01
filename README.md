@@ -132,7 +132,7 @@ creating a new .test.ts file that demonstrates its use for the placeholder sourc
 This is breaking because any previous service definition files need to change this property name to continue to work with this version or later.
 
 - Support for a common library shared by functions (_see [Tips and Techniques](./doc/Tips%20and%20Techiques.md)_)
-- Support for esbuild (e.g. React) (_see [ESBuild% and React support](./doc/ESBuild%20and%20React%20support.md)_)
+- Support for esbuild (e.g. React) (_see [ESBuild and React support](./doc/ESBuild%20and%20React%20support.md)_)
 
 ### 1.1.8
 
