@@ -106,7 +106,7 @@ async function buildFunctionModules (
             console.log(announce)
           }
           if (!filepath.endsWith('test.ts')) {
-              all.push(buildFile(filepath, outDir, statObj))
+            all.push(buildFile(filepath, outDir, statObj))
           }
         }
       }

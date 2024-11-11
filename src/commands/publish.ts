@@ -136,10 +136,11 @@ async function publishApi (
   const intRequests = prereq.MakeRequests()
   // console.log(ac.magenta.dim('>> putting integration'), intRequests)
   await PutIntegrations(intRequests)
-  await DeployApi(apiId ?? '', stageName)
+  const success = await DeployApi(apiId ?? '', stageName)
   const region = getSettings()?.awsPreferredRegion ?? ''
   const publishUrl = `https://${apiId ?? ''}.execute-api.${region}.amazonaws.com/${stageName}`
-  console.log(ac.green.bold(`\n Successfully deployed to ${publishUrl}`))
+  const characterize = success ? 'Successfully' : ''
+  console.log(ac.green.bold(`\n ${characterize} deployed to ${publishUrl}`))
   recordLatestPublish(publishUrl)
 }
 
@@ -223,13 +224,13 @@ class PrereqInfo {
   }
 
   public findARN (name: string): string {
-    let lastus = name.lastIndexOf(getIdDelimiter())
-    if (lastus !== -1) name = name.substring(0, lastus)
+    let lastDelim = name.lastIndexOf(getIdDelimiter())
+    if (lastDelim !== -1) name = name.substring(0, lastDelim)
     // console.warn(`>>> finding name ${name} in ${this.functions.length} functions`)
     for (const f of this.functions ?? []) {
-      lastus = f.name.lastIndexOf(getIdDelimiter())
-      const fname = f.name.substring(0, lastus)
-      // console.warn('comparing name, fname, lc ', {lastus, fname, name})
+      lastDelim = f.name.lastIndexOf(getIdDelimiter())
+      const fname = f.name.substring(0, lastDelim)
+      // console.warn('comparing name, fname, lc ', {lastus: lastDelim, fname, name})
       if (fname.toLowerCase() === name.toLowerCase()) {
         // console.warn(">>> Match! ", f)
         return f.arn
@@ -282,23 +283,33 @@ async function PrequisiteValues (id: string): Promise<PrereqInfo> {
 }
 
 async function GetFunctionInfo (info: PrereqInfo): Promise<PrereqInfo> {
-  const client = new LambdaClient(getAWSCredentials())
-  const listCommand: any = new ListFunctionsCommand({})
-  const response: any = await client.send(listCommand)
+  let Marker: string | undefined
+  do {
+    const client = new LambdaClient(getAWSCredentials())
+    const listCommand: any = new ListFunctionsCommand({ Marker })
+    const response: any = await client.send(listCommand)
 
-  const sfx = getIdSrc()
+    // console.log(">>>> Functions: ", response.Functions)
+    Marker = response.NextMarker
+    // console.log('>>> Marker', Marker)
 
-  for (const func of response.Functions ?? []) {
-    const fName: string = func?.FunctionName ?? ''
-    // console.log(ac.gray.dim('>> checking if '+fName+' has our suffix '+sfx))
-    if (fName.includes(sfx)) {
-      // console.log(ac.gray.dim('>>> Yes'))
-      info.functions.push({
-        name: func.FunctionName ?? '',
-        arn: func.FunctionArn ?? ''
-      })
+    const sfx = getIdSrc()
+
+    // console.log('>>>> sfx', sfx)
+
+    for (const func of response.Functions ?? []) {
+      const fName: string = func?.FunctionName ?? ''
+      // console.log(ac.gray.dim('>> checking if '+fName+' has our suffix '+sfx))
+      if (fName.includes(sfx)) {
+        // console.log(ac.gray.dim('>>> Yes'))
+        info.functions.push({
+          name: func.FunctionName ?? '',
+          arn: func.FunctionArn ?? ''
+        })
+      }
     }
-  }
+    // console.log(`>>> ${info.functions.length} functions added to list this page`)
+  } while (Marker !== undefined && Marker !== null && Marker !== '')
   return info
 }
 
@@ -332,7 +343,8 @@ async function PutIntegrations (integrations: PutIntegrationRequest[]): Promise<
   }
 }
 
-async function DeployApi (restApiId: string, stageName: string): Promise<void> {
+async function DeployApi (restApiId: string, stageName: string): Promise<boolean> {
+  let success = true
   try {
     const client = new APIGatewayClient(getAWSCredentials())
     const command: any = new CreateDeploymentCommand({
@@ -341,9 +353,11 @@ async function DeployApi (restApiId: string, stageName: string): Promise<void> {
     })
     await client.send(command)
   } catch (e: any) {
-    console.error(ac.red.bold(`Fatal Error with deployApi: ${e.message as string}`))
-    process.exit(-1)
+    console.error(ac.yellow.dim.bold(`Error with deployApi: ${e.message as string}`))
+    success = false
+    // process.exit(-1)
   }
+  return success
 }
 
 function recordLatestPublish (publishUrl: string): void {

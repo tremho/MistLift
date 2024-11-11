@@ -64,6 +64,12 @@ To get started using MistLift, please see the [QuickStart Guide](https://github.
 
 ## Changelog
 
+### 2.2.5
+ - fixes problems with exposing headers from local server request
+
+### 2.2.4
+ - fixes failure to bind when there are more than 50 functions in AWS account
+
 ### 2.2.3
  - fixes problematic bug w/rt test, build, and package consistency. 
 

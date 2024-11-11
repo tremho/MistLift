@@ -28,12 +28,12 @@ export async function StageWebrootZip
   // console.log(">>>> unzipping from "+builtinPath+" to "+exdir)
   await UnzipToFolder(builtinPath, exdir)
 
-  await rmSync(path.join(stagedWebrootFolder, 'Api.test.js'))
-  await rmSync(path.join(stagedWebrootFolder, 'Api.test.js.map'))
-  await rmSync(path.join(stagedWebrootFolder, 'FileServe.test.js'))
-  await rmSync(path.join(stagedWebrootFolder, 'FileServe.test.js.map'))
-  await rmSync(path.join(stagedWebrootFolder, 'Webroot.test.js'))
-  await rmSync(path.join(stagedWebrootFolder, 'Webroot.test.js.map'))
+  try {await rmSync(path.join(stagedWebrootFolder, 'Api.test.js'))}catch(e:any) {}
+  try {await rmSync(path.join(stagedWebrootFolder, 'Api.test.js.map'))}catch(e:any) {}
+  try {await rmSync(path.join(stagedWebrootFolder, 'FileServe.test.js'))}catch(e:any) {}
+  try {await rmSync(path.join(stagedWebrootFolder, 'FileServe.test.js.map'))}catch(e:any) {}
+  try {await rmSync(path.join(stagedWebrootFolder, 'Webroot.test.js'))}catch(e:any) {}
+  try {await rmSync(path.join(stagedWebrootFolder, 'Webroot.test.js.map'))}catch(e:any) {}
 
   // console.log("is exdir "+exdir+"/Webroot the same as stagedWebrootFolder "+stagedWebrootFolder+"?")
   // console.log(">>>> Code-only webroot folder at "+stagedWebrootFolder)

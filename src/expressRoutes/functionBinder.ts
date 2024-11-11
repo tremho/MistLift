@@ -108,6 +108,10 @@ function requestToEvent (template: string, req: any): any {
   for (const p of Object.getOwnPropertyNames(req.query)) {
     parameters[p] = req.query[p]
   }
+  const headers = req.headers
+  // console.warn(">>> functionBinder geting headers", {req, headers})
+  // const apiKey = req.header('x-api-key')
+  // console.warn(">>> apiKey returned using header function", {apiKey})
   const eventOut: any = {
     requestContext: req,
     request: {
