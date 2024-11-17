@@ -226,6 +226,7 @@ class PrereqInfo {
   public findARN (name: string): string {
     let lastDelim = name.lastIndexOf(getIdDelimiter())
     if (lastDelim !== -1) name = name.substring(0, lastDelim)
+    // console.log(ac.grey.dim.italic("binding "+name))
     // console.warn(`>>> finding name ${name} in ${this.functions.length} functions`)
     for (const f of this.functions ?? []) {
       lastDelim = f.name.lastIndexOf(getIdDelimiter())
@@ -233,6 +234,7 @@ class PrereqInfo {
       // console.warn('comparing name, fname, lc ', {lastus: lastDelim, fname, name})
       if (fname.toLowerCase() === name.toLowerCase()) {
         // console.warn(">>> Match! ", f)
+        console.log(ac.grey.dim.italic("binding "+name))
         return f.arn
       }
     }

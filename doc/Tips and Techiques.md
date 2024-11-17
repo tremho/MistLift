@@ -54,5 +54,10 @@ webroot tree forces the deployment of a new _fileserve_ handler.  This is necess
 way AWS path resolution and routing behaves.  As much as possible, try to keep all of your
 files within a single directory to minimize this overhead. Too many nested directories may cause a problem in deployment.
 
-
+### Couldn't find (FunctionName)
+In rare cases, you may get this error when you publish.
+If this happens, look at the package.json file of your project and try to shorten either the project name
+or the version number string (or both). Typically, a combined size of 30 characters or less should be okay.
+If your version string contains a '-prerelease' tag, consider removing this or changing it (e.g. "-beta")
+to shorten this aspect of the identifing string.
 
