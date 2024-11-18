@@ -68,6 +68,7 @@ Again, the locations of  your redirected files can be any valid public url sourc
 The file path structure and the file names need not match the mapped references, although this is generally more convenient.
 
 #### Redirections may not work
+_This is a very experimental workaround_
 Depending upon your web app and how you are using the assets, redirection like this
 may not always work to load the assets as expected.
 In this case you may choose to load the assets directly from the remote source.
