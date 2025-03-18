@@ -7,7 +7,8 @@ export type RecurseCB = (filepath: string, stats: Stats) => boolean
 
 // Recurse a directory, calling back to a 'for-each' callback for all files in tree
 export function recurseDirectory (dirpath: string, callback?: RecurseCB): void {
-  fs.readdirSync(dirpath).forEach((file: string) => {
+  const fl = fs.readdirSync(dirpath)
+  fl.forEach((file: string) => {
     const fpath = path.join(dirpath, file)
     // if(fpath.indexOf('node_modules') === -1) {
     const stat = fs.statSync(fpath)

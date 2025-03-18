@@ -13,7 +13,7 @@ export async function executeCommand (cmd: string, args: any[], cwd = '', consol
   }
   return await new Promise(resolve => {
     const cmdstr = cmd + ' ' + args.join(' ')
-    // console.log('executing ', cmdstr, 'at', cwd)
+    // console.log('executing ', cmdstr, 'at', cwd, {consolePass})
     const opts = {
       cwd,
       env: Object.assign(env, process.env)

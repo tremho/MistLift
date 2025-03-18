@@ -11,6 +11,8 @@ import { rmSync } from 'fs'
 
 export async function StageWebrootZip
 (
+  withRoot: boolean = true,
+  withFolders: boolean = true
 ): Promise<string> {
   // console.log(">>>> staging webroot to zip")
   const projectPaths = resolvePaths()
@@ -28,12 +30,12 @@ export async function StageWebrootZip
   // console.log(">>>> unzipping from "+builtinPath+" to "+exdir)
   await UnzipToFolder(builtinPath, exdir)
 
-  try {await rmSync(path.join(stagedWebrootFolder, 'Api.test.js'))}catch(e:any) {}
-  try {await rmSync(path.join(stagedWebrootFolder, 'Api.test.js.map'))}catch(e:any) {}
-  try {await rmSync(path.join(stagedWebrootFolder, 'FileServe.test.js'))}catch(e:any) {}
-  try {await rmSync(path.join(stagedWebrootFolder, 'FileServe.test.js.map'))}catch(e:any) {}
-  try {await rmSync(path.join(stagedWebrootFolder, 'Webroot.test.js'))}catch(e:any) {}
-  try {await rmSync(path.join(stagedWebrootFolder, 'Webroot.test.js.map'))}catch(e:any) {}
+  try { await rmSync(path.join(stagedWebrootFolder, 'Api.test.js')) } catch (e: any) {}
+  try { await rmSync(path.join(stagedWebrootFolder, 'Api.test.js.map')) } catch (e: any) {}
+  try { await rmSync(path.join(stagedWebrootFolder, 'FileServe.test.js')) } catch (e: any) {}
+  try { await rmSync(path.join(stagedWebrootFolder, 'FileServe.test.js.map')) } catch (e: any) {}
+  try { await rmSync(path.join(stagedWebrootFolder, 'Webroot.test.js')) } catch (e: any) {}
+  try { await rmSync(path.join(stagedWebrootFolder, 'Webroot.test.js.map')) } catch (e: any) {}
 
   // console.log("is exdir "+exdir+"/Webroot the same as stagedWebrootFolder "+stagedWebrootFolder+"?")
   // console.log(">>>> Code-only webroot folder at "+stagedWebrootFolder)
@@ -43,6 +45,7 @@ export async function StageWebrootZip
   await fs.mkdirSync(zipFilesPath)
 
   // todo: read the redirects.json file
+  // todo: Document as deprecated
   let redirected: string[] = []
   try {
     const redir = JSON.parse(fs.readFileSync(path.join(webroot, 'redirects.json')).toString())
@@ -55,13 +58,18 @@ export async function StageWebrootZip
   // console.log(">>>> enumerating "+webroot)
   await recurseDirectory(webroot, (filepath, stats) => {
     const relPath = filepath.substring(webroot.length)
-    if (stats.isDirectory()) {
+    if (stats.isDirectory() && withFolders) {
       fs.mkdirSync(zipFilesPath + relPath, { recursive: true })
     } else {
-      // console.log(ac.grey.dim('>> considering ' + relPath))
-      if (!redirected.includes(relPath.substring(1))) {
-        // console.log(ac.grey.dim('>> copying...'))
-        fs.copyFileSync(filepath, zipFilesPath + relPath) // copy only if not in redirected list
+      if (
+        (relPath.includes(path.sep) && withFolders) ||
+         ((!relPath.includes(path.sep)) && withRoot)
+      ) {
+        // TODO: Deprecate redirection. we'll continue to supoort it  here, though for now
+        if (!redirected.includes(relPath.substring(1))) {
+          // console.log(ac.grey.dim('>> copying...'))
+          fs.copyFileSync(filepath, zipFilesPath + relPath) // copy only if not in redirected list
+        }
       }
     }
     return false

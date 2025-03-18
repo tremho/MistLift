@@ -5,6 +5,7 @@ import { GetWebrootServePaths } from '../../lib/openAPI/WebrootFileSupport'
 import path from 'path'
 // import * as ac from 'ansi-colors'
 import { decoratedName } from '../../lib/IdSrc'
+import {getWebrootSettings} from "./ExportWebroot";
 
 export async function MakePublicApiDoc
 (
@@ -22,17 +23,22 @@ export async function MakeBuiltinApiDoc
   const defs = gatherFunctionDefinitions()
   // console.log(ac.gray.dim('>> after gatherfunctions'), defs)
   // console.log(ac.gray.dim('>>> addBuiltInDefinitions '))
-  addBuiltInDefinitions(defs)
+  const wrs = await getWebrootSettings()
+  const withWebroot = (wrs.webrootMethod ?? 'SELF') === 'SELF'
+  console.log("wrs.webrootMethod=",wrs.webrootMethod)
+  addBuiltInDefinitions(defs, withWebroot)
   // console.log(ac.gray.dim('>> after addBuiltIns'), defs)
   // console.log(ac.gray.dim('>>> buildOpenApi '))
   return await buildOpenApi(defs, false, yamlFile) //, true)
 }
 
-export function addBuiltInDefinitions (defs: any[]): void {
+export function addBuiltInDefinitions (defs: any[], withWebroot: boolean): void {
   // console.warn("NOT ADDING ANY BUILTIN API INTEGRATIONS")
   // console.log("ADDING apiDef");
   // console.log(ac.gray.dim('>>>> pushing apiDef '), apiDef)
   defs.push(apiDef)
+  console.log("withWebroot = "+withWebroot)
+  if (!withWebroot) return
   // console.log(ac.gray.dim('>>>> pushing webrootDef '), webrootDef)
   defs.push(webrootDef)
 

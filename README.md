@@ -61,8 +61,21 @@ and the [issues page](https://github.com/tremho/MistLift/issues) for future stat
 
 To get started using MistLift, please see the [QuickStart Guide](https://github.com/tremho/MistLift/blob/main/doc/MistLift%20Quick%20Start.md)
 
+### Help me out
+I would love to have others join this project as contributors, because it is a great tool
+and since I am using it myself constantly, I am improving it alone.
+If you would like to support my late night efforts, please consider a contribution to
+[buy me a coffee](https://buymeacoffee.com/tremho)
 
 ## Changelog
+
+### 2.3.0
+__New feature for S3-based webroot static files__
+Please see [Webroot redirect documentation](https://github.com/tremho/MistLift/blob/main/doc/Webroot%20S3%20exports.md)
+for information on this new feature that improves support for larger apps and assets.
+
+### 2.2.6, 2.2.7, 2.2.8, 2.2.9, 2.2.10
+  - package updates
 
 ### 2.2.5
  - fixes problems with exposing headers from local server request

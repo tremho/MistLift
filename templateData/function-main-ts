@@ -1,4 +1,11 @@
-import {LambdaApi, Success, NotFound, NotImplemented, ServerError} from "@tremho/inverse-y"
+import {
+    LambdaApi,
+    getAssetUrl,
+    Success,
+    NotFound,
+    NotImplemented,
+    ServerError,
+} from "@tremho/inverse-y"
 import fs from "fs"
 import path from 'path'
 import {Log} from "@tremho/inverse-y"

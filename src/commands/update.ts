@@ -22,6 +22,7 @@ export async function doUpdateAsync (
   try {
     // console.warn(">>> esbuilder")
     await esbuilder(null, true)
+    console.log('>>>> TODO: Call ExportWebroot on update instead of these next two functions')
     // console.warn(">>> DeployRootFileserves")
     await DeployRootFileserves()
     // console.warn(">>> DeployWebrootBuiltIn")

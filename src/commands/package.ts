@@ -11,6 +11,8 @@ import { executeCommand } from '../lib/executeCommand'
 import { isNewerFile } from '../lib/fileCompare'
 import { doBuildAsync } from './build'
 import { FolderToZip } from '../lib/utils'
+import { getWebrootSettings } from './builtin/ExportWebroot'
+import { getServiceSettings, setAws, setWebroot } from '@tremho/inverse-y'
 
 // test then package
 export async function doPackageAsync (
@@ -123,6 +125,8 @@ async function packageFunction (funcName: string): Promise<number> {
   //  - write out new package.json to workPath
   // console.log("writing package.json", pkgjson)
   fs.writeFileSync(path.join(workPath, 'package.json'), JSON.stringify(pkgjson, null, 2))
+
+  const webrootExport = await getWebrootSettings()
   //  - execute npm i at workpath, create node_modules
   await executeCommand('npm i', [], workPath).then(() => {
     // copy the lambda function
@@ -148,10 +152,37 @@ async function packageFunction (funcName: string): Promise<number> {
     const runmainPath = path.join(workPath, 'runmain.mjs')
     fs.writeFileSync(runmainPath, fs.readFileSync(templatePath))
 
-    all.push(FolderToZip(workPath, zipFile))
-    // console.log("now zip it")
-  })
+    // put svcsettings.json into place
 
+    // Get publish Url from existing .published file (if any).
+    // If we haven't published before, we won't have this, but I think that's okay for now at least
+
+    try {
+      // console.log("creating service settings file")
+      const pubsrc = path.join(workPath, '..', '.published')
+      let pubInfo: any = {}
+      // console.log("checking pubsrc at ", pubsrc)
+      if (fs.existsSync(pubsrc)) {
+        // console.log("found it")
+        pubInfo = JSON.parse(fs.readFileSync(pubsrc).toString())
+        // console.log({pubInfo})
+      }
+      const publishUrl = pubInfo.url ?? '/'
+
+      const stage = publishUrl.substring(publishUrl.lastIndexOf('/') + 1)
+      setWebroot(webrootExport.webrootMethod, webrootExport.webrootBaseUrl)
+      setAws(stage, publishUrl)
+      // console.log("getServiceSettings", getServiceSettings())
+      const settingsFile = path.join(projectPaths.basePath, '.package_temp', 'svcsettings.json')
+      fs.writeFileSync(settingsFile, JSON.stringify(getServiceSettings()))
+      // if (fs.existsSync(settingsFile)) console.log("file confirmed at ", settingsFile)
+    } catch (e: any) {
+      console.error(e)
+    }
+    // console.log("push to zip stack ", {zipFile})
+    all.push(FolderToZip(workPath, zipFile))
+  })
+  // console.log("all", {all})
   return await Promise.all(all).then(() => {
     return error
   })

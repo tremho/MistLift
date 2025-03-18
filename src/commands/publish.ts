@@ -28,6 +28,8 @@ import { addBuiltInDefinitions, MakeBuiltinApiDoc } from './builtin/ApiDocMaker'
 import { DeployApiBuiltin, DeployRootFileserves, DeployWebrootBuiltIn } from './builtin/BuiltInHandler'
 import { esbuilder } from '../lib/ESBuild'
 import { getIdSrc, getIdDelimiter } from '../lib/IdSrc'
+import { ExportWebroot, getWebrootSettings } from './builtin/ExportWebroot'
+import { ServiceSettingsData, setWebroot, setAws, getServiceSettings } from '@tremho/inverse-y'
 
 let projectPaths: any
 
@@ -57,9 +59,10 @@ async function publishApi (
   await esbuilder(null, true)
   // do the built-in deploys
   // console.log(ac.gray.dim('>> webroot '))
-  await DeployWebrootBuiltIn()
-  // console.log(ac.gray.dim('>> fileserves '))
-  await DeployRootFileserves()
+  // await DeployWebrootBuiltIn()
+  // // console.log(ac.gray.dim('>> fileserves '))
+  // await DeployRootFileserves()
+  await ExportWebroot()
   // console.log(ac.gray.dim('>> api built in '))
   await DeployApiBuiltin()
   // console.log(ac.gray.dim('>> past api built in '))
@@ -131,11 +134,13 @@ async function publishApi (
   if (apiId === '') return
 
   console.log(ac.grey('Continuing with binding...'))
+  // console.log("prerequisite values")
   const prereq = await PrequisiteValues(apiId ?? '')
-  // console.log(ac.gray.dim('>> making intRequests'))
+  // console.log('>> making intRequests')
   const intRequests = prereq.MakeRequests()
-  // console.log(ac.magenta.dim('>> putting integration'), intRequests)
+  // console.log('>> putting integration')
   await PutIntegrations(intRequests)
+  // console.log("deploy api")
   const success = await DeployApi(apiId ?? '', stageName)
   const region = getSettings()?.awsPreferredRegion ?? ''
   const publishUrl = `https://${apiId ?? ''}.execute-api.${region}.amazonaws.com/${stageName}`
@@ -234,7 +239,7 @@ class PrereqInfo {
       // console.warn('comparing name, fname, lc ', {lastus: lastDelim, fname, name})
       if (fname.toLowerCase() === name.toLowerCase()) {
         // console.warn(">>> Match! ", f)
-        console.log(ac.grey.dim.italic("binding "+name))
+        console.log(ac.grey.dim.italic('binding ' + name))
         return f.arn
       }
     }
@@ -249,6 +254,7 @@ class PrereqInfo {
 
     for (const d of this.defs) {
       const def = (d)
+      // if(def.name === 'Webroot' || def.name.substring(0,9) === 'fileServe') continue
       // console.log(ac.magenta.dim('>> finding api and arn for '), {pathMap:def.pathMap, name: def.name})
       const api = this.findApi(def.pathMap, def.method)
       const arn = this.findARN(def.name) ?? ''
@@ -277,7 +283,10 @@ async function PrequisiteValues (id: string): Promise<PrereqInfo> {
   const pri = new PrereqInfo()
   const out = await GetFunctionInfo(pri)
   out.defs = gatherFunctionDefinitions()
-  addBuiltInDefinitions(out.defs)
+  const wrs = await getWebrootSettings()
+  const withWebroot = (wrs.webrootMethod ?? 'SELF') === 'SELF'
+  console.log("wrs.webrootMethod=",wrs.webrootMethod)
+  addBuiltInDefinitions(out.defs, withWebroot)
   out.requestApiId = id
   await GetMethodResources(id, out)
 

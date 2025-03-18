@@ -1,6 +1,8 @@
 
 ## Webroot resource redirects
 
+_This technique is deprecated. Please see [Webroot S3 exports](./Webroot%20S3%20exports.md) instead._
+
 Files placed in a tree under the `webroot` directory will be uploaded to be available for
 loading as resources if for a webpage or SPA application that may be hosted here.
 

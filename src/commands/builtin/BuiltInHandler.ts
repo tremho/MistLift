@@ -9,8 +9,11 @@ import path from 'path'
 
 export async function DeployWebrootBuiltIn
 (
+  externalizedFolders: boolean = true
 ): Promise<void> {
   // console.warn(">> DeployWebrootBuiltIn")
+  // const withRoot = externalizedFolders
+  // const withFolders = true
   const wrZip = await StageWebrootZip()
   // console.log(">> Deploy Webroot Builtin from "+wrZip)
   await DeployBuiltInZip('Webroot', wrZip)

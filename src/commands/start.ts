@@ -15,6 +15,7 @@ import { doBuildAsync } from './build'
 import * as ac from 'ansi-colors'
 
 import path from 'path'
+import bodyParser from 'body-parser'
 
 const defaultPort = 8081
 const serverConfig = readServerConfig()
@@ -38,7 +39,7 @@ export async function startLocalServer (): Promise<void> {
   await functionBinder()
   // Log.Trace('done calling functionBinder')
   // for JSON posts
-  // app.use(bodyParser.json({limit: '50mb'}))
+  app.use(bodyParser.json({ limit: '50mb' }))
   app.use(express.json())
   // for form posts
   app.use(express.urlencoded({ extended: true }))

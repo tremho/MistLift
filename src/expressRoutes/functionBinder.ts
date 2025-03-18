@@ -74,6 +74,19 @@ export function functionBinder (): void {
 }
 
 function requestToEvent (template: string, req: any): any {
+  // console.log('requestToEvent (express)...', req.body, typeof (req.body))
+  // unpack weird choice of express when passed from curl.
+  if (typeof (req.body) === 'object') {
+    const bprops = Object.getOwnPropertyNames(req.body)
+    if (bprops.length === 1) {
+      try {
+        req.body = JSON.parse(bprops[0])
+      } catch (e: any) {
+        console.error('failed request body parse', bprops[0])
+      }
+    }
+  }
+
   let path: string = req.originalUrl ?? ''
   const qi = path.indexOf('?')
   if (qi !== -1) path = path.substring(0, qi)
@@ -108,10 +121,11 @@ function requestToEvent (template: string, req: any): any {
   for (const p of Object.getOwnPropertyNames(req.query)) {
     parameters[p] = req.query[p]
   }
-  const headers = req.headers
+  // const headers = req.headers
   // console.warn(">>> functionBinder geting headers", {req, headers})
   // const apiKey = req.header('x-api-key')
   // console.warn(">>> apiKey returned using header function", {apiKey})
+  // console.log('making eventOut with req.body=', req.body)
   const eventOut: any = {
     requestContext: req,
     request: {
