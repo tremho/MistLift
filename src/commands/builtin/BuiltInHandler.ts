@@ -15,8 +15,10 @@ export async function DeployWebrootBuiltIn
   // const withRoot = externalizedFolders
   // const withFolders = true
   const wrZip = await StageWebrootZip()
-  // console.log(">> Deploy Webroot Builtin from "+wrZip)
-  await DeployBuiltInZip('Webroot', wrZip)
+  const wrName = decoratedName('Webroot')
+  console.log(">> Deploy Webroot Builtin from "+wrZip+" as "+wrName)
+
+  await DeployBuiltInZip(wrName, wrZip)
   // remove temp zip when done
   // console.warn("a.zip is left behind")
   fs.rmSync(wrZip, { recursive: true })

@@ -85,7 +85,7 @@ The JSON of a SCRIPT configuration looks like this
 ```
 
 ###### Implementing the script
-If the first parameter passed is "--prefix" then the s cript should not process any files, but should
+If the first parameter passed is "--prefix" then the script should not process any files, but should
 instead return (via stdout) what the base url prefix is for accessing any uploaded files at the service host.
 The script is called with the --prefix option by the _MistLift_ pipeline before it is called
 with the file list of webroot files to be transferred.

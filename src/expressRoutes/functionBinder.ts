@@ -11,6 +11,7 @@ import { Log } from '@tremho/inverse-y'
 
 const clearModule = require('clear-module')
 const router = express.Router()
+router.use(express.json())
 
 export function functionBinder (): void {
   const defs = gatherFunctionDefinitions()
@@ -74,7 +75,7 @@ export function functionBinder (): void {
 }
 
 function requestToEvent (template: string, req: any): any {
-  // console.log('requestToEvent (express)...', req.body, typeof (req.body))
+  // console.warn('requestToEvent (express)...',  req.body, typeof (req.body))
   // unpack weird choice of express when passed from curl.
   if (typeof (req.body) === 'object') {
     const bprops = Object.getOwnPropertyNames(req.body)

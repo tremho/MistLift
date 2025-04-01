@@ -25,7 +25,7 @@ export async function MakeBuiltinApiDoc
   // console.log(ac.gray.dim('>>> addBuiltInDefinitions '))
   const wrs = await getWebrootSettings()
   const withWebroot = (wrs.webrootMethod ?? 'SELF') === 'SELF'
-  console.log("wrs.webrootMethod=",wrs.webrootMethod)
+  // console.log("wrs.webrootMethod=",wrs.webrootMethod)
   addBuiltInDefinitions(defs, withWebroot)
   // console.log(ac.gray.dim('>> after addBuiltIns'), defs)
   // console.log(ac.gray.dim('>>> buildOpenApi '))
@@ -37,20 +37,18 @@ export function addBuiltInDefinitions (defs: any[], withWebroot: boolean): void 
   // console.log("ADDING apiDef");
   // console.log(ac.gray.dim('>>>> pushing apiDef '), apiDef)
   defs.push(apiDef)
-  console.log("withWebroot = "+withWebroot)
-  if (!withWebroot) return
+  // console.log("withWebroot = "+withWebroot)
   // console.log(ac.gray.dim('>>>> pushing webrootDef '), webrootDef)
-  defs.push(webrootDef)
+  defs.push(webrootDef) // we need to do this to support index or anything else.
 
   // console.log(ac.gray.dim('>>>> Adding webroot literals '))
   // console.warn("Adding webroot literals");
   // do just /docs and see how that goes
-  /*
-  const fsdef = Object.assign({}, fileServeDef) // copy
-  fsdef.name = decoratedName('fileserve_docs')
-  fsdef.pathMap = '/docs/{path}'
-  defs.push(fsdef)
-   */
+    // const fsdef = Object.assign({}, fileServeDef) // copy
+    // fsdef.name = decoratedName('fileserve_docs')
+    // fsdef.pathMap = '/docs/{path}'
+    // defs.push(fsdef)
+  // }
   const roots = GetWebrootServePaths()
   // console.log("roots", roots)
   // console.log(ac.gray.dim('>>>> roots here: '), roots)
@@ -61,6 +59,9 @@ export function addBuiltInDefinitions (defs: any[], withWebroot: boolean): void 
       let rootName = rootPath
       // console.log(ac.gray.dim('>> rootName = '+rootName))
       while (rootName.includes('/')) rootName = rootName.replace('/', '').toLowerCase().trim()
+      // TODO: Trying to exclude here seems to remove our ability to get anything from root (webroot, should be there already)
+      // console.log('fileserve '+ rootName)
+      // if(!withWebroot && rootName !== 'docs') continue; // only copy docs for non-self export types
       // console.log(ac.gray.dim('>> past stupid error = '+rootName))
       const fileserve = Object.assign({}, fileServeDef) // copy
       fileserve.name = decoratedName('fileserve_' + rootName)

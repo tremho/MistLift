@@ -10,10 +10,14 @@ export function getIdSrc (): string {
   while (idsrc.includes(' ')) idsrc = idsrc.replace(' ', '_')
   while (idsrc.includes('.')) idsrc = idsrc.replace('.', '-')
 
+  let projectHash = sha1(idsrc).toString().substring(0,8)
+  // console.log("project hash", {idsrc, projectHash})
+  idsrc = getProjectName() +'_'+projectHash
+  // console.log("idsrc is "+idsrc)
   return idsrc
 }
 export function decoratedName (name: string): string {
-  if (name.includes(getIdDelimiter())) {
+  if (name.includes(getIdDelimiter()) && name.includes(getIdSrc())) {
     // console.warn('name '+name+' appears to be decorated already')
     return name
   }
@@ -22,12 +26,13 @@ export function decoratedName (name: string): string {
 
   const hash8 = sha1(name.toLowerCase()).toString().substring(0, 8)
 
-  const fullName = name + getIdDelimiter() + getIdSrc()
+  const fullName = name + getIdDelimiter() + '_'+getIdSrc()
+  // console.log("fullname is "+fullName)
   let dname
   if (name.startsWith('fileserve_')) {
-    dname = ('fileServe_' + hash8 + getIdDelimiter() + getIdSrc()).substring(0, 64)
+    dname = ('fileServe_' + hash8 + getIdDelimiter() + '_'+getIdSrc()).substring(0, 64)
   } else {
-    dname = fullName.substring(0, 50) + '_' + hash8
+    dname = fullName //.substring(0, 50) + '_' + hash8
   }
   // console.warn('decorated to '+dname+' from '+name)
   return dname
