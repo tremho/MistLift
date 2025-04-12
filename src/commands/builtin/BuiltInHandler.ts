@@ -16,7 +16,7 @@ export async function DeployWebrootBuiltIn
   // const withFolders = true
   const wrZip = await StageWebrootZip()
   const wrName = decoratedName('Webroot')
-  console.log(">> Deploy Webroot Builtin from "+wrZip+" as "+wrName)
+  // console.log(">> Deploy Webroot Builtin from "+wrZip+" as "+wrName)
 
   await DeployBuiltInZip(wrName, wrZip)
   // remove temp zip when done

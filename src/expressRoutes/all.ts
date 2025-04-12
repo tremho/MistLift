@@ -7,7 +7,7 @@ import { gatherFunctionDefinitions } from '../lib/openAPI/ApiBuildCollector'
 
 import express from 'express'
 const router = express.Router()
-router.use(express.json())
+// router.use( express.raw({type: 'application/octet-stream'}))
 
 export function allBinder (): void {
   const projectPaths = resolvePaths()

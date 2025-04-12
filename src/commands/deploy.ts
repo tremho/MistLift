@@ -106,11 +106,11 @@ export async function deployPackage (
   try {
     def = JSON.parse(fs.readFileSync(defFile).toString())
   } catch (e: any) {
-    // hack for assigning a definition -- the defs from ApiDocMaker don't appear here
-    if (funcName === 'Webroot') {
+    // hack for assigning a definition -- the defs from the MistBuiltIn def file don't appear here
+    if (funcName.includes('Webroot')) {
       def.name = 'Webroot'
       def.timeoutSeconds = 8
-      def.memorySize = 256
+      def.memorySize = 8192
     }
   }
   const timeout: number = def.timeoutSeconds ?? 0 // zero will mean default (3 seconds on AWS)

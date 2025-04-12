@@ -6,13 +6,19 @@ import fs from 'fs'
 import path from 'path'
 import { resolvePaths } from '../pathResolve'
 import * as ac from 'ansi-colors'
+import { decoratedName, getAccountId } from '../IdSrc'
+import { getAWSCredentials, getSettings } from '../LiftConfig'
+import {parseConstraints, TypeConstraint} from "../TypeCheck";
 
 export async function buildOpenApi (
   defs: any[],
   includePrivate: boolean = false,
+  includeCORS: boolean = false,
   yamlFile?: string
 ): Promise<Uint8Array> {
   const builder = new OpenApiBuilder()
+
+  // console.log("buildOpenApi to "+yamlFile)
 
   const projectPaths = await resolvePaths()
   if (!projectPaths.verified) return new Uint8Array(0) // don't continue if not valid
@@ -67,12 +73,14 @@ export async function buildOpenApi (
       addTypeSchema(builder, schemaName, schema)
     }
     method = method.trim().toLowerCase()
-    addFunctionMethod(pathDef, method, def)
+    await addFunctionMethod(pathDef, method, def, includeCORS)
     for (const param of parameters) {
       addParameter(pathDef, param)
     }
-    addCORSOptionMethod(pathDef)
-    const pathMap = def.pathMap ?? '/' + (def.name as string)
+    if(includeCORS) addCORSOptionMethod(pathDef)
+    let pathMap = def.pathMap ?? '/' + (def.name as string)
+    pathMap = pathMap.replace('?', '')
+
     // pathMap = stagePathSegment + pathMap
     builder.addPath(pathMap, pathDef)
 
@@ -95,30 +103,89 @@ export async function buildOpenApi (
 
   const yaml = builder.getSpecAsYaml()
   const bytes = str2ab(yaml)
-  if (!includePrivate) {
+  // if (!includePrivate) {
     fs.writeFileSync(outFile, yaml)
-  }
+  // }
   return bytes
 }
 
-function addTypeSchema (builder: any, schemaName: string, schema: any): void {
-  const ref: any = { title: schemaName, type: 'object', properties: {} }
-  for (const prop of Object.getOwnPropertyNames(schema)) {
-    const scType: any = schemaType('', schema[prop], false)
+function addTypeSchema(builder: any, schemaName: string, schema: any): void {
 
-    ref.properties[prop] = scType
+  const ref: any = {
+    title: schemaName,
+    type: schema.type ?? 'object',
+  }
+  if(ref.type === 'object') ref.properties = {}
+
+  const constraints = ref.type !== 'object' && Array.isArray(schema?.constraints) ? parseConstraints(schema.type, schema.constraints.join('\n'), '\n') : undefined
+
+  let cdesc = constraints ? '\n  - ' + (constraints.describe() ?? '').split('\n').join('\n  - ') : ''
+  let description = schema.description
+  if(cdesc) description += cdesc
+
+  ref.description = description
+
+
+  const required: string[] = []
+
+  for (const [propName, propDef] of Object.entries(schema.properties || {})) {
+    const pda = propDef as any
+    const constraints = Array.isArray(pda?.constraints) ? parseConstraints(pda.type, pda.constraints.join('\n'),'\n') : undefined
+
+    let cdesc = constraints ? '\n  - ' + (constraints.describe() ?? '').split('\n').join('\n  - ') : ''
+    let description = (propDef as any).description
+    if(cdesc) description += cdesc
+
+    // if(constraints) {
+    //   console.log("schema definition for "+schemaName+', prop '+propName)
+    //   console.log(description)
+    // }
+
+    const propSchema: any = {
+      type: (propDef as any).type,
+      description
+    }
+
+    // Optional support for constraints as custom fields
+    // if ((propDef as any).constraint) {
+    //   propSchema['x-constraint'] = (propDef as any).constraints
+    // }
+
+    // You can add other custom handling here (e.g., enums, format, pattern)
+    ref.properties[propName] = propSchema
+
+    // Only mark as required if declared explicitly
+    if (schema.required && schema.required.includes(propName)) {
+      required.push(propName)
+    }
+  }
+
+  if (required.length > 0) {
+    ref.required = required
   }
 
   builder.addSchema(schemaName, ref)
 }
 
-function addFunctionMethod (pathDef: any, method: string, def: any): void {
-  // TODO: Define a return schema and put that here
+async function addFunctionMethod (pathDef: any, method: string, def: any, includeCORS = true): Promise<void> {
+
   const retDef: any = (def.returns)['200']
   const content: any = {}
-  const mime = retDef?.content ?? retDef?.mime ?? 'text/plain'
+  // const mime =mime retDef?.type ?? retDef?.content ?? retDef?.mime ?? 'text/plain'
+  const mime = retDef?.mime ?? 'application/json'
+  let type = retDef?.type ?? 'Empty'
+  if(type === 'empty') type = 'Empty' // fix case
+  const refLine = type ? '#/components/schemas/'+type : undefined
+  const schema = type ? {
+    '$ref': refLine
+  } : undefined
   content[mime] = {
+    schema
   }
+
+  const region = getSettings()?.awsPreferredRegion ?? ''
+  const accountId = await getAccountId()
+  const decName = decoratedName(def.name)
 
   const methData = {
     summary: def.name,
@@ -126,39 +193,107 @@ function addFunctionMethod (pathDef: any, method: string, def: any): void {
     responses: {
       200: {
         description: retDef?.description ?? 'Success Response',
+        headers: includeCORS ? {
+          'Access-Control-Allow-Origin': {
+            schema: {
+              type: 'string'
+            },
+            example: '*'
+          },
+          'Access-Control-Allow-Headers': {
+            schema: {
+              type: 'string'
+            },
+            example: 'Content-Type, Authorization'
+          },
+          'Access-Control-Allow-Methods': {
+            schema: {
+              type: 'string'
+            },
+            example: 'GET,POST,PUT,OPTIONS'
+          }
+        } : undefined,
         content
+      }
+    },
+    'x-amazon-apigateway-integration': {
+      uri: `arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${region}:${accountId}:function:${decName}/invocations`,
+      passthroughbehavior: 'when_no_match',
+      httpMethod: 'POST', // always POST - this is how API gateway calls Lambda, not the method of the api
+      type: 'aws_proxy'
+    }
+  }
+
+  if(!includeCORS) {
+    // get the other response code declarations
+    for (let rcode of Object.getOwnPropertyNames(def.returns)) {
+      if (rcode != "200") {
+        const retDef = def.returns[rcode] ?? {}
+
+        const content: any = {}
+        let primType = ''
+        let type = retDef?.type ?? 'Empty'
+        retDef.type = undefined
+        if (type === 'empty') type = 'Empty' // fix case
+        if (type === 'string' || type === 'number' || type === 'object') primType = type
+        const mime = retDef?.mime ?? primType ? 'text/plain' : 'application/json'
+        content[mime] = {
+          schema: primType ? {type: primType} : {'$ref': '#/components/schemas/' + type}
+        }
+        retDef.content = content;
+        (methData.responses as any)[rcode] = retDef
       }
     }
   }
+
   pathDef[method] = methData
 }
 function addCORSOptionMethod (pathDef: any): void {
-  if (pathDef.options === undefined) return // already assinged by definition
+  // if (pathDef.options === undefined) return // already assinged by definition
   // add options for CORS
   pathDef.options = {
+    summary: 'CORS support',
     responses: {
       200: {
-        description: '200 response',
-        content: {
-          'application/json': {
+        description: 'CORS response',
+        headers: {
+          'Access-Control-Allow-Origin': {
             schema: {
-              $ref: '#/components/schemas/Empty'
-            }
+              type: 'string'
+            },
+            example: '*'
+          },
+          'Access-Control-Allow-Methods': {
+            schema: {
+              type: 'string'
+            },
+            example: 'GET,POST,PUT,OPTIONS'
+          },
+          'Access-Control-Allow-Headers': {
+            schema: {
+              type: 'string'
+            },
+            example: 'Content-Type, Authorization'
           }
         }
       }
     },
     'x-amazon-apigateway-integration': {
-      responses: {
-        default: {
-          statusCode: '200'
-        }
-      },
+      type: 'mock',
       requestTemplates: {
         'application/json': '{"statusCode": 200}'
       },
-      passthroughBehavior: 'when_no_match',
-      type: 'mock'
+      responses: {
+        default: {
+          statusCode: '200',
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': "'*'",
+            'method.response.header.Access-Control-Allow-Methods': "'GET, POST, PUT, OPTIONS'",
+            'method.response.header.Access-Control-Allow-Headers': "'Content-Type, Authorization'"
+          }
+        }
+      },
+      passthroughBehavior: 'when_no_match'
     }
   }
 }
@@ -170,17 +305,32 @@ function addParameter (pathDef: any, param: any): void {
   const type = param.type ?? typeof example
   const deflt = param.default ?? example
 
+  // parameter is always required if it comes from path
+  // never required if it comes from query
+  // and may or may not be if it comes from body (per def)
+  let src = param?.in?.trim().toLowerCase() ?? ''
+  let required = (src === 'path')
+  if(src === 'body') required = param.required ?? false
+
+  const constraints = Array.isArray(param.constraints) ? parseConstraints(param.type, param.constraints.join('\n'), '\n') : undefined
+
+  let cdesc = constraints ? '\n  - ' + (constraints.describe() ?? '').split('\n').join('\n  - ') : ''
+  let description = param.description
+  if(cdesc) description += cdesc
+
   parameters.push({
     in: param.in,
     name: param.name,
-    description: param.description,
-    example,
-    required: param.required,
+    description,
+    example: example ? example : undefined,
+    required,
     schema: schemaType(deflt, type, true)
   })
 }
 
-function schemaType (deflt: string, namedType: string, innerOnly: boolean): any {
+
+
+function schemaType (deflt: string|undefined, namedType: string, innerOnly: boolean): any {
   if (typeof namedType === 'object') return namedType
   const typeFormat = namedType.split(':')
   let type = typeFormat[0]
@@ -204,5 +354,6 @@ function schemaType (deflt: string, namedType: string, innerOnly: boolean): any 
   }
   if (type === 'int') type = 'integer'
   if (type === 'bool') type = 'boolean'
+  if(!deflt) deflt = undefined
   return innerOnly ? { type, format, example: deflt } : { schema: { type, format, example: deflt } }
 }

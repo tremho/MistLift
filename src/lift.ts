@@ -64,7 +64,7 @@ async function processCommand (): Promise<void> {
     }
       return
     case 'publish': {
-      const ret = await doPublishAsync()
+      const ret = await doPublishAsync(args)
       process.exit(ret)
     }
       return

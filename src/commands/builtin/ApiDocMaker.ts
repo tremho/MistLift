@@ -5,7 +5,7 @@ import { GetWebrootServePaths } from '../../lib/openAPI/WebrootFileSupport'
 import path from 'path'
 // import * as ac from 'ansi-colors'
 import { decoratedName } from '../../lib/IdSrc'
-import {getWebrootSettings} from "./ExportWebroot";
+import { getWebrootSettings } from './ExportWebroot'
 
 export async function MakePublicApiDoc
 (
@@ -29,7 +29,7 @@ export async function MakeBuiltinApiDoc
   addBuiltInDefinitions(defs, withWebroot)
   // console.log(ac.gray.dim('>> after addBuiltIns'), defs)
   // console.log(ac.gray.dim('>>> buildOpenApi '))
-  return await buildOpenApi(defs, false, yamlFile) //, true)
+  return await buildOpenApi(defs, true, true, yamlFile)
 }
 
 export function addBuiltInDefinitions (defs: any[], withWebroot: boolean): void {
@@ -44,10 +44,10 @@ export function addBuiltInDefinitions (defs: any[], withWebroot: boolean): void 
   // console.log(ac.gray.dim('>>>> Adding webroot literals '))
   // console.warn("Adding webroot literals");
   // do just /docs and see how that goes
-    // const fsdef = Object.assign({}, fileServeDef) // copy
-    // fsdef.name = decoratedName('fileserve_docs')
-    // fsdef.pathMap = '/docs/{path}'
-    // defs.push(fsdef)
+  // const fsdef = Object.assign({}, fileServeDef) // copy
+  // fsdef.name = decoratedName('fileserve_docs')
+  // fsdef.pathMap = '/docs/{path}'
+  // defs.push(fsdef)
   // }
   const roots = GetWebrootServePaths()
   // console.log("roots", roots)

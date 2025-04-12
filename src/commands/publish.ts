@@ -29,14 +29,15 @@ import { DeployApiBuiltin, DeployRootFileserves, DeployWebrootBuiltIn } from './
 import { esbuilder } from '../lib/ESBuild'
 import { getIdSrc, getIdDelimiter } from '../lib/IdSrc'
 import { ExportWebroot, getWebrootSettings } from './builtin/ExportWebroot'
-import { ServiceSettingsData, setWebroot, setAws, getServiceSettings } from '@tremho/inverse-y'
+import { doDeployAsync } from './deploy'
 
 let projectPaths: any
 
-export async function doPublishAsync (stageName?: string): Promise<number> {
-  // let retCode = await doDeployAsync([])
-  // if(retCode) return retCode
-  const retCode = 0
+export async function doPublishAsync (args: string[] = []): Promise<number> {
+  const stageName = 'Dev'
+  const retCode = await doDeployAsync(args)
+  if (retCode) return retCode
+  // const retCode = 0
 
   projectPaths = resolvePaths()
   if (projectPaths.verified !== true) {
@@ -139,6 +140,7 @@ async function publishApi (
   // console.log('>> making intRequests')
   const intRequests = prereq.MakeRequests()
   // console.log('>> putting integration')
+  // console.log(ac.green("finalizing deployment..."))
   await PutIntegrations(intRequests)
   // console.log("deploy api")
   const success = await DeployApi(apiId ?? '', stageName)
@@ -229,19 +231,19 @@ class PrereqInfo {
   }
 
   public findARN (name: string): string {
-    console.log("findARN")
+    // console.log("findARN")
     let lastDelim = name.lastIndexOf(getIdDelimiter())
     if (lastDelim !== -1) name = name.substring(0, lastDelim)
-    console.log(ac.grey.dim.italic("binding "+name))
-    console.warn(`>>> finding name ${name} in ${this.functions.length} functions`)
+    // console.log(ac.grey.dim.italic("binding "+name))
+    // console.warn(`>>> finding name ${name} in ${this.functions.length} functions`)
     for (const f of this.functions ?? []) {
-      console.log("inspecting function " + f.name)
+      // console.log("inspecting function " + f.name)
       lastDelim = f.name.lastIndexOf(getIdDelimiter())
       const fname = f.name.substring(0, lastDelim)
-      console.warn('comparing name, fname, lc ', {lastus: lastDelim, fname, name})
+      // console.warn('comparing name, fname, lc ', {lastus: lastDelim, fname, name})
       if (fname.toLowerCase() === name.toLowerCase()) {
-        console.warn(">>> Match! ", f)
-        console.log(ac.grey.dim.italic('binding ' + name + ' to arn '+ f.arn))
+        // console.warn(">>> Match! ", f)
+        // console.log(ac.grey.dim.italic('binding ' + name + ' to arn '+ f.arn))
         return f.arn
       }
     }
@@ -310,26 +312,26 @@ async function GetFunctionInfo (info: PrereqInfo): Promise<PrereqInfo> {
     const listCommand: any = new ListFunctionsCommand({ Marker })
     const response: any = await client.send(listCommand)
 
-    console.log(">>>> Functions: ", response.Functions)
+    // console.log(">>>> Functions: ", response.Functions)
     Marker = response.NextMarker
-    console.log('>>> Marker', Marker)
+    // console.log('>>> Marker', Marker)
 
     const sfx = getIdSrc()
 
-    console.log('>>>> sfx', sfx)
+    // console.log('>>>> sfx', sfx)
 
     for (const func of response.Functions ?? []) {
       const fName: string = func?.FunctionName ?? ''
-      console.log(ac.gray.dim('>> checking if '+fName+' has our suffix '+sfx))
+      // console.log(ac.gray.dim('>> checking if '+fName+' has our suffix '+sfx))
       if (fName.includes(sfx)) {
-        console.log(ac.gray.dim('>>> Yes'))
+        // console.log(ac.gray.dim('>>> Yes'))
         info.functions.push({
           name: func.FunctionName ?? '',
           arn: func.FunctionArn ?? ''
         })
       }
     }
-    console.log(`>>> ${info.functions.length} functions added to list this page`)
+    // console.log(`>>> ${info.functions.length} functions added to list this page`)
   } while (Marker !== undefined && Marker !== null && Marker !== '')
   return info
 }
@@ -367,6 +369,7 @@ async function PutIntegrations (integrations: PutIntegrationRequest[]): Promise<
 async function DeployApi (restApiId: string, stageName: string): Promise<boolean> {
   let success = true
   try {
+    // console.log("Creating deployment for "+restApiId+", stage "+stageName)
     const client = new APIGatewayClient(getAWSCredentials())
     const command: any = new CreateDeploymentCommand({
       restApiId,

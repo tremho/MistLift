@@ -3,7 +3,7 @@ import { s3ListObjects, s3CreateBucket, s3UploadFile, s3Delete, S3ActionsLog } f
 import * as fs from 'fs'
 import * as ac from 'ansi-colors'
 import { WebrootS3Options, WebrootScriptOptions } from '../ExportWebroot'
-import {DeployRootFileserves, DeployWebrootBuiltIn} from "../BuiltInHandler";
+import { DeployRootFileserves, DeployWebrootBuiltIn } from '../BuiltInHandler'
 
 export async function exportWebrootToS3 (exportFileList: string[], options?: WebrootS3Options) {
   const bucketName = determineBucketName()
@@ -18,10 +18,9 @@ export async function exportWebrootToS3 (exportFileList: string[], options?: Web
     // console.log("bucket created")
   }
 
-  console.log(ac.blue.italic("Deploying base webroot handling"))
+  console.log(ac.blue.italic('Deploying base webroot handling'))
   await DeployWebrootBuiltIn(true)
   await DeployRootFileserves()
-
 
   // console.log("existing ", existing)
 
@@ -32,7 +31,7 @@ export async function exportWebrootToS3 (exportFileList: string[], options?: Web
     const i = file.indexOf('/webroot/') + 9
     const sfile = file.substring(i)
     if (!sfile) continue
-    if(sfile.substring(0,4) === 'docs') continue // keep these in self-serve only
+    if (sfile.substring(0, 4) === 'docs') continue // keep these in self-serve only
     const xi = existing.indexOf(sfile)
     let disp = 'created'
     if (xi !== -1) {

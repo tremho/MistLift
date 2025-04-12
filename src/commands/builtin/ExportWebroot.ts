@@ -109,6 +109,7 @@ export async function getWebrootSettings () {
   }
 }
 
+let warned = false
 function readWebrootConfig (configPath: string): WebrootExportConfig {
   let conf = new WebrootExportConfig()
   let content = ''
@@ -118,8 +119,11 @@ function readWebrootConfig (configPath: string): WebrootExportConfig {
     content = fs.readFileSync(configPath).toString()
     conf = JSON.parse(content)
   } catch (e: any) {
-    console.error(ac.red.bold('Error: Failed to read or parse ' + configPath))
-    console.warn(ac.yellow.bold.dim("Falling back to 'self' publish mode"))
+    if (!warned) {
+      warned = true
+      console.error(ac.yellow.bold('Warning: Failed to read or parse ' + configPath))
+      console.warn(ac.yellow.bold.dim("Falling back to 'self' publish mode"))
+    }
   }
 
   return conf
