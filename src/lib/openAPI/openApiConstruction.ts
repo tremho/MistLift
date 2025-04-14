@@ -9,6 +9,7 @@ import * as ac from 'ansi-colors'
 import { decoratedName, getAccountId } from '../IdSrc'
 import { getAWSCredentials, getSettings } from '../LiftConfig'
 import {parseConstraints, TypeConstraint} from "../TypeCheck";
+import yaml from 'js-yaml'
 
 export async function buildOpenApi (
   defs: any[],
@@ -50,7 +51,7 @@ export async function buildOpenApi (
     description: svcInfo.description,
     version: svcInfo.version ?? version ?? new Date().toUTCString()
   }
-  builder.addInfo(info)
+  builder.addInfo(info);
 
   // map our defs into openApi values
   for (const def of defs) {
@@ -101,69 +102,84 @@ export async function buildOpenApi (
     return bufView
   }
 
-  const yaml = builder.getSpecAsYaml()
-  const bytes = str2ab(yaml)
+  const spec = builder.getSpec()
+  spec['x-amazon-apigateway-binary-media-types'] = [
+    'application/octet-stream',
+    'image/*',
+    'audio/*'
+  ]
+  const yamlSpec = yaml.dump(spec)
+  const bytes = str2ab(yamlSpec)
   // if (!includePrivate) {
-    fs.writeFileSync(outFile, yaml)
+    fs.writeFileSync(outFile, yamlSpec)
   // }
   return bytes
 }
 
 function addTypeSchema(builder: any, schemaName: string, schema: any): void {
 
-  const ref: any = {
-    title: schemaName,
-    type: schema.type ?? 'object',
+  let primType = ''
+  let type = schema?.type ?? 'Empty'
+  if (type === 'empty') type = 'Empty' // fix case
+  let isArray = (type.endsWith('[]'))
+  if (isArray) type = type.substring(0, type.length - 2)
+  if (type === 'string' || type === 'number' || type === 'object') primType = type
+  const mime = schema?.mime ?? primType ? 'text/plain' : 'application/json'
+  const sref = primType ? {type: primType} : {'$ref': '#/components/schemas/' + type}
+  let ref: any = {}
+  if (isArray) {
+    ref = {type: "array", items: sref}
+  } else {
+    ref = sref
   }
-  if(ref.type === 'object') ref.properties = {}
 
-  const constraints = ref.type !== 'object' && Array.isArray(schema?.constraints) ? parseConstraints(schema.type, schema.constraints.join('\n'), '\n') : undefined
+  ref.title = schemaName
+
+  if (ref.type === 'object') ref.properties = {}
+
+  const constraints = schema.type !== 'object' && Array.isArray(schema?.constraints) ? parseConstraints(schema.type, schema.constraints.join('\n'), '\n') : undefined
 
   let cdesc = constraints ? '\n  - ' + (constraints.describe() ?? '').split('\n').join('\n  - ') : ''
   let description = schema.description
-  if(cdesc) description += cdesc
+  if (cdesc) description += cdesc
 
   ref.description = description
 
 
   const required: string[] = []
 
-  for (const [propName, propDef] of Object.entries(schema.properties || {})) {
-    const pda = propDef as any
-    const constraints = Array.isArray(pda?.constraints) ? parseConstraints(pda.type, pda.constraints.join('\n'),'\n') : undefined
+  if(ref.properties) {
+      for (const [propName, propDef] of Object.entries(schema.properties || {})) {
+        const pda = propDef as any
+        const constraints = Array.isArray(pda?.constraints) ? parseConstraints(pda.type, pda.constraints.join('\n'), '\n') : undefined
 
-    let cdesc = constraints ? '\n  - ' + (constraints.describe() ?? '').split('\n').join('\n  - ') : ''
-    let description = (propDef as any).description
-    if(cdesc) description += cdesc
+        let cdesc = constraints ? '\n  - ' + (constraints.describe() ?? '').split('\n').join('\n  - ') : ''
+        let description = (propDef as any).description
+        if (cdesc) description += cdesc
 
-    // if(constraints) {
-    //   console.log("schema definition for "+schemaName+', prop '+propName)
-    //   console.log(description)
-    // }
+        // if(constraints) {
+        //   console.log("schema definition for "+schemaName+', prop '+propName)
+        //   console.log(description)
+        // }
 
-    const propSchema: any = {
-      type: (propDef as any).type,
-      description
-    }
+        const propSchema: any = {
+          type: (propDef as any).type,
+          description
+        }
 
-    // Optional support for constraints as custom fields
-    // if ((propDef as any).constraint) {
-    //   propSchema['x-constraint'] = (propDef as any).constraints
-    // }
+        // You can add other custom handling here (e.g., enums, format, pattern)
+        ref.properties[propName] = propSchema
 
-    // You can add other custom handling here (e.g., enums, format, pattern)
-    ref.properties[propName] = propSchema
+        // Only mark as required if declared explicitly
+        if (schema.required && schema.required.includes(propName)) {
+          required.push(propName)
+        }
+      }
 
-    // Only mark as required if declared explicitly
-    if (schema.required && schema.required.includes(propName)) {
-      required.push(propName)
-    }
+      if (required.length > 0) {
+        ref.required = required
+      }
   }
-
-  if (required.length > 0) {
-    ref.required = required
-  }
-
   builder.addSchema(schemaName, ref)
 }
 
@@ -171,14 +187,20 @@ async function addFunctionMethod (pathDef: any, method: string, def: any, includ
 
   const retDef: any = (def.returns)['200']
   const content: any = {}
-  // const mime =mime retDef?.type ?? retDef?.content ?? retDef?.mime ?? 'text/plain'
-  const mime = retDef?.mime ?? 'application/json'
+  let primType = ''
   let type = retDef?.type ?? 'Empty'
-  if(type === 'empty') type = 'Empty' // fix case
-  const refLine = type ? '#/components/schemas/'+type : undefined
-  const schema = type ? {
-    '$ref': refLine
-  } : undefined
+  if (type === 'empty') type = 'Empty' // fix case
+  let isArray = (type.endsWith('[]'))
+  if(isArray) type = type.substring(0,type.length-2)
+  if (type === 'string' || type === 'number' || type === 'object') primType = type
+  const mime = retDef?.mime ?? primType ? 'text/plain' : 'application/json'
+  const ref = primType ? {type: primType} : {'$ref': '#/components/schemas/' + type}
+  let schema:any
+  if(isArray) {
+    schema = { type:"array", items: ref }
+  } else {
+    schema = ref
+  }
   content[mime] = {
     schema
   }
@@ -186,6 +208,8 @@ async function addFunctionMethod (pathDef: any, method: string, def: any, includ
   const region = getSettings()?.awsPreferredRegion ?? ''
   const accountId = await getAccountId()
   const decName = decoratedName(def.name)
+
+  const isBinary = def.bodyType && !def.bodyType.startsWith('text') && !def.bodyType.endsWith('json')
 
   const methData = {
     summary: def.name,
@@ -219,6 +243,7 @@ async function addFunctionMethod (pathDef: any, method: string, def: any, includ
     'x-amazon-apigateway-integration': {
       uri: `arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${region}:${accountId}:function:${decName}/invocations`,
       passthroughbehavior: 'when_no_match',
+      contentHandling: isBinary ? "CONVERT_TO_BINARY" : undefined,
       httpMethod: 'POST', // always POST - this is how API gateway calls Lambda, not the method of the api
       type: 'aws_proxy'
     }
@@ -233,12 +258,20 @@ async function addFunctionMethod (pathDef: any, method: string, def: any, includ
         const content: any = {}
         let primType = ''
         let type = retDef?.type ?? 'Empty'
-        retDef.type = undefined
         if (type === 'empty') type = 'Empty' // fix case
+        let isArray = (type.endsWith('[]'))
+        if(isArray) type = type.substring(0,type.length-2)
         if (type === 'string' || type === 'number' || type === 'object') primType = type
         const mime = retDef?.mime ?? primType ? 'text/plain' : 'application/json'
+        const ref = primType ? {type: primType} : {'$ref': '#/components/schemas/' + type}
+        let schema:any
+        if(isArray) {
+          schema = { type:"array", items: ref }
+        } else {
+          schema = ref
+        }
         content[mime] = {
-          schema: primType ? {type: primType} : {'$ref': '#/components/schemas/' + type}
+          schema
         }
         retDef.content = content;
         (methData.responses as any)[rcode] = retDef
@@ -301,9 +334,9 @@ function addCORSOptionMethod (pathDef: any): void {
 function addParameter (pathDef: any, param: any): void {
   if (pathDef.parameters === undefined) pathDef.parameters = []
   const parameters = pathDef.parameters
-  const example = param.example ?? param.default ?? ''
-  const type = param.type ?? typeof example
-  const deflt = param.default ?? example
+  const example = param.example ?? ''
+  const type = param.type ?? 'string'
+  const deflt = param.default ?? ''
 
   // parameter is always required if it comes from path
   // never required if it comes from query
@@ -318,14 +351,17 @@ function addParameter (pathDef: any, param: any): void {
   let description = param.description
   if(cdesc) description += cdesc
 
-  parameters.push({
-    in: param.in,
-    name: param.name,
-    description,
-    example: example ? example : undefined,
-    required,
-    schema: schemaType(deflt, type, true)
-  })
+  // don't declare parameters marked as 'body'.  OpenAPI doesn't support that.
+  if(param.in === 'path' || param.in === 'query') {
+    parameters.push({
+      in: param.in,
+      name: param.name,
+      description,
+      example: example ? example : undefined,
+      required,
+      schema: schemaType(deflt, type, true)
+    })
+  }
 }
 
 

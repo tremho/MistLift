@@ -135,7 +135,9 @@ export async function deployPackage (
     const response: any = await CreateCloudFunction(dFuncName, zipFile, timeout, memorySize)
     const parts = response.FunctionArn.split(':')
     const principal = parts[4]
-    await AddPermissions(client, dFuncName, principal)
+    if(dFuncName.includes('Webroot') || dFuncName.includes('FileServe')) {
+      await AddPermissions(client, dFuncName, principal)
+    }
     let deployMsg: string = `Successfully deployed ${funcName}`
     // console.log(ac.gray.dim('>> deploy trace 1'))
     if (memorySize > 0 || timeout > 0) {

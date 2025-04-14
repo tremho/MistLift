@@ -30,6 +30,7 @@ import { esbuilder } from '../lib/ESBuild'
 import { getIdSrc, getIdDelimiter } from '../lib/IdSrc'
 import { ExportWebroot, getWebrootSettings } from './builtin/ExportWebroot'
 import { doDeployAsync } from './deploy'
+import updateDeployedPermissions from "./actions/updateDeployedPermissions";
 
 let projectPaths: any
 
@@ -147,6 +148,8 @@ async function publishApi (
   const region = getSettings()?.awsPreferredRegion ?? ''
   const publishUrl = `https://${apiId ?? ''}.execute-api.${region}.amazonaws.com/${stageName}`
   const characterize = success ? 'Successfully' : ''
+  console.log(ac.green.italic("Updating bound function permissions..."))
+  await updateDeployedPermissions(apiId)
   console.log(ac.green.bold(`\n ${characterize} deployed to ${publishUrl}`))
   recordLatestPublish(publishUrl)
 }
@@ -392,3 +395,4 @@ function recordLatestPublish (publishUrl: string): void {
   const publishedFile = path.join(projectPaths.basePath, '.published')
   fs.writeFileSync(publishedFile, JSON.stringify(publishRecord))
 }
+

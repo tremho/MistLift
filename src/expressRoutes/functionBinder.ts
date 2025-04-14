@@ -8,6 +8,7 @@ import express from 'express'
 import { gatherFunctionDefinitions } from '../lib/openAPI/ApiBuildCollector'
 import { buildOpenApi } from '../lib/openAPI/openApiConstruction'
 import {BadRequest, Log} from '@tremho/inverse-y'
+import {parseConstraints} from "../lib/TypeCheck";
 
 const clearModule = require('clear-module')
 const router = express.Router()
@@ -45,10 +46,21 @@ export function functionBinder (): void {
         if (n !== -1) entryRoot = entryRoot.substring(0, n) + '/*'
 
         const callHandler = (def: any, req: any, res: any): void => {
-          if(!isRouteValid(def, req)) {
-            return handleResponse(res, {statusCode:403, body:'Invalid route'})
+          if(Buffer.isBuffer(req.body)) {
+            const buffer:Buffer = req.body
+            console.log("body is a buffer at callHandler. Length is " + buffer.byteLength)
+            console.log('First 16 bytes:', buffer.subarray(0, 16).toString('hex'));
+          }
+          let message = testPathRoute(def, req)
+          if(message) {
+            return handleResponse(res, {statusCode:403, body:{error: message}})
           }
           const event = requestToEvent(def, req)
+          try {
+            performParameterTesting(def, event)
+          } catch(e:any) {
+            return handleResponse(res, {statusCode:400, body:{error: e.message}})
+          }
           Promise.resolve(start(event, null, null)).then(respOut => {
             handleResponse(res, respOut)
           }).catch<any>((reason: any) => undefined)
@@ -78,34 +90,40 @@ export function functionBinder (): void {
 }
 
 // compare request route to the definition of this function to see if it matches
-function isRouteValid(def:any, req:any) {
-  console.log("---- isRouteValid checks ----")
+function testPathRoute(def:any, req:any) {
   let path = req.path
   let pathMap = def.pathMap
   if(path.endsWith('/')) path = path.substring(0, path.length-1)
   if(pathMap.endsWith('/')) pathMap = pathMap.substring(0,path.length-1)
-  console.log("definition is "+pathMap)
-  console.log("path is "+path)
   const defParts = pathMap.split('/')
   const pathParts = path.split('/')
-  console.log("defParts", defParts)
-  console.log("pathParts", pathParts)
 
-  // No optional parameters -- we have to pass 'undefined' or '~' for unused path values, or use querystring parameters
-  // let firstOptional = 0
-  // for(let p of defParts) {
-  //   ++firstOptional
-  //   if(p.startsWith('{') && p.endsWith('}')) {
-  //     p = p.substring(1, p.length-1).trim()
-  //     if(p.endsWith('?')) break;
-  //   }
-  // }
-  // console.log('firstOptional = '+firstOptional)
-  // console.log("pathParts.length = "+pathParts.length)
-  // let valid = pathParts.length <= firstOptional
-  let valid = pathParts.length == defParts.length
-  console.log("--------------")
-  return valid
+  let message = ''
+  if(pathParts.length > defParts.length) {
+    message = "Too many parameters passed on path"
+  }
+  if(pathParts.length < defParts.length) {
+    message = "Too few parameters passed on path"
+  }
+  return message
+}
+
+function performParameterTesting(def:any, event:any) {
+
+  // for every parameter defined in def
+  // find the corresponding value in event.parameters (by name)
+  // find the constraints for that parameter in def
+  // test the value against the constraints
+  for (let pdef of (def.parameters ?? [])) {
+    const constraints = Array.isArray(pdef.constraints) ? parseConstraints(pdef.type, pdef.constraints.join('\n'), '\n') : undefined
+    let value:any = event.parameters[pdef.name]
+    if(value === undefined) {
+      if(!pdef.required) return; // okay to be undefined
+    }
+    if(pdef.type === 'number') value = Number(value) // TODO: Type coercion for all types
+    constraints?.test(value)
+  }
+
 }
 
 // returns 'text', 'json', or undefined
@@ -128,6 +146,7 @@ function requestToEvent (def: any, req: any): any {
   const type = bodyTypeCollapse(def.bodyType)
   if (type === 'text') {
     if(typeof req.body === 'object') {
+      console.log(">> requestToEvent modifying body (text)")
       if(Buffer.isBuffer(req.body)) {
         req.body = req.body.toString()
       } else {
@@ -137,12 +156,14 @@ function requestToEvent (def: any, req: any): any {
   }
   else if (type === 'json') {
     if(typeof req.body === 'object') {
+      console.log(">> requestToEvent modifying body (json1)")
       if(Buffer.isBuffer(req.body)) {
         req.body = req.body.toString()
       }
     }
     if (typeof req.body === 'string') {
       try {
+        console.log(">> requestToEvent modifying body (json2)")
         req.body = JSON.parse(req.body)
       } catch (e: any) {
         console.error(ac.bold.red('Failed request body JSON parse'))
@@ -150,16 +171,27 @@ function requestToEvent (def: any, req: any): any {
     }
   } else {
     // binary expects a buffer
-    if(typeof req.body === 'object') {
-      req.body = JSON.stringify(req.body) // make a string first before we bufferize the json
+    if (!Buffer.isBuffer(req.body)) { // if already a buffer, leave as is
+      if (typeof req.body === 'object') {
+        req.body = JSON.stringify(req.body) // make a string first before we bufferize the json
+      }
+      req.body = Buffer.from(req.body)
     }
-    req.body = Buffer.from(req.body)
+  }
+  if(Buffer.isBuffer(req.body)) {
+    const buffer:Buffer = req.body;
+    console.log("body is buffer eventToRequest, Length = "+buffer.byteLength)
+    console.log('First 16 bytes:', buffer.subarray(0, 16).toString('hex'));
   }
   const template = def.pathMap
 
   // unpack weird choice of express when passed from curl.
-  if (typeof (req.body) === 'object') {
-    const bprops = Object.getOwnPropertyNames(req.body)
+
+  if (typeof (req.body) === 'object' && !Buffer.isBuffer(req.body)) {
+    let bprops:string[] = []
+    try {
+      bprops = Object.getOwnPropertyNames(req.body)
+    } catch(e:any) {}
     if (bprops.length === 1) {
       try {
         req.body = JSON.parse(bprops[0])
