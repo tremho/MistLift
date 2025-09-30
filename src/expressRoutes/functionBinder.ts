@@ -7,8 +7,8 @@ import { resolvePaths } from '../lib/pathResolve'
 import express from 'express'
 import { gatherFunctionDefinitions } from '../lib/openAPI/ApiBuildCollector'
 import { buildOpenApi } from '../lib/openAPI/openApiConstruction'
-import {BadRequest, Log} from '@tremho/inverse-y'
-import {parseConstraints} from "../lib/TypeCheck";
+import { BadRequest, Log } from '@tremho/inverse-y'
+import { parseConstraints } from '../lib/TypeCheck'
 
 const clearModule = require('clear-module')
 const router = express.Router()
@@ -46,20 +46,21 @@ export function functionBinder (): void {
         if (n !== -1) entryRoot = entryRoot.substring(0, n) + '/*'
 
         const callHandler = (def: any, req: any, res: any): void => {
-          if(Buffer.isBuffer(req.body)) {
-            const buffer:Buffer = req.body
-            console.log("body is a buffer at callHandler. Length is " + buffer.byteLength)
-            console.log('First 16 bytes:', buffer.subarray(0, 16).toString('hex'));
+          console.log('>>>>>>> YES WE ARE HERE<<<<<<<<<')
+          if (Buffer.isBuffer(req.body)) {
+            const buffer: Buffer = req.body
+            console.log('body is a buffer at callHandler. Length is ' + buffer.byteLength)
+            console.log('First 16 bytes:', buffer.subarray(0, 16).toString('hex'))
           }
-          let message = testPathRoute(def, req)
-          if(message) {
-            return handleResponse(res, {statusCode:403, body:{error: message}})
+          const message = testPathRoute(def, req)
+          if (message) {
+            return handleResponse(res, { statusCode: 403, body: { error: message } })
           }
           const event = requestToEvent(def, req)
           try {
             performParameterTesting(def, event)
-          } catch(e:any) {
-            return handleResponse(res, {statusCode:400, body:{error: e.message}})
+          } catch (e: any) {
+            return handleResponse(res, { statusCode: 400, body: { error: e.message } })
           }
           Promise.resolve(start(event, null, null)).then(respOut => {
             handleResponse(res, respOut)
@@ -90,40 +91,38 @@ export function functionBinder (): void {
 }
 
 // compare request route to the definition of this function to see if it matches
-function testPathRoute(def:any, req:any) {
+function testPathRoute (def: any, req: any) {
   let path = req.path
   let pathMap = def.pathMap
-  if(path.endsWith('/')) path = path.substring(0, path.length-1)
-  if(pathMap.endsWith('/')) pathMap = pathMap.substring(0,path.length-1)
+  if (path.endsWith('/')) path = path.substring(0, path.length - 1)
+  if (pathMap.endsWith('/')) pathMap = pathMap.substring(0, path.length - 1)
   const defParts = pathMap.split('/')
   const pathParts = path.split('/')
 
   let message = ''
-  if(pathParts.length > defParts.length) {
-    message = "Too many parameters passed on path"
+  if (pathParts.length > defParts.length) {
+    message = 'Too many parameters passed on path'
   }
-  if(pathParts.length < defParts.length) {
-    message = "Too few parameters passed on path"
+  if (pathParts.length < defParts.length) {
+    message = 'Too few parameters passed on path'
   }
   return message
 }
 
-function performParameterTesting(def:any, event:any) {
-
+function performParameterTesting (def: any, event: any) {
   // for every parameter defined in def
   // find the corresponding value in event.parameters (by name)
   // find the constraints for that parameter in def
   // test the value against the constraints
-  for (let pdef of (def.parameters ?? [])) {
+  for (const pdef of (def.parameters ?? [])) {
     const constraints = Array.isArray(pdef.constraints) ? parseConstraints(pdef.type, pdef.constraints.join('\n'), '\n') : undefined
-    let value:any = event.parameters[pdef.name]
-    if(value === undefined) {
-      if(!pdef.required) return; // okay to be undefined
+    let value: any = event.parameters[pdef.name]
+    if (value === undefined) {
+      if (!pdef.required) return // okay to be undefined
     }
-    if(pdef.type === 'number') value = Number(value) // TODO: Type coercion for all types
+    if (pdef.type === 'number') value = Number(value) // TODO: Type coercion for all types
     constraints?.test(value)
   }
-
 }
 
 // returns 'text', 'json', or undefined
@@ -142,34 +141,46 @@ function bodyTypeCollapse (type: string) {
 
 function requestToEvent (def: any, req: any): any {
   console.warn('requestToEvent (express)... body is type ', typeof (req.body))
+  const isBuffer = Buffer.isBuffer(req.body)
+  console.log('Body is a buffer ', isBuffer)
+  console.log('bodyType from def is ', def.bodyType)
   // lets assume template says the type
   const type = bodyTypeCollapse(def.bodyType)
+  console.log('collapsed bodyType is ', type)
   if (type === 'text') {
-    if(typeof req.body === 'object') {
-      console.log(">> requestToEvent modifying body (text)")
-      if(Buffer.isBuffer(req.body)) {
+    console.log('>> we want plain text')
+    if (typeof req.body === 'object') {
+      console.log('>> requestToEvent modifying body (text)')
+      if (Buffer.isBuffer(req.body)) {
         req.body = req.body.toString()
+        console.log('>> just turned it to a string ', req.body)
       } else {
         req.body = JSON.stringify(req.body)
+        console.log('>> is is an object, make it a json string ', req.body)
       }
     }
-  }
-  else if (type === 'json') {
-    if(typeof req.body === 'object') {
-      console.log(">> requestToEvent modifying body (json1)")
-      if(Buffer.isBuffer(req.body)) {
+  } else if (type === 'json') {
+    console.log('>> we want json')
+    if (typeof req.body === 'object') {
+      if (Buffer.isBuffer(req.body)) {
+        console.log('>> converting first from buffer to string')
         req.body = req.body.toString()
       }
     }
     if (typeof req.body === 'string') {
+      console.log('>> body is a string', req.body)
       try {
-        console.log(">> requestToEvent modifying body (json2)")
+        console.log('>> requestToEvent modifying body (json2)')
         req.body = JSON.parse(req.body)
+        console.log(">> it's now an object ", req.body)
       } catch (e: any) {
-        console.error(ac.bold.red('Failed request body JSON parse'))
+        console.error(ac.bold.red('Failed request body JSON parse '), req.body)
       }
+    } else {
+      console.log('We already have an object here as ', req.body)
     }
   } else {
+    console.log('>> binary type path')
     // binary expects a buffer
     if (!Buffer.isBuffer(req.body)) { // if already a buffer, leave as is
       if (typeof req.body === 'object') {
@@ -178,28 +189,37 @@ function requestToEvent (def: any, req: any): any {
       req.body = Buffer.from(req.body)
     }
   }
-  if(Buffer.isBuffer(req.body)) {
-    const buffer:Buffer = req.body;
-    console.log("body is buffer eventToRequest, Length = "+buffer.byteLength)
-    console.log('First 16 bytes:', buffer.subarray(0, 16).toString('hex'));
+  if (Buffer.isBuffer(req.body)) {
+    const buffer: Buffer = req.body
+    console.log('body is buffer eventToRequest, Length = ' + buffer.byteLength)
+    console.log('First 16 bytes:', buffer.subarray(0, 16).toString('hex'))
   }
   const template = def.pathMap
 
   // unpack weird choice of express when passed from curl.
-
+  /*
   if (typeof (req.body) === 'object' && !Buffer.isBuffer(req.body)) {
+    console.log(">> in curl case", req.body)
     let bprops:string[] = []
     try {
       bprops = Object.getOwnPropertyNames(req.body)
+      console.log(">> bprops ", bprops)
     } catch(e:any) {}
     if (bprops.length === 1) {
+      const bText = req.body[bprops[0]]
+      console.log(">> bText ",bText)
       try {
-        req.body = JSON.parse(bprops[0])
+        req.body = JSON.parse(bText)
       } catch (e: any) {
-        console.error(ac.bold.red('Failed request body JSON parse '), '(curl)')
+        console.warn(ac.bold.yellow.italic('Failed request body JSON parse Yellow'), '(curl)')
+        req.body = bText
+        return requestToEvent(def, req)
       }
     }
   }
+   */
+
+  console.log('last look at body', req.body)
 
   let path: string = req.originalUrl ?? ''
   const qi = path.indexOf('?')
@@ -228,9 +248,9 @@ function requestToEvent (def: any, req: any): any {
   for (let i = 0; i < tslots.length; i++) {
     const brknm = (tslots[i] ?? '').trim()
     if (brknm.charAt(0) === '{') {
-      let pn = brknm.substring(1, brknm.length - 1)
-      let pv:string|undefined =  (pslots[i] ?? '').trim()
-      if(pv === 'undefined' || pv === '~') pv = undefined
+      const pn = brknm.substring(1, brknm.length - 1)
+      let pv: string | undefined = (pslots[i] ?? '').trim()
+      if (pv === 'undefined' || pv === '~') pv = undefined
       parameters[pn] = pv
     }
   }

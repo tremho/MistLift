@@ -69,6 +69,9 @@ If you would like to support my late night efforts, please consider a contributi
 
 ## Changelog
 
+### 2.4.0
+  - maintenance update
+
 ### 2.3.0
 __New feature for S3-based webroot static files__
 Please see [Webroot redirect documentation](https://github.com/tremho/MistLift/blob/main/doc/Webroot%20S3%20exports.md)

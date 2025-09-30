@@ -3,11 +3,11 @@ import * as fs from 'fs'
 import * as ac from 'ansi-colors'
 import { resolvePaths } from '../../lib/pathResolve'
 import { recurseDirectory } from '../../lib/DirectoryUtils'
-import { isNewer } from '../../lib/fileCompare'
+// import { isNewer } from '../../lib/fileCompare'
 import { executeCommand } from '../../lib/executeCommand'
-import { mkdirSync } from 'fs'
+// import { mkdirSync } from 'fs'
 import { DeployRootFileserves, DeployWebrootBuiltIn } from './BuiltInHandler'
-import { ServiceSettingsData } from '@tremho/inverse-y'
+// import { ServiceSettingsData } from '@tremho/inverse-y'
 import { exportWebrootToS3, getS3Prefix } from './webroot-export/s3webroot'
 
 /*
@@ -33,8 +33,10 @@ export class WebrootScriptOptions {
   public options = '' // options passed as second parameter to script (see comment above)
 }
 export class WebrootS3Options {
+  public unused = '' // empty (lint)
 }
 export class WebrootDefaultOptions {
+  public unused = '' // empty (lint)
 }
 
 export type WebrootOptions = WebrootDefaultOptions | WebrootScriptOptions | WebrootS3Options
@@ -61,7 +63,7 @@ let basePath = ''
 /**
  * Exports the webroot according to configuration
  */
-export async function ExportWebroot () {
+export async function ExportWebroot (): Promise<any> {
   const projectPaths = resolvePaths()
   basePath = projectPaths.basePath
   const webrootConfig = readWebrootConfig(path.join(basePath, 'webrootConfig.json'))
@@ -78,11 +80,12 @@ export async function ExportWebroot () {
     case WebrootExportType.SCRIPT:
       await exportScript(fla, webrootConfig.options as WebrootScriptOptions)
       break
-    default:
-      throw new Error('UNSUPPORTED WEBROOT EXPORT ' + webrootConfig.type)
+    default: {
+      throw new Error(`UNSUPPORTED WEBROOT EXPORT ${WebrootExportType[webrootConfig.type]}`)
+    }
   }
 }
-export async function getWebrootSettings () {
+export async function getWebrootSettings (): Promise<{ webrootMethod: string, webrootBaseUrl: string }> {
   const projectPaths = resolvePaths()
   basePath = projectPaths.basePath
   const webrootConfig = readWebrootConfig(path.join(basePath, 'webrootConfig.json'))
@@ -94,14 +97,17 @@ export async function getWebrootSettings () {
     case WebrootExportType.S3:
       baseUrl = await getS3Prefix()
       break
-    case WebrootExportType.SCRIPT:
+    case WebrootExportType.SCRIPT: {
       const options = webrootConfig.options as WebrootScriptOptions
       const scriptPath = path.join(basePath, options.scriptName)
       const out = await executeCommand(scriptPath, ['--prefix'], basePath, false)
       baseUrl = out.stdStr.trim()
       break
-    default:
-      throw new Error('UNSUPPORTED WEBROOT EXPORT ' + webrootConfig.type)
+    }
+    default: {
+      const unreachable: never = webrootConfig.type
+      throw new Error(`UNSUPPORTED WEBROOT EXPORT ${unreachable}`)
+    }
   }
   return {
     webrootMethod: webrootConfig.type.toString(),
@@ -129,7 +135,7 @@ function readWebrootConfig (configPath: string): WebrootExportConfig {
   return conf
 }
 
-async function exportSelf () {
+async function exportSelf (): Promise<void> {
   // zip up everything
   // console.log(">> exportSelf")
   // console.log("  >> deployWebrootBuiltIn")

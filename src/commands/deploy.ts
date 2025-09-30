@@ -135,7 +135,7 @@ export async function deployPackage (
     const response: any = await CreateCloudFunction(dFuncName, zipFile, timeout, memorySize)
     const parts = response.FunctionArn.split(':')
     const principal = parts[4]
-    if(dFuncName.includes('Webroot') || dFuncName.includes('FileServe')) {
+    if (dFuncName.includes('Webroot') || dFuncName.includes('FileServe')) {
       await AddPermissions(client, dFuncName, principal)
     }
     let deployMsg: string = `Successfully deployed ${funcName}`
