@@ -23,7 +23,7 @@ async function test (t: any): Promise<void> {
     fs.rmSync('QSTest', { recursive: true })
   }
   // init
-  await doInit('QSTest', true)
+  await doInit('QSTest', '', true)
 
   // verify project got made
   assert.isTrue(fs.existsSync('QSTest'), 'created test project')

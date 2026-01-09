@@ -22,9 +22,15 @@ import { addPackageScripts, installPackage, installDevPackage } from './actions/
 
 export async function doInit (
   folder?: string,
+  clientType? : string,
   defaults?: boolean
 ): Promise<void> {
   if (folder === undefined || folder === '') {
+    helpInit()
+    return
+  }
+  if(!clientType) clientType = "js"
+  if(clientType?.toLowerCase() !== 'react' && clientType?.toLowerCase() != 'js') {
     helpInit()
     return
   }
@@ -62,14 +68,50 @@ export async function doInit (
     fs.copyFileSync(path.join(webrootSrcDir, 'app.css'), path.join(webroot, 'app.css'))
     fs.copyFileSync(path.join(webrootSrcDir, 'watcher.js'), path.join(webroot, 'watcher.js'))
 
-    fs.copyFileSync(path.join(swaggerSrcDir, 'localServerConfig.json'), path.join(refPath, 'localServerConfig.json'))
+    localConfig(clientType, refPath);
+
+    if(clientType == 'react') {
+      const appPath = path.join(refPath, 'app');
+      const appSrc = path.join(swaggerSrcDir, 'app')
+      if (!fs.existsSync(appPath)) fs.mkdirSync(appPath)
+      {
+        fs.copyFileSync(path.join(appSrc, 'app.tsx'), path.join(appPath, 'app.tsx'))
+        fs.copyFileSync(path.join(appSrc, 'MainPage.tsx'), path.join(appPath, 'MainPage.tsx'))
+      }
   }
 
   await interrogateUserForPackageJsonSettings(refPath, defaults)
   await addPackageScripts(refPath)
+  if(clientType == 'react') {
+    await installPackage(refPath, 'react')
+    await installPackage(refPath, 'react-dom')
+    await installPackage(refPath, 'react-router-dom')
+    await installDevPackage(refPath, '@types/react')
+
+  }
   await installDevPackage(refPath, '@types/node')
   await installDevPackage(refPath, 'typescript')
   await installDevPackage(refPath, 'tap')
   await installDevPackage(refPath, '@tremho/tap-assert')
   await installPackage(refPath, '@tremho/inverse-y')
+}
+
+
+function localConfig(clientType:string, refpath:string) {
+  const config:any = {
+    "port": 8081,
+    "rebuildFunctionsOnChange": false,
+    "refreshBrowserOnFunctionChange": false,
+    "refreshBrowserOnWebrootChange": false
+  }
+    if(clientType == "react") config.esbuild = {
+      "watch": false,
+      "entryPoints": [
+        "app/app.tsx"
+      ],
+      "outdir": "webroot"
+    }
+
+    const content = JSON.stringify(config, null, 2);
+    fs.writeFileSync(path.join(refpath, 'localServerConfig.json'), content);
 }

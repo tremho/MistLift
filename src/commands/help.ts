@@ -75,7 +75,8 @@ function helpHelp (): void {
 export function helpInit (): void {
   printBanner('init')
   console.log('use ' + ac.bold('lift init .') + ' from within a directory to init the current directory as a MistLift project')
-  console.log('use ' + ac.bold('lift init ' + ac.grey.dim('projectPath')) + ' to create a new directory at ' +
+  console.log('use ' + ac.bold('lift init ' + ac.grey.dim('projectPath') + ac.grey.dim('[, clientType]')) + ac.grey.italic(' where clientType is one of "js" or "react", default=js')
+       + ' to create a new directory at ' +
     ac.grey.dim('projectPath') + ' if it does not exist and init a MistLift project in that directory, if not already initialized')
   console.log('')
   console.log('This will begin an interactive session where you will be asked questions about the project you are creating.')

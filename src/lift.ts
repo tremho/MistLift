@@ -37,7 +37,7 @@ async function processCommand (): Promise<void> {
       await doDoctor()
       return
     case 'init':
-      return await doInit(args[0] ?? '')
+      return await doInit(args[0] ?? '', args[1]) // folder, clientType (react or js default js)
     case 'create':
       return doCreate(args[0] ?? '')
     case 'build': {

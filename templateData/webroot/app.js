@@ -1,9 +1,9 @@
-/*
-empty template file
+const root = document.getElementById('root')
+const label = document.createElement('H1');
+const message = document.createElement('p');
 
-loaded by template index.html
+label.innerText =  'Hello MistLift'
+message.innerText = "This page content is generated from the default javascript MistLift page in webroot/app.js"
 
-Could be the output of an ESBuild bundle, for example.
-See docs/ESBuild and React support.md
-
- */
+root.appendChild(label);
+root.appendChild(message)
