@@ -39,7 +39,7 @@ instructions on this part.
 
 Install MistLift with the command
 
-    npm install -g @tremho/MistLift
+    npm install -g @tremho/mist-lift
 
 Once installed, type
 
@@ -109,6 +109,18 @@ and then use a browser to navigate to http://localhost:8081
 
 and you will see your page displayed.  You can create and edit your front end in this conventional way as much as you like.
 Press ctrl-C to stop the local server.
+
+
+___2.5.0 React option___ _Starting with v2.5.0, the `init` command is updated to take an optional second parameter 
+after the path. This may be either "react" or "js". If none is given, the default is "js".
+This will determine which front-end skeleton will be created for you to edit and expand.
+For a React project, it will create files in a folder named "app". This is a minimalist but ezpandable
+skeleton of two files, with `MainPage.tsx` being the key point where the "hello world" content is generated.
+This code gets bundled with `esbuild` to create `app.js` in the `webroot` directory.
+
+For the "js" option, a plain-jane javascript file `app.js` is created in the `webroot` directory directly.
+This uses JS element construction techniques to perform a similar rendering.  You can edit this
+file to fit your needs for whatever HTML/JS front-end you wish to use, including none at all. 
 
 #### Creating a back-end function
 

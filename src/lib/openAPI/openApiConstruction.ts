@@ -266,7 +266,7 @@ async function addFunctionMethod (pathDef: any, method: string, def: any, includ
         const isArray: boolean = (type.endsWith('[]'))
         if (isArray) type = type.substring(0, type.length - 2)
         if (type === 'string' || type === 'number' || type === 'object') primType = type
-        const mime: string = retDef?.mime.length > 0 ? primType?.length > 0 ? 'text/plain' : 'application/json' : ''
+        const mime: string = retDef?.mime !== undefined ? primType?.length > 0 ? 'text/plain' : 'application/json' : ''
         const ref: any = primType !== '' ? { type: primType } : { $ref: '#/components/schemas/' + type }
         let schema: any
         if (isArray) {

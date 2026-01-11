@@ -35,9 +35,11 @@ import updateDeployedPermissions from './actions/updateDeployedPermissions'
 let projectPaths: any
 
 export async function doPublishAsync (args: string[] = []): Promise<number> {
+
   const stageName: string = 'Dev'
   const retCode: number | undefined = await doDeployAsync(args)
-  if (retCode !== undefined) return retCode
+
+  if (retCode !== 0) return retCode
   // const retCode = 0
 
   projectPaths = resolvePaths()

@@ -1,13 +1,13 @@
 {
   "name": "@tremho/mist-lift",
-  "version": "2.5.0",
+  "version": "2.5.2",
   "description": "lift command line utility for MistLift development",
   "main": "build/lift.js",
   "bin": {
     "lift": "build/lift.js"
   },
   "scripts": {
-    "prepublish": "npx rimraf build && npm run build && npm run lint",
+    "prepublish": "npx rimraf build && npx rimraf QSTest && npm run build && npm run lint",
     "clean": "npx rimraf build ; npx rimraf node_modules ; npm install",
     "build": "run-script-os",
     "build:windows": "tsc & npm run postbuild",
@@ -15,7 +15,7 @@
     "lint": "ts-standard --fix src",
     "test": "npm run build && npm run unitTest && npm run integrationTest",
     "unitTest": "tap --reporter=base --color --passes --disable-coverage src/lib/**/*.test.ts",
-    "integrationTest": "tap -t 150000 --reporter=base --color --passes --disable-coverage src/**/*.test.ts",
+    "integrationTest": "tap -t 200 --reporter=base --color --passes --disable-coverage src/**/*.test.ts",
     "indev": "run-script-os",
     "indev:nix": "echo nix",
     "indev:windows": "echo windows",

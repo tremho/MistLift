@@ -1,6 +1,11 @@
 
 ### Constraints -- Understanding and utilizing the TypeCheck APIs
-_TypeCheck_ is a secondary feature of the _Doc-Holiday_ offering.
+_TypeCheck_ is a secondary feature that originated from a project naemd _Doc-Holiday_.
+
+The documentation here is from that project, and the context for its use in MistLift
+is different -- and will be documented more properly in a futher update.
+The intention is to use this as part of the API definitions.
+
 It is embodied in the use of [constraints](constraints) when documenting
 sources. But there is more to the _TypeCheck_ story.
 

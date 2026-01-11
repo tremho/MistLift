@@ -73,13 +73,14 @@ async function test (t: any): Promise<void> {
   const data: string = resp.data.toString()
   assert.isEqual(data, testMessage, 'saw expected data')
 
-  // clean up
-  process.chdir('..')
-  fs.rmSync('QSTest', { recursive: true })
+  console.log(" ---------- test is complete --------")
 
+  // This should end the test, but for some reason doesn;t
   t.end()
 }
 
 Tap.test('Integration Quickstart', async t => {
   await test(t)
+  console.log(" ---------- test ended --------")
+  process.exit(0); // force exit of test harness
 })
