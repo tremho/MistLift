@@ -7,8 +7,8 @@ import path from 'path'
 import { resolvePaths } from '../pathResolve'
 import * as ac from 'ansi-colors'
 import { decoratedName, getAccountId } from '../IdSrc'
-import { getAWSCredentials, getSettings } from '../LiftConfig'
-import { parseConstraints, TypeConstraint } from '../TypeCheck'
+import { getSettings } from '../LiftConfig'
+import { parseConstraints } from '../TypeCheck'
 import yaml from 'js-yaml'
 
 export async function buildOpenApi (
@@ -117,14 +117,15 @@ export async function buildOpenApi (
 }
 
 function addTypeSchema (builder: any, schemaName: string, schema: any): void {
-  let primType = ''
-  let type = schema?.type ?? 'Empty'
+  let primType: string = ''
+  let type: string = schema?.type ?? 'Empty'
   if (type === 'empty') type = 'Empty' // fix case
-  const isArray = (type.endsWith('[]'))
+  const isArray: boolean = (type.endsWith('[]'))
   if (isArray) type = type.substring(0, type.length - 2)
   if (type === 'string' || type === 'number' || type === 'object') primType = type
-  const mime = schema?.mime ?? primType ? 'text/plain' : 'application/json'
-  const sref = primType ? { type: primType } : { $ref: '#/components/schemas/' + type }
+  // const sm: string = schema?.mime
+  // const mime: string = sm !== '' ?? primType !== '' ? 'text/plain' : 'application/json'
+  const sref: any = primType !== '' ? { type: primType } : { $ref: '#/components/schemas/' + type }
   let ref: any = {}
   if (isArray) {
     ref = { type: 'array', items: sref }
@@ -139,21 +140,22 @@ function addTypeSchema (builder: any, schemaName: string, schema: any): void {
   const constraints = schema.type !== 'object' && Array.isArray(schema?.constraints) ? parseConstraints(schema.type, schema.constraints.join('\n'), '\n') : undefined
 
   const cdesc = (constraints != null) ? '\n  - ' + (constraints.describe() ?? '').split('\n').join('\n  - ') : ''
-  let description = schema.description
-  if (cdesc) description += cdesc
+  let description: string = schema.description
+  if (cdesc !== '') description += cdesc
 
   ref.description = description
 
   const required: string[] = []
 
-  if (ref.properties) {
-    for (const [propName, propDef] of Object.entries(schema.properties || {})) {
+  if ((ref.properties as boolean)) {
+    const sp: any = schema.properties ?? {}
+    for (const [propName, propDef] of Object.entries(sp)) {
       const pda = propDef as any
       const constraints = Array.isArray(pda?.constraints) ? parseConstraints(pda.type, pda.constraints.join('\n'), '\n') : undefined
 
       const cdesc = (constraints != null) ? '\n  - ' + (constraints.describe() ?? '').split('\n').join('\n  - ') : ''
-      let description = (propDef as any).description
-      if (cdesc) description += cdesc
+      let description: string = (propDef as any).description
+      if (cdesc !== '') description += cdesc
 
       // if(constraints) {
       //   console.log("schema definition for "+schemaName+', prop '+propName)
@@ -169,7 +171,8 @@ function addTypeSchema (builder: any, schemaName: string, schema: any): void {
       ref.properties[propName] = propSchema
 
       // Only mark as required if declared explicitly
-      if (schema.required && schema.required.includes(propName)) {
+      const sr: string = schema.required ?? ''
+      if (sr !== '' && sr.includes(propName)) {
         required.push(propName)
       }
     }
@@ -185,13 +188,14 @@ async function addFunctionMethod (pathDef: any, method: string, def: any, includ
   const retDef: any = (def.returns)['200']
   const content: any = {}
   let primType = ''
-  let type = retDef?.type ?? 'Empty'
+  let type: string = retDef?.type ?? 'Empty'
   if (type === 'empty') type = 'Empty' // fix case
-  const isArray = (type.endsWith('[]'))
+  const isArray: boolean = (type.endsWith('[]'))
   if (isArray) type = type.substring(0, type.length - 2)
   if (type === 'string' || type === 'number' || type === 'object') primType = type
-  const mime = retDef?.mime ?? primType ? 'text/plain' : 'application/json'
-  const ref = primType ? { type: primType } : { $ref: '#/components/schemas/' + type }
+  const rdm: string = retDef?.mime ?? ''
+  const mime: string = rdm !== '' ? rdm : primType !== '' ? 'text/plain' : 'application/json'
+  const ref: any = primType !== '' ? { type: primType } : { $ref: '#/components/schemas/' + type }
   let schema: any
   if (isArray) {
     schema = { type: 'array', items: ref }
@@ -202,11 +206,12 @@ async function addFunctionMethod (pathDef: any, method: string, def: any, includ
     schema
   }
 
-  const region = getSettings()?.awsPreferredRegion ?? ''
-  const accountId = await getAccountId()
-  const decName = decoratedName(def.name)
+  const region: string = getSettings()?.awsPreferredRegion ?? ''
+  const accountId: string = await getAccountId() ?? ''
+  const decName: string = decoratedName(def.name) ?? ''
 
-  const isBinary = def.bodyType && !def.bodyType.startsWith('text') && !def.bodyType.endsWith('json')
+  const bodyType: string = def.bodyType ?? ''
+  const isBinary: boolean = bodyType.startsWith('text') && bodyType.endsWith('json')
 
   const methData = {
     summary: def.name,
@@ -251,18 +256,18 @@ async function addFunctionMethod (pathDef: any, method: string, def: any, includ
   if (!includeCORS) {
     // get the other response code declarations
     for (const rcode of Object.getOwnPropertyNames(def.returns)) {
-      if (rcode != '200') {
+      if (rcode !== '200') {
         const retDef = def.returns[rcode] ?? {}
 
         const content: any = {}
-        let primType = ''
-        let type = retDef?.type ?? 'Empty'
+        let primType: string = ''
+        let type: string = retDef?.type ?? 'Empty'
         if (type === 'empty') type = 'Empty' // fix case
-        const isArray = (type.endsWith('[]'))
+        const isArray: boolean = (type.endsWith('[]'))
         if (isArray) type = type.substring(0, type.length - 2)
         if (type === 'string' || type === 'number' || type === 'object') primType = type
-        const mime = retDef?.mime ?? primType ? 'text/plain' : 'application/json'
-        const ref = primType ? { type: primType } : { $ref: '#/components/schemas/' + type }
+        const mime: string = retDef?.mime.length > 0 ? primType?.length > 0 ? 'text/plain' : 'application/json' : ''
+        const ref: any = primType !== '' ? { type: primType } : { $ref: '#/components/schemas/' + type }
         let schema: any
         if (isArray) {
           schema = { type: 'array', items: ref }
@@ -347,8 +352,8 @@ function addParameter (pathDef: any, param: any): void {
   const constraints = Array.isArray(param.constraints) ? parseConstraints(param.type, param.constraints.join('\n'), '\n') : undefined
 
   const cdesc = (constraints != null) ? '\n  - ' + (constraints.describe() ?? '').split('\n').join('\n  - ') : ''
-  let description = param.description
-  if (cdesc) description += cdesc
+  let description: string = param.description
+  if (cdesc !== '') description += cdesc
 
   // don't declare parameters marked as 'body'.  OpenAPI doesn't support that.
   if (param.in === 'path' || param.in === 'query') {
@@ -356,7 +361,7 @@ function addParameter (pathDef: any, param: any): void {
       in: param.in,
       name: param.name,
       description,
-      example: example || undefined,
+      example: example ?? undefined,
       required,
       schema: schemaType(deflt, type, true)
     })
@@ -387,6 +392,6 @@ function schemaType (deflt: string | undefined, namedType: string, innerOnly: bo
   }
   if (type === 'int') type = 'integer'
   if (type === 'bool') type = 'boolean'
-  if (!deflt) deflt = undefined
+  if (deflt === null || deflt === '') deflt = undefined
   return innerOnly ? { type, format, example: deflt } : { schema: { type, format, example: deflt } }
 }

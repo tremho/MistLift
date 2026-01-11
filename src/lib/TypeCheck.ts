@@ -2,6 +2,7 @@
 Module for Constraint definitions and TypeCheck support
  */
 
+/* eslint-disable */ // too screwed up.  This file originated in an old JS project and was converted to TS quickly. TS-Standard is too restrictive for the style.
 /**
  * Enumeration of basic types
  *
@@ -1166,3 +1167,5 @@ export function validate (
   }
   return ok
 }
+
+/* eslint-enable */

@@ -69,6 +69,11 @@ If you would like to support my late night efforts, please consider a contributi
 
 ## Changelog
 
+### 2.5.0
+ - Changed init to allow specifying 'react' or 'js' (default) parameter when creating project
+ - Support for a skeleton js or react starting point as front end
+ - maintenence updates
+
 ### 2.4.0
   - maintenance update
 

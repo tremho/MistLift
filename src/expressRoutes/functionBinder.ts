@@ -7,7 +7,7 @@ import { resolvePaths } from '../lib/pathResolve'
 import express from 'express'
 import { gatherFunctionDefinitions } from '../lib/openAPI/ApiBuildCollector'
 import { buildOpenApi } from '../lib/openAPI/openApiConstruction'
-import { BadRequest, Log } from '@tremho/inverse-y'
+import { Log } from '@tremho/inverse-y'
 import { parseConstraints } from '../lib/TypeCheck'
 
 const clearModule = require('clear-module')
@@ -46,14 +46,16 @@ export function functionBinder (): void {
         if (n !== -1) entryRoot = entryRoot.substring(0, n) + '/*'
 
         const callHandler = (def: any, req: any, res: any): void => {
-          console.log('>>>>>>> YES WE ARE HERE<<<<<<<<<')
+          // console.log('>>>>>>> YES WE ARE HERE<<<<<<<<<')
           if (Buffer.isBuffer(req.body)) {
             const buffer: Buffer = req.body
+            /* eslint-disable */
             console.log('body is a buffer at callHandler. Length is ' + buffer.byteLength)
             console.log('First 16 bytes:', buffer.subarray(0, 16).toString('hex'))
+            /* eslint-enable */
           }
           const message = testPathRoute(def, req)
-          if (message) {
+          if (message !== '') {
             return handleResponse(res, { statusCode: 403, body: { error: message } })
           }
           const event = requestToEvent(def, req)
@@ -91,11 +93,11 @@ export function functionBinder (): void {
 }
 
 // compare request route to the definition of this function to see if it matches
-function testPathRoute (def: any, req: any) {
+function testPathRoute (def: any, req: any): string {
   let path = req.path
   let pathMap = def.pathMap
-  if (path.endsWith('/')) path = path.substring(0, path.length - 1)
-  if (pathMap.endsWith('/')) pathMap = pathMap.substring(0, path.length - 1)
+  if (path.endsWith('/') === true) path = path.substring(0, path.length - 1)
+  if (pathMap.endsWith('/') === true) pathMap = pathMap.substring(0, path.length - 1)
   const defParts = pathMap.split('/')
   const pathParts = path.split('/')
 
@@ -109,7 +111,7 @@ function testPathRoute (def: any, req: any) {
   return message
 }
 
-function performParameterTesting (def: any, event: any) {
+function performParameterTesting (def: any, event: any): void {
   // for every parameter defined in def
   // find the corresponding value in event.parameters (by name)
   // find the constraints for that parameter in def
@@ -118,7 +120,7 @@ function performParameterTesting (def: any, event: any) {
     const constraints = Array.isArray(pdef.constraints) ? parseConstraints(pdef.type, pdef.constraints.join('\n'), '\n') : undefined
     let value: any = event.parameters[pdef.name]
     if (value === undefined) {
-      if (!pdef.required) return // okay to be undefined
+      if (pdef.required !== true) return // okay to be undefined
     }
     if (pdef.type === 'number') value = Number(value) // TODO: Type coercion for all types
     constraints?.test(value)
@@ -126,13 +128,13 @@ function performParameterTesting (def: any, event: any) {
 }
 
 // returns 'text', 'json', or undefined
-function bodyTypeCollapse (type: string) {
+function bodyTypeCollapse (type: string): string | undefined {
   const options: any = {
     text: 'text',
     json: 'json',
     'application/json': 'json'
   }
-  if (type) {
+  if (type !== '') {
     type = type.toLowerCase().trim()
     if (type.substring(0, 5) === 'text/') return 'text'
     return options[type]
@@ -189,11 +191,13 @@ function requestToEvent (def: any, req: any): any {
       req.body = Buffer.from(req.body)
     }
   }
+  /* eslint-disable */
   if (Buffer.isBuffer(req.body)) {
     const buffer: Buffer = req.body
     console.log('body is buffer eventToRequest, Length = ' + buffer.byteLength)
     console.log('First 16 bytes:', buffer.subarray(0, 16).toString('hex'))
   }
+  /* eslint-enable */
   const template = def.pathMap
 
   // unpack weird choice of express when passed from curl.

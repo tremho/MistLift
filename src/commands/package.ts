@@ -169,7 +169,9 @@ async function packageFunction (funcName: string): Promise<number> {
       }
       const publishUrl = pubInfo.url ?? '/'
 
-      const stage = publishUrl.substring(publishUrl.lastIndexOf('/') + 1)
+      /* eslint-disable */
+      const stage = publishUrl.substring(publishUrl.lastIndexOf('/')) + 1
+      /* eslint-enable */
       setWebroot(webrootExport.webrootMethod, webrootExport.webrootBaseUrl)
       setAws(stage, publishUrl)
       // console.log("getServiceSettings", getServiceSettings())

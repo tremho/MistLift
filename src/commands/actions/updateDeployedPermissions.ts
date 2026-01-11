@@ -28,7 +28,7 @@ export default async function updateDeployedPermissions (apiId: string): Promise
     return false
   })
 
-  const accountId: string = await getAccountId()
+  const accountId: string = await getAccountId() ?? ''
   const region: string = getSettings().awsPreferredRegion ?? ''
 
   const client = new LambdaClient(getAWSCredentials())

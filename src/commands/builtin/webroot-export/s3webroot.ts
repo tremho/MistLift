@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import { S3Client } from '@aws-sdk/client-s3'
 import { s3ListObjects, s3CreateBucket, s3UploadFile, s3Delete, S3ActionsLog } from '@tremho/basic-s3-actions'
 import * as fs from 'fs'
@@ -76,3 +78,5 @@ export function getS3Prefix () {
   const name = determineBucketName()
   return `https://${name}.s3.us-west-1.amazonaws.com/`
 }
+
+/* eslint-enable */

@@ -25,7 +25,7 @@ import { resolvePaths } from '../lib/pathResolve'
 import { gatherFunctionDefinitions } from '../lib/openAPI/ApiBuildCollector'
 import { delay } from '../lib/utils'
 import { addBuiltInDefinitions, MakeBuiltinApiDoc } from './builtin/ApiDocMaker'
-import { DeployApiBuiltin, DeployRootFileserves, DeployWebrootBuiltIn } from './builtin/BuiltInHandler'
+import { DeployApiBuiltin /*, DeployRootFileserves, DeployWebrootBuiltIn */ } from './builtin/BuiltInHandler'
 import { esbuilder } from '../lib/ESBuild'
 import { getIdSrc, getIdDelimiter } from '../lib/IdSrc'
 import { ExportWebroot, getWebrootSettings } from './builtin/ExportWebroot'
@@ -35,9 +35,9 @@ import updateDeployedPermissions from './actions/updateDeployedPermissions'
 let projectPaths: any
 
 export async function doPublishAsync (args: string[] = []): Promise<number> {
-  const stageName = 'Dev'
-  const retCode = await doDeployAsync(args)
-  if (retCode) return retCode
+  const stageName: string = 'Dev'
+  const retCode: number | undefined = await doDeployAsync(args)
+  if (retCode !== undefined) return retCode
   // const retCode = 0
 
   projectPaths = resolvePaths()

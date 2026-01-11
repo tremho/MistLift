@@ -1,6 +1,6 @@
 {
   "name": "@tremho/mist-lift",
-  "version": "2.4.0",
+  "version": "2.5.0",
   "description": "lift command line utility for MistLift development",
   "main": "build/lift.js",
   "bin": {
@@ -74,7 +74,6 @@
     "@types/node": "^20.14.2",
     "@types/tap": "^15.0.11",
     "@types/ws": "^8.5.10",
-    "axios": "^1.7.2",
     "rimraf": "^5.0.7",
     "run-script-os": "^1.1.6",
     "tap": "^19.2.5",

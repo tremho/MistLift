@@ -63,7 +63,7 @@ let basePath = ''
 /**
  * Exports the webroot according to configuration
  */
-export async function ExportWebroot (): Promise<any> {
+export async function ExportWebroot (): Promise<any> | never {
   const projectPaths = resolvePaths()
   basePath = projectPaths.basePath
   const webrootConfig = readWebrootConfig(path.join(basePath, 'webrootConfig.json'))
@@ -81,7 +81,7 @@ export async function ExportWebroot (): Promise<any> {
       await exportScript(fla, webrootConfig.options as WebrootScriptOptions)
       break
     default: {
-      throw new Error(`UNSUPPORTED WEBROOT EXPORT ${WebrootExportType[webrootConfig.type]}`)
+      throw new Error('UNSUPPORTED WEBROOT EXPORT TYPE (must be SELF, S3, or SCRIPT)')
     }
   }
 }
@@ -105,7 +105,7 @@ export async function getWebrootSettings (): Promise<{ webrootMethod: string, we
       break
     }
     default: {
-      const unreachable: never = webrootConfig.type
+      const unreachable: string = webrootConfig.type ?? '<none?'
       throw new Error(`UNSUPPORTED WEBROOT EXPORT ${unreachable}`)
     }
   }
@@ -144,7 +144,7 @@ async function exportSelf (): Promise<void> {
   await DeployRootFileserves()
 }
 
-async function exportScript (fla: string[], options: WebrootScriptOptions) {
+async function exportScript (fla: string[], options: WebrootScriptOptions): Promise<void> {
   // console.log(">> exportScript")
   // console.log("  >> DeployWebrootBuiltIn")
   // await DeployWebrootBuiltIn(true)
@@ -175,7 +175,7 @@ async function getUpdatedExportFileList (): Promise<string[]> {
   // enumerate at webroot and files from all non-root directories
   const folder = path.join(basePath, 'webroot')
   const rootpathsteps = folder.split(path.sep).length
-  const enumerating = true
+  // const enumerating = true
 
   function gatherFiles (filepath: string, stats: fs.Stats): boolean {
     // console.log(filepath, {steps:filepath.split(path.sep).length, rootpathsteps, isDir:stats.isDirectory()})

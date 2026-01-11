@@ -39,9 +39,9 @@ export function decoratedName (name: string): string {
   return dname
 }
 
-export async function getAccountId () {
+export async function getAccountId (): Promise<string | undefined> {
   const client = new STSClient({} as any)
   const command: any = new GetCallerIdentityCommand({})
   const response: any = await client.send(command)
-  return response.Account // This is your AWS account ID
+  return response.Account ?? '' // This is your AWS account ID
 }
