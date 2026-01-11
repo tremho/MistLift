@@ -73,7 +73,7 @@ async function test (t: any): Promise<void> {
   const data: string = resp.data.toString()
   assert.isEqual(data, testMessage, 'saw expected data')
 
-  console.log(" ---------- test is complete --------")
+  console.log(' ---------- test is complete --------')
 
   // This should end the test, but for some reason doesn;t
   t.end()
@@ -81,6 +81,6 @@ async function test (t: any): Promise<void> {
 
 Tap.test('Integration Quickstart', async t => {
   await test(t)
-  console.log(" ---------- test ended --------")
-  process.exit(0); // force exit of test harness
+  console.log(' ---------- test ended --------')
+  process.exit(0) // force exit of test harness
 })
